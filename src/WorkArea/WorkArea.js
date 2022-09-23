@@ -58,7 +58,7 @@ export function WorkArea({ image }) {
             onMouseUp={onmouseup}>
             <div id="block">
                 <div id="zoom" ref={zoom} >
-                    <img ref={aImg} src={image ? image.toDataURL() : null} alt="" draggable="false" />
+                    <img ref={aImg} src={image} alt="" draggable="false" />
                 </div>
             </div>
         </div>
