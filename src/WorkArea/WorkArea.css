@@ -1,0 +1,16 @@
+#workarea {
+  width: 100%;
+  overflow: hidden;
+  cursor: grab;
+}
+
+#zoom {
+  transform-origin: 0px 0px;
+  transform: scale(1) translate(0px, 0px);
+}
+
+div#zoom > img {
+  width: 100%;
+  height: auto;
+  box-shadow: 5px 5px 15px 5px rgb(0 0 0 / 33%);
+}
