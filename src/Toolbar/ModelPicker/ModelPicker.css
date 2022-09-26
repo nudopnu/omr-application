@@ -4,7 +4,19 @@
     text-align: center;
 }
 
+#container {
+    align-items: left;
+}
+
+#list {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid;
+    margin: 10px 0px 20px;
+    padding: 5px;
+}
+
 .entry:hover {
-    background-color: aqua;
-    color: black;
+    background-color: #E2E2E2;
+    color: #333333;
 }

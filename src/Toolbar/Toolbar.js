@@ -5,6 +5,7 @@ export function Toolbar() {
     return (
         <div id="toolbar">
             <ModelPicker />
+            <hr class="divider" />
         </div>
     );
 }

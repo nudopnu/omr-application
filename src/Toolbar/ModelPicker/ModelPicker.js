@@ -14,10 +14,14 @@ export function ModelPicker() {
 
 
     return (
-        <div id="container">
-            {modelList && modelList.map(name =>
-                <span key={name} className="entry">{name}</span>
-            )}
+        <div id="mp-container">
+            <span>Pick a model:</span>
+            <div id="list">
+                {modelList && modelList.map(name =>
+                    <span key={name} className="entry">{name}</span>
+                )}
+            </div>
+            <button>Predict Classes</button>
         </div>
     );
 }

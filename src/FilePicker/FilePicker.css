@@ -16,7 +16,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-around;
+    justify-content: space-evenly;
     height: 50%;
     width: 50%;
 }
@@ -27,9 +27,19 @@ input {
 
 button {
     color: white;
-    background-color: rgb(43, 128, 226);
+    background-color: #005E8E;
     border-radius: 5px;
     padding: 5px;
-    width: 200px;
+    width: 250px;
+    height: 40px;
+    border: 1px solid #707070;
     cursor: pointer;
+}
+
+button:hover {
+    background-color: #0079b6;
+}
+
+button:active {
+    background-color: #005783;
 }
