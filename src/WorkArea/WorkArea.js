@@ -1,7 +1,6 @@
-import { useRef, useState } from "react";
-import { React } from "react";
+import { React, useEffect, useRef, useState } from "react";
 import { FilePicker } from "../FilePicker/FilePicker";
-import './WorkArea.css'
+import './WorkArea.css';
 
 // Thanks to:
 // https://dev.to/stackfindover/zoom-image-point-with-mouse-wheel-11n3
@@ -9,6 +8,7 @@ import './WorkArea.css'
 export function WorkArea(props) {
     const aImg = useRef(null);
     const zoom = useRef(null);
+    const [isLoading, setLoading] = useState(false);
 
     let scale = 1,
         panning = false,
@@ -17,7 +17,7 @@ export function WorkArea(props) {
         start = { x: 0, y: 0 };
 
     function setTransform() {
-        if(zoom.current){
+        if (zoom.current) {
             zoom.current.style.transform = "translate(" + pointX + "px, " + pointY + "px) scale(" + scale + ")";
         }
     }
@@ -72,13 +72,21 @@ export function WorkArea(props) {
 
         /* Delegate responsibility */
         const files = e.dataTransfer.files;
+        setLoading(true);
         props.onOpenFiles(files);
     }
 
     function onFilesReceive(files) {
         /* Delegate responsibility */
-        props.onOpenFiles(files)
+        if (!isLoading) {
+            setLoading(true);
+            props.onOpenFiles(files)
+        }
     }
+
+    useEffect(() => {
+        setLoading(false);
+      }, [props.image]);
 
     return (
         <div id='workarea'
@@ -96,11 +104,13 @@ export function WorkArea(props) {
         >
             <div id="block">
                 {
-                    (props.image &&
+                    (props.image && !isLoading &&
                         <div id="zoom" ref={zoom} >
                             <img ref={aImg} src={props.image} alt="" draggable="false" />
-                        </div>) ||
-                    <FilePicker onFilesReceive={onFilesReceive} />
+                        </div>
+                    ) || (
+                        <FilePicker loading={isLoading} onFilesReceive={onFilesReceive} />
+                    )
                 }
             </div>
         </div>

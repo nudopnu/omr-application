@@ -1,28 +1,12 @@
-import './App.css';
-import { FilePicker } from './FilePicker/FilePicker';
 import { useState } from 'react';
+import './App.css';
 import { WorkArea } from './WorkArea/WorkArea';
 // import { Image } from 'image-js';
-
+import * as tf from '@tensorflow/tfjs';
 
 function App() {
 
-
   const [image, setImage] = useState(null);
-
-
-  // function readFileAsync(file) {
-  //   return new Promise((resolve, reject) => {
-  //     let reader = new FileReader();
-
-  //     reader.onload = () => {
-  //       resolve(reader.result);
-  //     };
-
-  //     reader.onerror = reject;
-  //     reader.readAsArrayBuffer(file);
-  //   })
-  // }
 
   const buildRgb = (imageData) => {
     let rgbValues = [];
@@ -75,6 +59,10 @@ function App() {
       };
       reader.readAsDataURL(file);
     }
+  }
+
+  async function predict() {
+    await tf.loadLayersModel('https://raw.githubusercontent.com/nudopnu/optical-music-recognition/main/js-models/model.json?token=GHSAT0AAAAAABXJXHKRASFV24CBWCVF3PXKYZRUDYQ');
   }
 
 

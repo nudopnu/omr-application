@@ -1,4 +1,5 @@
 import { React, useRef } from 'react';
+import { Spinner } from '../Spinner/Spinner';
 import "./FilePicker.css"
 
 export function FilePicker(props) {
@@ -9,22 +10,24 @@ export function FilePicker(props) {
     }
 
     function handleChange(e) {
-        console.log("HELLO", e.target.value.split("\\").slice(-1)[0]);
-        console.log("HELLO", e.target.files);
-        // this.props.onFilesReceive(files);
         props.onFilesReceive(e.target.files);
     }
 
 
     return (
         <div id="drop-area" >
-            {!props.invisible &&
-                <div id="instructions">
-                    <span>Drop Sheet here or choose from</span>
-                    <button onClick={handleClick}>here</button>
-                    <input type="file" name="sheet" id="" ref={inp} onChange={handleChange} accept="image/png, image/jpeg" />
-                </div>
-            }
+            <div id="instructions">
+                {
+                    (!props.loading &&
+                        <>
+                            <span>Drop Sheet here</span>
+                            <button onClick={handleClick}>or choose from file...</button>
+                            <input type="file" name="sheet" id="" ref={inp} onChange={handleChange} accept="image/png, image/jpeg" />
+                        </>
+                    ) ||
+                    <Spinner text={"Loading image..."} />
+                }
+            </div>
         </div>
     );
 }
