@@ -103,17 +103,15 @@ export function WorkArea(props) {
             onDragOver={dragover}
             onDrop={drop}
         >
-            <div id="block">
-                {
-                    (props.image && !isLoading &&
-                        <div id="zoom" ref={zoom} >
-                            <img ref={aImg} src={props.image} alt="" draggable="false" />
-                        </div>
-                    ) || (
-                        <FilePicker loading={isLoading} onFilesReceive={onFilesReceive} />
-                    )
-                }
-            </div>
+            {
+                (props.image && !isLoading &&
+                    <div id="zoom" ref={zoom} >
+                        <img ref={aImg} src={props.image} alt="" draggable="false" />
+                    </div>
+                ) || (
+                    <FilePicker loading={isLoading} onFilesReceive={onFilesReceive} />
+                )
+            }
         </div>
     )
 }

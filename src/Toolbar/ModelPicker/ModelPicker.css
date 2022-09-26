@@ -1,0 +1,10 @@
+.entry {
+    cursor: pointer;
+    width: 100%;
+    text-align: center;
+}
+
+.entry:hover {
+    background-color: aqua;
+    color: black;
+}

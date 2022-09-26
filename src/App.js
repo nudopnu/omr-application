@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import './App.css';
+import { Toolbar } from './Toolbar/Toolbar';
 import { WorkArea } from './WorkArea/WorkArea';
 // import { Image } from 'image-js';
 
@@ -60,15 +61,11 @@ function App() {
     }
   }
 
-  (async () => {
-    const res = await window.classification.getModels();
-    console.log(res);
-  })()
 
   return (
     <div className="App">
       <WorkArea image={image} onOpenFiles={onOpenFiles} />
-      <div>{window.versions.chrome()}</div>
+      <Toolbar />
     </div>
   );
 }
