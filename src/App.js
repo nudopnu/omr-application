@@ -7,7 +7,22 @@ import { WorkArea } from './WorkArea/WorkArea';
 
 function App() {
 
+
   const [image, setImage] = useState(null);
+
+
+  // function readFileAsync(file) {
+  //   return new Promise((resolve, reject) => {
+  //     let reader = new FileReader();
+
+  //     reader.onload = () => {
+  //       resolve(reader.result);
+  //     };
+
+  //     reader.onerror = reject;
+  //     reader.readAsArrayBuffer(file);
+  //   })
+  // }
 
   const buildRgb = (imageData) => {
     let rgbValues = [];
@@ -32,20 +47,7 @@ function App() {
   };
 
 
-  // function readFileAsync(file) {
-  //   return new Promise((resolve, reject) => {
-  //     let reader = new FileReader();
-
-  //     reader.onload = () => {
-  //       resolve(reader.result);
-  //     };
-
-  //     reader.onerror = reject;
-  //     reader.readAsArrayBuffer(file);
-  //   })
-  // }
-
-  async function handleFiles(files) {
+  async function onOpenFiles(files) {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
 
@@ -68,17 +70,17 @@ function App() {
           canvas.height = fakeImage.height;
           ctx.drawImage(fakeImage, 0, 0);
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          console.log("Drwaing", buildRgb(imageData.data));
+          console.log("Drawing", buildRgb(imageData.data));
         }
       };
       reader.readAsDataURL(file);
     }
   }
 
+
   return (
     <div className="App">
-      <WorkArea image={image} />
-      <FilePicker onFilesReceive={handleFiles} />
+      <WorkArea image={image} onOpenFiles={onOpenFiles} />
     </div>
   );
 }

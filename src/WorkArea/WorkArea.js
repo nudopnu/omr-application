@@ -1,11 +1,12 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { React } from "react";
+import { FilePicker } from "../FilePicker/FilePicker";
 import './WorkArea.css'
 
 // Thanks to:
 // https://dev.to/stackfindover/zoom-image-point-with-mouse-wheel-11n3
 
-export function WorkArea({ image }) {
+export function WorkArea(props) {
     const aImg = useRef(null);
     const zoom = useRef(null);
 
@@ -16,7 +17,13 @@ export function WorkArea({ image }) {
         start = { x: 0, y: 0 };
 
     function setTransform() {
-        zoom.current.style.transform = "translate(" + pointX + "px, " + pointY + "px) scale(" + scale + ")";
+        if(zoom.current){
+            zoom.current.style.transform = "translate(" + pointX + "px, " + pointY + "px) scale(" + scale + ")";
+        }
+    }
+
+    function onmouseenter(e) {
+        panning = e.buttons;
     }
 
     function onmousedown(e) {
@@ -40,7 +47,6 @@ export function WorkArea({ image }) {
     }
 
     function onWheel(e) {
-        e.preventDefault();
         let xs = (e.clientX - pointX) / scale;
         let ys = (e.clientY - pointY) / scale;
         let delta = (e.wheelDelta ? e.wheelDelta : -e.deltaY);
@@ -50,16 +56,52 @@ export function WorkArea({ image }) {
         setTransform();
     }
 
+    function dragenter(e) {
+        e.stopPropagation();
+        e.preventDefault();
+    }
+
+    function dragover(e) {
+        e.stopPropagation();
+        e.preventDefault();
+    }
+
+    function drop(e) {
+        e.stopPropagation();
+        e.preventDefault();
+
+        /* Delegate responsibility */
+        const files = e.dataTransfer.files;
+        props.onOpenFiles(files);
+    }
+
+    function onFilesReceive(files) {
+        /* Delegate responsibility */
+        props.onOpenFiles(files)
+    }
+
     return (
         <div id='workarea'
+            /* For zoom operations */
             onWheel={onWheel}
             onMouseMove={onmousemove}
             onMouseDown={onmousedown}
-            onMouseUp={onmouseup}>
+            onMouseEnter={onmouseenter}
+            onMouseUp={onmouseup}
+
+            /* for file opening */
+            onDragEnter={dragenter}
+            onDragOver={dragover}
+            onDrop={drop}
+        >
             <div id="block">
-                <div id="zoom" ref={zoom} >
-                    <img ref={aImg} src={image} alt="" draggable="false" />
-                </div>
+                {
+                    (props.image &&
+                        <div id="zoom" ref={zoom} >
+                            <img ref={aImg} src={props.image} alt="" draggable="false" />
+                        </div>) ||
+                    <FilePicker onFilesReceive={onFilesReceive} />
+                }
             </div>
         </div>
     )

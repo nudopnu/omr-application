@@ -4,7 +4,6 @@ import "./FilePicker.css"
 export function FilePicker(props) {
     const inp = useRef(null);
 
-
     function handleClick() {
         inp.current.click();
     }
@@ -16,31 +15,16 @@ export function FilePicker(props) {
         props.onFilesReceive(e.target.files);
     }
 
-    function dragenter(e) {
-        e.stopPropagation();
-        e.preventDefault();
-    }
-
-    function dragover(e) {
-        e.stopPropagation();
-        e.preventDefault();
-    }
-
-    function drop(e) {
-        e.stopPropagation();
-        e.preventDefault();
-
-        const dt = e.dataTransfer;
-        const files = dt.files;
-
-        props.onFilesReceive(files);
-    }
 
     return (
-        <div id="drop-area" onDragEnter={dragenter} onDragOver={dragover} onDrop={drop}>
-            <span>Drop Sheet here or choose from</span>
-            <button onClick={handleClick}>here</button>
-            <input type="file" name="sheet" id="" ref={inp} onChange={handleChange} accept="image/png, image/jpeg" />
+        <div id="drop-area" >
+            {!props.invisible &&
+                <div id="instructions">
+                    <span>Drop Sheet here or choose from</span>
+                    <button onClick={handleClick}>here</button>
+                    <input type="file" name="sheet" id="" ref={inp} onChange={handleChange} accept="image/png, image/jpeg" />
+                </div>
+            }
         </div>
     );
 }
