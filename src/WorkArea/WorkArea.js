@@ -84,9 +84,10 @@ export function WorkArea(props) {
         }
     }
 
+    /* Turn off loading when new image arrives */
     useEffect(() => {
         setLoading(false);
-      }, [props.image]);
+    }, [props.image]);
 
     return (
         <div id='workarea'

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import './App.css';
 import { WorkArea } from './WorkArea/WorkArea';
 // import { Image } from 'image-js';
-import * as tf from '@tensorflow/tfjs';
 
 function App() {
 
@@ -61,14 +60,15 @@ function App() {
     }
   }
 
-  async function predict() {
-    await tf.loadLayersModel('https://raw.githubusercontent.com/nudopnu/optical-music-recognition/main/js-models/model.json?token=GHSAT0AAAAAABXJXHKRASFV24CBWCVF3PXKYZRUDYQ');
-  }
-
+  (async () => {
+    const res = await window.classification.getModels();
+    console.log(res);
+  })()
 
   return (
     <div className="App">
       <WorkArea image={image} onOpenFiles={onOpenFiles} />
+      <div>{window.versions.chrome()}</div>
     </div>
   );
 }
