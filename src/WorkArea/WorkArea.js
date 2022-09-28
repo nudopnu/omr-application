@@ -6,7 +6,6 @@ import './WorkArea.css';
 // https://dev.to/stackfindover/zoom-image-point-with-mouse-wheel-11n3
 
 export function WorkArea(props) {
-    const aImg = useRef(null);
     const zoom = useRef(null);
     const [isLoading, setLoading] = useState(false);
 
@@ -106,7 +105,7 @@ export function WorkArea(props) {
             {
                 (props.image && !isLoading &&
                     <div id="zoom" ref={zoom} >
-                        <img ref={aImg} src={props.image} alt="" draggable="false" />
+                        <img src={props.image} alt="" draggable="false" />
                     </div>
                 ) || (
                     <FilePicker loading={isLoading} onFilesReceive={onFilesReceive} />

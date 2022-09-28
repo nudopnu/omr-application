@@ -23,12 +23,7 @@ function createWindow() {
   });
   ipcMain.handle('ping', () => 'poing');
   ipcMain.handle('get-models', () => getModels());
-  ipcMain.handle('predict', async (_, modelname, img) => {
-    console.log("[ipcmain]", modelname, img);
-    let res = await predict(modelname, img);
-    console.log("[ipcmain]", res);
-    return res;
-  });
+  ipcMain.handle('predict', async (_, modelname, img) => predict(modelname, img));
   mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);
   mainWindow.on('closed', () => mainWindow = null);
 }

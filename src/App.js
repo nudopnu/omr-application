@@ -37,11 +37,12 @@ function App() {
       const file = files[i];
       const reader = new FileReader();
       reader.onload = (e) => {
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
         const fakeImage = new Image();
         setImage(e.target.result);
         fakeImage.src = e.target.result
+
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
         fakeImage.onload = () => {
           canvas.width = fakeImage.width;
           canvas.height = fakeImage.height;

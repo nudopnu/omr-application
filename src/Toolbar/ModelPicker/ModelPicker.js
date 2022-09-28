@@ -8,20 +8,12 @@ export function ModelPicker({ onRequestPrediction }) {
     /* on load */
     useEffect(() => {
         (async () => {
-            const res = await window.python.getModels();
-            console.log(res);
-            setModelList(res)
-            setSelectedModel(res[0])
+            const modelnames = await window.python.getModels();
+            const firstmodel = modelnames[0];
+            setModelList(modelnames);
+            setSelectedModel(firstmodel);
         })()
     }, [])
-
-    function onModelSelect(selection) {
-        setSelectedModel(selection);
-    }
-
-    function onPredict() {
-        onRequestPrediction(selectedModel)
-    }
 
     return (
         <div id="mp-container">
@@ -31,13 +23,13 @@ export function ModelPicker({ onRequestPrediction }) {
                     <span
                         key={name}
                         className={`entry${name === selectedModel ? " selected" : ""}`}
-                        onClick={_ => onModelSelect(name)}
+                        onClick={_ => setSelectedModel(name)}
                     >
                         {name}
                     </span>
                 )}
             </div>
-            <button onClick={onPredict}>Predict Classes</button>
+            <button onClick={e => onRequestPrediction(selectedModel)}>Predict Classes</button>
         </div>
     );
 }

@@ -22,7 +22,8 @@ function predict(modelname, image) {
         pyshell.send(image);
         pyshell.on('message', function (message) {
             // received a message sent from the Python script (a simple "print" statement)
-            console.log(message);
+            let res = message.slice(2, -1);
+            resolve(res);
         });
         // end the input stream and allow the process to exit
         pyshell.end(function (err, code, signal) {
