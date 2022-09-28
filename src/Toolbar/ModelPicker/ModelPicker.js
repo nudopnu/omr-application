@@ -29,7 +29,7 @@ export function ModelPicker({ onRequestPrediction }) {
                     </span>
                 )}
             </div>
-            <button onClick={e => onRequestPrediction(selectedModel)}>Predict Classes</button>
+            <button onClick={_ => onRequestPrediction(selectedModel)}>Predict Classes</button>
         </div>
     );
 }

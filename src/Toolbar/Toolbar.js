@@ -2,7 +2,8 @@ import { ModelPicker } from './ModelPicker/ModelPicker';
 import './Toolbar.css'
 
 export function Toolbar({ canvas }) {
-    function handleOnRequestPrediction(modelName) {
+    
+    function onRequestPrediction(modelName) {
         console.log("REunnfn");
         (async () => {
             let res = await window.python.predict(modelName, canvas.toDataURL());
@@ -13,7 +14,7 @@ export function Toolbar({ canvas }) {
 
     return (
         <div id="toolbar">
-            <ModelPicker onRequestPrediction={handleOnRequestPrediction} />
+            <ModelPicker onRequestPrediction={onRequestPrediction} />
             <hr className="divider" />
         </div>
     );
