@@ -18,6 +18,8 @@ export function loadImage(file, imgRef) {
                 const canvas = document.createElement('canvas')
                 canvas.width = targetImage.width;
                 canvas.height = targetImage.height;
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(targetImage, 0, 0);
                 resolve({
                     canvas: canvas,
                     dataUrl: dataUrl,

@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import { List } from "../../common/List";
+import { Spinner } from "../../Spinner/Spinner";
 import './ModelPicker.css'
 
-export function ModelPicker({ onRequestPrediction }) {
+export function ModelPicker({ onRequestPrediction, isPredicting }) {
     const [modelList, setModelList] = useState(null);
     const [selectedModel, setSelectedModel] = useState(null);
 
@@ -9,27 +11,18 @@ export function ModelPicker({ onRequestPrediction }) {
     useEffect(() => {
         (async () => {
             const modelnames = await window.python.getModels();
-            const firstmodel = modelnames[0];
             setModelList(modelnames);
-            setSelectedModel(firstmodel);
         })()
     }, [])
 
     return (
         <div id="mp-container">
             <span>Pick a model:</span>
-            <div id="list">
-                {modelList && modelList.map(name =>
-                    <span
-                        key={name}
-                        className={`entry${name === selectedModel ? " selected" : ""}`}
-                        onClick={_ => setSelectedModel(name)}
-                    >
-                        {name}
-                    </span>
-                )}
-            </div>
-            <button onClick={_ => onRequestPrediction(selectedModel)}>Predict Classes</button>
+            <List items={modelList} onSelect={setSelectedModel} />
+            {
+                (isPredicting && <Spinner text={"Predicting..."}/>) ||
+                (selectedModel && <button onClick={_ => onRequestPrediction(selectedModel)}>Predict Classes</button>)
+            }
         </div>
     );
 }
