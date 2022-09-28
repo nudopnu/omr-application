@@ -105,7 +105,7 @@ export function WorkArea(props) {
             {
                 (props.image && !isLoading &&
                     <div id="zoom" ref={zoom} >
-                        <img src={props.image} alt="" draggable="false" />
+                        {props.children}
                     </div>
                 ) || (
                     <FilePicker loading={isLoading} onFilesReceive={onFilesReceive} />
