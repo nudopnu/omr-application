@@ -5,7 +5,7 @@ const BrowserWindow = electron.BrowserWindow;
 const path = require('path');
 const isDev = require('electron-is-dev');
 const { ipcMain } = require('electron');
-const { getModels } = require('./python');
+const { getModels, predict } = require('./python');
 
 let mainWindow;
 
@@ -22,7 +22,12 @@ function createWindow() {
     }
   });
   ipcMain.handle('ping', () => 'poing');
-  ipcMain.handle('get-models', async () => getModels());
+  ipcMain.handle('get-models', () => getModels());
+  ipcMain.handle('predict', async (_, img) => {
+    let res = await predict(img);
+    console.log("[ipcmain]", res);
+    return res;
+  });
   mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);
   mainWindow.on('closed', () => mainWindow = null);
 }

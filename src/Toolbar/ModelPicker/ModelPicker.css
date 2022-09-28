@@ -4,7 +4,7 @@
     text-align: center;
 }
 
-#container {
+#mp-container {
     align-items: left;
 }
 
@@ -16,7 +16,7 @@
     padding: 5px;
 }
 
-.entry:hover {
+.entry:hover, .selected {
     background-color: #E2E2E2;
     color: #333333;
 }

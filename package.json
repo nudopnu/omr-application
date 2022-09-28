@@ -19,7 +19,7 @@
   },
   "main": "./public/electron.js",
   "scripts": {
-    "start": "npm run react-start & wait-on http://localhost:3000/ && npm run electron-start",
+    "start": "concurrently \"npm run react-start\" \"wait-on http://localhost:3000/ && npm run electron-start\"",
     "react-start": "react-scripts start",
     "electron-start": "electron .",
     "build": "react-scripts build",
@@ -45,6 +45,7 @@
     ]
   },
   "devDependencies": {
+    "concurrently": "^7.4.0",
     "wait-on": "^6.0.1"
   }
 }

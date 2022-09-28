@@ -7,6 +7,7 @@ import { WorkArea } from './WorkArea/WorkArea';
 function App() {
 
   const [image, setImage] = useState(null);
+  const [canvas, setCanvas] = useState(null);
 
   const buildRgb = (imageData) => {
     let rgbValues = [];
@@ -34,14 +35,6 @@ function App() {
   async function onOpenFiles(files) {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-
-      // First try
-      // console.log("Trying to read ", file);
-      // const buffer = await readFileAsync(file);
-      // let image = await Image.load(buffer);
-      // setImage(image);
-
-      // Alternative
       const reader = new FileReader();
       reader.onload = (e) => {
         const canvas = document.createElement("canvas");
@@ -53,6 +46,7 @@ function App() {
           canvas.width = fakeImage.width;
           canvas.height = fakeImage.height;
           ctx.drawImage(fakeImage, 0, 0);
+          setCanvas(canvas);
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
           console.log("Drawing", buildRgb(imageData.data));
         }
@@ -65,7 +59,7 @@ function App() {
   return (
     <div className="App">
       <WorkArea image={image} onOpenFiles={onOpenFiles} />
-      <Toolbar />
+      <Toolbar canvas={canvas}/>
     </div>
   );
 }

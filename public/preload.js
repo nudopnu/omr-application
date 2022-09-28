@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld('versions', {
     ping: () => ipcRenderer.invoke('ping'),
 })
 
-contextBridge.exposeInMainWorld('classification', {
-    getModels: () => ipcRenderer.invoke('get-models')
+contextBridge.exposeInMainWorld('python', {
+    getModels: () => ipcRenderer.invoke('get-models'),
+    predict: (img) => ipcRenderer.invoke('predict', img),
 })

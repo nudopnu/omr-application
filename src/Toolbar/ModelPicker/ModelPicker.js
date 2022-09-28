@@ -1,27 +1,43 @@
 import { useEffect, useState } from "react";
 import './ModelPicker.css'
 
-export function ModelPicker() {
+export function ModelPicker({ onRequestPrediction }) {
     const [modelList, setModelList] = useState(null);
+    const [selectedModel, setSelectedModel] = useState(null);
 
+    /* on load */
     useEffect(() => {
         (async () => {
-            const res = await window.classification.getModels();
+            const res = await window.python.getModels();
             console.log(res);
             setModelList(res)
+            setSelectedModel(res[0])
         })()
     }, [])
 
+    function onModelSelect(selection) {
+        setSelectedModel(selection);
+    }
+
+    function onPredict() {
+        onRequestPrediction()
+    }
 
     return (
         <div id="mp-container">
             <span>Pick a model:</span>
             <div id="list">
                 {modelList && modelList.map(name =>
-                    <span key={name} className="entry">{name}</span>
+                    <span
+                        key={name}
+                        className={`entry${name === selectedModel ? " selected" : ""}`}
+                        onClick={_ => onModelSelect(name)}
+                    >
+                        {name}
+                    </span>
                 )}
             </div>
-            <button>Predict Classes</button>
+            <button onClick={onPredict}>Predict Classes</button>
         </div>
     );
 }
