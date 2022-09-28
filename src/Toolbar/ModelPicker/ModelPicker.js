@@ -20,7 +20,7 @@ export function ModelPicker({ onRequestPrediction }) {
     }
 
     function onPredict() {
-        onRequestPrediction()
+        onRequestPrediction(selectedModel)
     }
 
     return (

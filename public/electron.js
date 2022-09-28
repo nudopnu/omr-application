@@ -23,8 +23,9 @@ function createWindow() {
   });
   ipcMain.handle('ping', () => 'poing');
   ipcMain.handle('get-models', () => getModels());
-  ipcMain.handle('predict', async (_, img) => {
-    let res = await predict(img);
+  ipcMain.handle('predict', async (_, modelname, img) => {
+    console.log("[ipcmain]", modelname, img);
+    let res = await predict(modelname, img);
     console.log("[ipcmain]", res);
     return res;
   });

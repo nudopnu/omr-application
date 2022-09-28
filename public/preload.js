@@ -9,5 +9,5 @@ contextBridge.exposeInMainWorld('versions', {
 
 contextBridge.exposeInMainWorld('python', {
     getModels: () => ipcRenderer.invoke('get-models'),
-    predict: (img) => ipcRenderer.invoke('predict', img),
+    predict: (modelname, img) => ipcRenderer.invoke('predict', modelname, img),
 })
