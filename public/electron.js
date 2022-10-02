@@ -6,7 +6,7 @@ const path = require('path');
 const isDev = require('electron-is-dev');
 const { ipcMain } = require('electron');
 const { getModels, predict } = require('./python');
-const { startBackgroundProcess } = require('./background/background');
+const { startBackgroundProcess } = require('./background');
 
 let mainWindow;
 

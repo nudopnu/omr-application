@@ -6,6 +6,16 @@ export function drawDataURIOnCanvas(strDataURI, canvas) {
     img.setAttribute("src", strDataURI);
 }
 
+export function readAsDataURL(bytes, callback) {
+    return new Promise((resolve, reject) => {
+        let reader = new FileReader();
+        reader.onloadend = function () {
+            resolve(reader.result);
+        }
+        reader.readAsDataURL(bytes);
+    });
+}
+
 export function loadImage(file, imgRef) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();

@@ -3,12 +3,15 @@ import cv2
 import numpy as np
 from PIL import ImageColor
 
+print("Ready")
 img64 = input()
 
 # Convert from base64 to img
 imgBytes = base64.b64decode(img64, altchars=None, validate=False)
 img = np.frombuffer(imgBytes, dtype=np.uint8)
 img = cv2.imdecode(img, cv2.IMREAD_ANYCOLOR)
+
+print("Received image")
 
 while True:
     hex = input()

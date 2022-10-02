@@ -21,7 +21,7 @@ function App() {
     }
     console.log("STARTING")
     let res = await window.layers.start();
-    console.log("STARTING")
+    console.log("End STARTING")
     console.log(res);
   }
 
@@ -42,7 +42,7 @@ function App() {
       </WorkArea>
       <Toolbar canvas={canvas}>
         <ModelPicker onRequestPrediction={onRequestPrediction} />
-        {canvas && <ColorLayers canvas={canvas} />}
+        {canvas && <ColorLayers canvas={canvas} updateImage={setImage} />}
       </Toolbar>
     </div>
   );

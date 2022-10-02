@@ -1,0 +1,2 @@
+ping = input()
+print(ping)

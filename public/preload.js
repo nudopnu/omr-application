@@ -14,4 +14,6 @@ contextBridge.exposeInMainWorld('python', {
 
 contextBridge.exposeInMainWorld('layers', {
     start: () => ipcRenderer.invoke('START_HIGHLIGHT', 'highlight'),
+    provideImage: (img) => ipcRenderer.invoke('MSG_SEND_TO_HIGHLIGHT', img.split(',')[1]),
+    highlight: (color) => ipcRenderer.invoke('MSG_SEND_TO_HIGHLIGHT', color),
 })
