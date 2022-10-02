@@ -6,8 +6,8 @@ export function List({ items, onSelect, toKey = (item) => item, toContent = (ite
     const [selected, setSelected] = useState(null);
 
     function selectionHandler(item) {
-        onSelect(item);
         setSelected(toKey(item));
+        onSelect(item);
     }
 
     return (

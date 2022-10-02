@@ -52,3 +52,24 @@ export function getDistinctColors(imageData) {
     }
     return distinctRgbValues;
 };
+
+export function highlightColor(imageData, hexColor) {
+    let res = [...imageData];
+
+    /* Iterate over all pixels */
+    for (let i = 0; i < imageData.length; i += 4) {
+        const hex = `#${imageData[i]}${imageData[i + 1]}${imageData[i + 2]}`;
+
+        /* Generate unique hash value per color and check for existence */
+        if (hex === hexColor) {
+            res[i] = 255
+            res[i + 1] = 0
+            res[i + 2] = 0
+        } else {
+            res[i] = 0
+            res[i + 1] = 0
+            res[i + 2] = 0
+        }
+    }
+    return res;
+};

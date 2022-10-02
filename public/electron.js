@@ -6,6 +6,7 @@ const path = require('path');
 const isDev = require('electron-is-dev');
 const { ipcMain } = require('electron');
 const { getModels, predict } = require('./python');
+const { startBackgroundProcess } = require('./background/background');
 
 let mainWindow;
 
@@ -21,9 +22,11 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
     }
   });
+  mainWindow.webContents.openDevTools();
   ipcMain.handle('ping', () => 'poing');
   ipcMain.handle('get-models', () => getModels());
   ipcMain.handle('predict', async (_, modelname, img) => predict(modelname, img));
+  startBackgroundProcess("HIGHLIGHT");
   mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);
   mainWindow.on('closed', () => mainWindow = null);
 }

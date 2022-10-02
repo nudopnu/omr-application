@@ -5,6 +5,7 @@
   font-size: calc(10px + 0.5vmin);
   color: #E2E2E2;
   padding: 20px 20px;
+  overflow-y: scroll;
 }
 
 .divider {

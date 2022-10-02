@@ -11,3 +11,7 @@ contextBridge.exposeInMainWorld('python', {
     getModels: () => ipcRenderer.invoke('get-models'),
     predict: (modelname, img) => ipcRenderer.invoke('predict', modelname, img),
 })
+
+contextBridge.exposeInMainWorld('layers', {
+    start: () => ipcRenderer.invoke('START_HIGHLIGHT', 'highlight'),
+})
