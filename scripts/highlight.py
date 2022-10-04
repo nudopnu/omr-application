@@ -20,7 +20,7 @@ while True:
 
     res = cv2.cvtColor(img, cv2.COLOR_RGBA2GRAY)
     res = cv2.cvtColor(res, cv2.COLOR_GRAY2RGB)
-    res[np.all(img==rgb, axis=2)] = (0, 0, 255)
+    res[np.all(img==rgb[::-1], axis=2)] = (0, 0, 255)
     
     # Convert result to base64
     bytes = cv2.imencode(".png", res)[1]

@@ -15,7 +15,7 @@ export function ColorLayers({ canvas, updateImage }) {
     }, []);
 
     async function onLayerSelect(sel) {
-        const hex = `#${sel.r.toString(16)}${sel.g.toString(16)}${sel.b.toString(16)}`;
+        const hex = `#${sel.r.toString(16).padStart(2, "0")}${sel.g.toString(16).padStart(2, "0")}${sel.b.toString(16).padStart(2, "0")}`;
         if (!hasSentImage) {
             console.log(`selecting ${hex}, sending`, canvas.toDataURL());
             let res = await window.layers.provideImage(canvas.toDataURL());
@@ -33,7 +33,7 @@ export function ColorLayers({ canvas, updateImage }) {
             <List
                 items={layers}
                 toKey={item => [item.r, item.g, item.b].join("")}
-                toContent={item => `#${item.r.toString(16)}${item.g.toString(16)}${item.b.toString(16)}`}
+                toContent={item => `#${item.r.toString(16).padStart(2, "0")}${item.g.toString(16).padStart(2, "0")}${item.b.toString(16).padStart(2, "0")}`}
                 onSelect={onLayerSelect}
             />
         </div>
