@@ -39,7 +39,7 @@ function pythonBackgroundProcess(name) {
                 pyshell.send(msg);
             });
 
-            log("[Subprocess]", processPath)
+            log("[Subprocess] Starting:", processPath)
             log("[Subprocess -> Main]", READY_TO_MAIN)
             ipcRenderer.send(READY_TO_MAIN, processPath)
         },

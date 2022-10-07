@@ -5,8 +5,13 @@ const { ipcMain } = require('electron');
 const path = require('path');
 
 
+
 function startBackgroundProcess(name) {
+    
     let hiddenWindows = {};
+    let hasStarted = false;
+    let startResolve;
+    let msgResolve;
 
     const PRELOAD_START = `START_${name.toLocaleUpperCase()}`;
     const PRELOAD_MSG = `MSG_TO_${name.toLocaleUpperCase()}`;
@@ -15,13 +20,10 @@ function startBackgroundProcess(name) {
     const SUBPROCESS_ERROR = `${name.toLocaleUpperCase()}_ERROR`;
     const SUBPROCESS_DEBUG = `${name.toLocaleUpperCase()}_DEBUG`;
 
-    let startResolve;
-    let msgResolve;
-
     /* From Renderer */
     ipcMain.handle(PRELOAD_START, async () => {
         return new Promise((resolve, reject) => {
-            console.log("[PRELOAD - START]:".padEnd(25), name.toLocaleUpperCase());
+            console.log(`[PRELOAD -> ${name.toLocaleUpperCase()}]:`.padEnd(25), PRELOAD_START);
 
             const preload = path.join(__dirname, 'background', `${name}.js`);
             hiddenWindows[name] = new BrowserWindow({
@@ -49,12 +51,18 @@ function startBackgroundProcess(name) {
                 hiddenWindows[name] = null;
             });
             startResolve = resolve;
+            hasStarted = true;
         });
     });
 
     ipcMain.handle(PRELOAD_MSG, (_, msg) => {
+        console.log(`[PRELOAD -> ${name.toLocaleUpperCase()}]:`.padEnd(25), msg);
+        if (!hasStarted) {
+            return new Promise((resolve, reject) => {
+                reject(`Subprocess ${name.toLocaleUpperCase()} hasn't started yet`)
+            });
+        }
         return new Promise((resolve, reject) => {
-            console.log("[PRELOAD - MESSAGE]:".padEnd(25), name.toLocaleUpperCase(), msg);
             hiddenWindows[name].webContents.send(`MSG_RECEIVE_${name.toLocaleUpperCase()}`, msg);
             msgResolve = resolve;
         });
@@ -62,12 +70,13 @@ function startBackgroundProcess(name) {
 
     /* From Subprocess */
     ipcMain.on(SUBPROCESS_READY, () => {
-        console.log("[SUBPROCESS - READY]:".padEnd(25), name.toLocaleUpperCase());
+        console.log(`[${name.toLocaleUpperCase()} -> RENDERER]:`.padEnd(25), SUBPROCESS_READY);
+        console.log(startResolve);
         startResolve(`${name} is ready!`)
     });
 
     ipcMain.on(SUBPROCESS_RESPONSE, (_, resp) => {
-        console.log("[SUBPROCESS - RESPONSE]:".padEnd(25), name.toLocaleUpperCase(), resp);
+        console.log(`[${name.toLocaleUpperCase()} -> RENDERER]:`.padEnd(25), resp);
         if (msgResolve) {
             msgResolve(resp);
         }

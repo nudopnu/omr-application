@@ -1,5 +1,12 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
+function provideBackgroundPython(name) {
+    contextBridge.exposeInMainWorld(name, {
+        start: () => ipcRenderer.invoke(`START_${name.toLocaleUpperCase()}`),
+        sendCommand: (type, payload) => ipcRenderer.invoke(`MSG_TO_${name.toLocaleUpperCase()}`, { type: type, payload: payload }),
+    })
+}
+
 contextBridge.exposeInMainWorld('versions', {
     node: () => process.versions.node,
     chrome: () => process.versions.chrome,
@@ -18,15 +25,5 @@ contextBridge.exposeInMainWorld('layers', {
     highlight: (color) => ipcRenderer.invoke('MSG_TO_HIGHLIGHT', color),
 })
 
-// contextBridge.exposeInMainWorld('json', {
-//     start: () => ipcRenderer.invoke('START_JSON'),
-//     sendCommand: (command) => ipcRenderer.invoke('MSG_TO_JSON', command),
-// })
 provideBackgroundPython("jsontest");
-
-function provideBackgroundPython(name) {
-    contextBridge.exposeInMainWorld(name, {
-        start: () => ipcRenderer.invoke(`START_${name.toLocaleUpperCase()}`),
-        sendCommand: (command) => ipcRenderer.invoke(`MSG_TO_${name.toLocaleUpperCase()}`, command),
-    })
-}
+provideBackgroundPython("predict");

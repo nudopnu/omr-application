@@ -23,20 +23,25 @@ function App() {
       setImage(dataUrl)
       setCanvas(canvas)
     }
-    console.log("STARTING")
-    let res = await window.jsontest.start();
-    console.log("End STARTING")
-    console.log(await window.jsontest.sendCommand({"this": "object"}));
   }
 
-  function onRequestPrediction(modelName) {
+  async function onModelSelect(modelName) {
+    console.log(modelName);
+    await window.predict.sendCommand({
+      type: "setModel",
+      payload: modelName,
+    });
+    console.log("SETTING MODEL", modelName);
+  }
+
+  async function onRequestPrediction() {
     setPredicting(true);
-    (async () => {
-      let res = await window.python.predict(modelName, canvas.toDataURL());
-      console.log(res);
-      setPredicting(false);
-      alert(res)
-    })();
+    let res = await window.predict.sendCommand({
+      type: "predict",
+      payload: canvas.toDataURL(),
+    });
+    console.log(res);
+    setPredicting(false);
   }
 
   return (
@@ -45,7 +50,7 @@ function App() {
         <img src={image} alt="" draggable="false" />
       </WorkArea>
       <Toolbar canvas={canvas}>
-        <ModelPicker onRequestPrediction={onRequestPrediction} />
+        <ModelPicker onModelSelect={onModelSelect} onRequestPrediction={onRequestPrediction} />
         {/* {canvas && <ColorLayers canvas={canvas} updateImage={setImage} />} */}
       </Toolbar>
     </div>
