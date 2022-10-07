@@ -7,7 +7,7 @@ export function ColorLayers({ canvas, updateImage }) {
 
     const [layers, setLayers] = useState([]);
     const [hasSentImage, setHasSentImage] = useState(false);
-    let toContent = useRef(item => `#${item.r.toString(16).padStart(2, "0")}${item.g.toString(16).padStart(2, "0")}${item.b.toString(16).padStart(2, "0")}`);
+    let toContent = useRef(item => `#${item.r.toString(16).padStart(2, "0")}${item.g.toString(16).padStart(2, "0")}${item.b.toString(16).padStart(2, "0")}: ${item.count}`);
 
     useEffect(() => {
         const ctx = canvas.getContext('2d');
@@ -20,7 +20,7 @@ export function ColorLayers({ canvas, updateImage }) {
             }
         });
         if (everyGray) {
-            toContent.current = (item) => `#${item.r.toString(16).padStart(2, "0")}${item.g.toString(16).padStart(2, "0")}${item.b.toString(16).padStart(2, "0")} (${item.r})`;
+            toContent.current = (item) => `#${item.r.toString(16).padStart(2, "0")}${item.g.toString(16).padStart(2, "0")}${item.b.toString(16).padStart(2, "0")} (${item.r}): ${item.count}`;
             res = res.sort((a, b) => a.r - b.r)
         } else {
             res = res.sort((a, b) => toContent.current(a).localeCompare(toContent.current(b)))

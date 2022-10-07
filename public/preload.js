@@ -13,7 +13,12 @@ contextBridge.exposeInMainWorld('python', {
 })
 
 contextBridge.exposeInMainWorld('layers', {
-    start: () => ipcRenderer.invoke('START_HIGHLIGHT', 'highlight'),
-    provideImage: (img) => ipcRenderer.invoke('MSG_SEND_TO_HIGHLIGHT', img.split(',')[1]),
-    highlight: (color) => ipcRenderer.invoke('MSG_SEND_TO_HIGHLIGHT', color),
+    start: () => ipcRenderer.invoke('START_HIGHLIGHT'),
+    provideImage: (img) => ipcRenderer.invoke('MSG_TO_HIGHLIGHT', img.split(',')[1]),
+    highlight: (color) => ipcRenderer.invoke('MSG_TO_HIGHLIGHT', color),
+})
+
+contextBridge.exposeInMainWorld('json', {
+    start: () => ipcRenderer.invoke('START_JSON'),
+    sendCommand: (command) => ipcRenderer.invoke('MSG_TO_JSON', command),
 })

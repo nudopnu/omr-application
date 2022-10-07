@@ -26,7 +26,8 @@ function createWindow() {
   ipcMain.handle('ping', () => 'poing');
   ipcMain.handle('get-models', () => getModels());
   ipcMain.handle('predict', async (_, modelname, img) => predict(modelname, img));
-  startBackgroundProcess("HIGHLIGHT");
+  startBackgroundProcess("highlight");
+  startBackgroundProcess("json");
   mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);
   mainWindow.on('closed', () => mainWindow = null);
 }

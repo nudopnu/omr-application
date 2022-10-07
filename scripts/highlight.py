@@ -17,8 +17,11 @@ while True:
     hex = input()
     rgb = ImageColor.getcolor(hex, "RGB")
 
-
     res = cv2.cvtColor(img, cv2.COLOR_RGBA2GRAY)
+    
+    isSparse = np.sum(img > 0) < np.sum(img == 0)
+    if isSparse:
+        res = (res > 0).astype(np.uint8) * 255
     res = cv2.cvtColor(res, cv2.COLOR_GRAY2RGB)
     res[np.all(img==rgb[::-1], axis=2)] = (0, 0, 255)
     

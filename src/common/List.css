@@ -10,7 +10,7 @@
 .entry {
     cursor: pointer;
     width: 100%;
-    text-align: center;
+    text-align: left;
 }
 .entry:hover, .selected {
     background-color: #E2E2E2;

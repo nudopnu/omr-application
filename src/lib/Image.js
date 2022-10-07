@@ -51,13 +51,16 @@ export function getDistinctColors(imageData) {
             r: imageData[i],
             g: imageData[i + 1],
             b: imageData[i + 2],
+            count: 1,
         };
 
         /* Generate unique hash value per color and check for existence */
         let str = Object.values(rgb).join("");
         if (!lastFound.hasOwnProperty(str)) {
             distinctRgbValues.push(rgb);
-            lastFound[str] = i;
+            lastFound[str] = rgb;
+        } else {
+            lastFound[str].count++;
         }
     }
     return distinctRgbValues;

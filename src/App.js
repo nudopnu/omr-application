@@ -8,7 +8,11 @@ import { WorkArea } from './WorkArea/WorkArea';
 
 function App() {
 
+  // image is the original one, tmp is whats displayed
   const [image, setImage] = useState(null);
+  const [tmpImage, settmpImage] = useState(null);
+
+  // 
   const [canvas, setCanvas] = useState(null);
   const [isPredicting, setPredicting] = useState(false);
 
@@ -20,9 +24,9 @@ function App() {
       setCanvas(canvas)
     }
     console.log("STARTING")
-    let res = await window.layers.start();
+    let res = await window.json.start();
     console.log("End STARTING")
-    console.log(res);
+    console.log(await window.json.sendCommand({"this": "object"}));
   }
 
   function onRequestPrediction(modelName) {
@@ -42,7 +46,7 @@ function App() {
       </WorkArea>
       <Toolbar canvas={canvas}>
         <ModelPicker onRequestPrediction={onRequestPrediction} />
-        {canvas && <ColorLayers canvas={canvas} updateImage={setImage} />}
+        {/* {canvas && <ColorLayers canvas={canvas} updateImage={setImage} />} */}
       </Toolbar>
     </div>
   );
