@@ -3,14 +3,18 @@ import { List } from "../../common/List";
 import { Spinner } from "../../Spinner/Spinner";
 import './ModelPicker.css'
 
-export function ModelPicker({ onModelSelect, onRequestPrediction, isPredicting }) {
+export function ModelPicker({ onModelSelect, onRequestPrediction, isModelLoaded, isPredicting }) {
     const [modelList, setModelList] = useState(null);
-    const [selectedModel, setSelectedModel] = useState(null);
+    const [hasInit, setHasInit] = useState(false);
 
     /* on load */
     useEffect(() => {
         (async () => {
-            // await window.predict.start();
+            if (hasInit)
+                return;
+            setHasInit(true);
+            console.log("Starting because", hasInit);
+            await window.predict.start();
             const modelnames = await window.python.getModels();
             setModelList(modelnames);
         })()
@@ -21,8 +25,8 @@ export function ModelPicker({ onModelSelect, onRequestPrediction, isPredicting }
             <span>Pick a model:</span>
             <List items={modelList} onSelect={onModelSelect} />
             {
-                (isPredicting && <Spinner text={"Predicting..."}/>) ||
-                (selectedModel && <button onClick={_ => onRequestPrediction()}>Predict Classes</button>)
+                (isPredicting && <Spinner text={"Predicting..."} />) ||
+                (isModelLoaded && <button onClick={_ => onRequestPrediction()}>Predict Classes</button>)
             }
         </div>
     );

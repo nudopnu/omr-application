@@ -14,6 +14,7 @@ glob = {}
 def loadModel(model_file):
     model = tf.keras.models.load_model(os.path.join("../optical-music-recognition/models/", model_file))
     glob["model"] = model
+    return f"Loaded model '{model_file}'"
 
 def predict(img64):
     return apply(img64)(
@@ -58,13 +59,15 @@ def receive():
     return type, payload
 
 def reply(type, payload):
-    print(json.dumps({"type": type, "payload": payload}))
+    print(json.dumps({"type": type, "payload": str(payload)}))
 
 while True:
     type, payload = receive()
     if type not in commands:
         reply(ERROR, "command not found")
-    reply(MESSAGE, type)
+    else:
+        result = commands[type](payload)
+        reply(MESSAGE, result)
 
 # test: 
 # cat b64.txt | py scripts/predict.py simple_unet_256x256_03.h5 > tmp.txt

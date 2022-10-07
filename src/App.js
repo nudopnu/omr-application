@@ -12,9 +12,27 @@ function App() {
   const [image, setImage] = useState(null);
   const [tmpImage, settmpImage] = useState(null);
 
-  // 
+  // Prediction
   const [canvas, setCanvas] = useState(null);
   const [isPredicting, setPredicting] = useState(false);
+  const [isModelLoaded, setIsModelLoaded] = useState(false);
+
+  async function onModelSelect(modelName) {
+    console.log(modelName);
+    await window.predict.sendCommand("loadModel", modelName);
+    setIsModelLoaded(true);
+    console.log("SETTING MODEL", modelName);
+  }
+
+  async function onRequestPrediction() {
+    setPredicting(true);
+    let res = await window.predict.sendCommand("predict", canvas.toDataURL().split(",")[1]);
+    setPredicting(false);
+    res = res.payload;
+    res = "data:image/png;base64," + res.slice(2, -1)
+    setImage(res);
+    console.log(res);
+  }
 
   async function onOpenFiles(files) {
     for (let i = 0; i < files.length; i++) {
@@ -25,32 +43,18 @@ function App() {
     }
   }
 
-  async function onModelSelect(modelName) {
-    console.log(modelName);
-    await window.predict.sendCommand({
-      type: "setModel",
-      payload: modelName,
-    });
-    console.log("SETTING MODEL", modelName);
-  }
-
-  async function onRequestPrediction() {
-    setPredicting(true);
-    let res = await window.predict.sendCommand({
-      type: "predict",
-      payload: canvas.toDataURL(),
-    });
-    console.log(res);
-    setPredicting(false);
-  }
-
   return (
     <div className="App">
       <WorkArea image={image} onOpenFiles={onOpenFiles}>
         <img src={image} alt="" draggable="false" />
       </WorkArea>
       <Toolbar canvas={canvas}>
-        <ModelPicker onModelSelect={onModelSelect} onRequestPrediction={onRequestPrediction} />
+        <ModelPicker
+          onModelSelect={onModelSelect}
+          onRequestPrediction={onRequestPrediction}
+          isModelLoaded={isModelLoaded}
+          isPredicting={isPredicting}
+        />
         {/* {canvas && <ColorLayers canvas={canvas} updateImage={setImage} />} */}
       </Toolbar>
     </div>

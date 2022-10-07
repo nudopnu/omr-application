@@ -31,6 +31,13 @@ function pythonBackgroundProcess(name) {
                 log("[Python -> Main]", error)
                 ipcRenderer.send(ERROR_TO_MAIN, error);
             })
+            pyshell.on('pythonError', function (error) {
+                if (error) {
+                    log("[Python -> Main]", error);
+                    ipcRenderer.send(ERROR_TO_MAIN, error);
+                }
+            });
+
 
             // listen for Main
             ipcRenderer.on(MSG_FROM_MAIN, (_event, msg) => {
