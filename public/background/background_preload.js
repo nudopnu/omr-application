@@ -4,32 +4,48 @@ const { PythonShell } = require('python-shell');
 const path = require('path');
 
 let pyshell;
-let log, err;
+let log;
 
 function pythonBackgroundProcess(name) {
+
+    const READY_TO_MAIN = `${name.toLocaleUpperCase()}_READY`;
+    const RESPONSE_TO_MAIN = `${name.toLocaleUpperCase()}_RESPONSE`;
+    const ERROR_TO_MAIN = `${name.toLocaleUpperCase()}_ERROR`;
+    const DEBUG_TO_MAIN = `${name.toLocaleUpperCase()}_DEBUG`;
+    const MSG_FROM_MAIN = `MSG_RECEIVE_${name.toLocaleUpperCase()}`;
+
+    const PY_MSG = 'message';
+    const PY_ERROR = 'error';
+
     contextBridge.exposeInMainWorld('api', {
         start: () => {
-            ipcRenderer.send(`${name.toLocaleUpperCase()}_DEBUG`);
-            pyshell = new PythonShell(path.join(__dirname, '..', '..', 'scripts', `${name}.py`), { mode: 'json' });
-            pyshell.on('message', function (results) {
+            const processPath = path.join(__dirname, '..', '..', 'scripts', `${name}.py`);
+            pyshell = new PythonShell(processPath, { mode: 'json' });
+
+            // listen for python 
+            pyshell.on(PY_MSG, function (results) {
                 log("[Receiving from python]", results)
-                ipcRenderer.send(`${name.toLocaleUpperCase()}_RESPONSE`, results);
+                ipcRenderer.send(RESPONSE_TO_MAIN, results);
             });
-            pyshell.on('error', function (error) {
-                err("[Receiving from python]", error)
-                ipcRenderer.send(`${name.toLocaleUpperCase()}_ERROR`, error);
+            pyshell.on(PY_ERROR, function (error) {
+                log("[Receiving from python]", error)
+                ipcRenderer.send(ERROR_TO_MAIN, error);
             })
-            ipcRenderer.on(`MSG_RECEIVE_${name.toLocaleUpperCase()}`, (_event, msg) => {
+
+            // listen for main
+            ipcRenderer.on(MSG_FROM_MAIN, (_event, msg) => {
                 log("[Receiving from main]", msg)
-                ipcRenderer.send(`${name.toLocaleUpperCase()}_DEBUG`, msg);
+                ipcRenderer.send(DEBUG_TO_MAIN, msg);
                 pyshell.send(msg);
             });
-            ipcRenderer.send(`${name.toLocaleUpperCase()}_READY`)
-            log("[Sending ready signal to main]", `${name.toLocaleUpperCase()}_READY`)
+
+            log("[Processpath]", processPath)
+            log("[Sending to main]", READY_TO_MAIN)
+            ipcRenderer.send(READY_TO_MAIN, processPath)
         },
-        onMessage: (callback) => ipcRenderer.on(`MSG_RECEIVE_${name.toLocaleUpperCase()}`, callback),
+        onMessage: (callback) => ipcRenderer.on(MSG_FROM_MAIN, callback),
         talkToProcess: (msg) => pyshell.send(msg),
-        setConsole: (console) => { log = console.log; err = console.err },
+        setConsole: (console) => log = console.log,
     })
 }
 

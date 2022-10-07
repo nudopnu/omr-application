@@ -24,9 +24,9 @@ function App() {
       setCanvas(canvas)
     }
     console.log("STARTING")
-    let res = await window.json.start();
+    let res = await window.jsontest.start();
     console.log("End STARTING")
-    console.log(await window.json.sendCommand({"this": "object"}));
+    console.log(await window.jsontest.sendCommand({"this": "object"}));
   }
 
   function onRequestPrediction(modelName) {

@@ -18,7 +18,15 @@ contextBridge.exposeInMainWorld('layers', {
     highlight: (color) => ipcRenderer.invoke('MSG_TO_HIGHLIGHT', color),
 })
 
-contextBridge.exposeInMainWorld('json', {
-    start: () => ipcRenderer.invoke('START_JSON'),
-    sendCommand: (command) => ipcRenderer.invoke('MSG_TO_JSON', command),
-})
+// contextBridge.exposeInMainWorld('json', {
+//     start: () => ipcRenderer.invoke('START_JSON'),
+//     sendCommand: (command) => ipcRenderer.invoke('MSG_TO_JSON', command),
+// })
+provideBackgroundPython("jsontest");
+
+function provideBackgroundPython(name) {
+    contextBridge.exposeInMainWorld(name, {
+        start: () => ipcRenderer.invoke(`START_${name.toLocaleUpperCase()}`),
+        sendCommand: (command) => ipcRenderer.invoke(`MSG_TO_${name.toLocaleUpperCase()}`, command),
+    })
+}
