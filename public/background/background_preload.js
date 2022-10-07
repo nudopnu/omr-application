@@ -24,23 +24,23 @@ function pythonBackgroundProcess(name) {
 
             // listen for python 
             pyshell.on(PY_MSG, function (results) {
-                log("[Receiving from python]", results)
+                log("[Python -> Main]", results)
                 ipcRenderer.send(RESPONSE_TO_MAIN, results);
             });
             pyshell.on(PY_ERROR, function (error) {
-                log("[Receiving from python]", error)
+                log("[Python -> Main]", error)
                 ipcRenderer.send(ERROR_TO_MAIN, error);
             })
 
-            // listen for main
+            // listen for Main
             ipcRenderer.on(MSG_FROM_MAIN, (_event, msg) => {
-                log("[Receiving from main]", msg)
+                log("[Main -> Python]", msg)
                 ipcRenderer.send(DEBUG_TO_MAIN, msg);
                 pyshell.send(msg);
             });
 
-            log("[Processpath]", processPath)
-            log("[Sending to main]", READY_TO_MAIN)
+            log("[Subprocess]", processPath)
+            log("[Subprocess -> Main]", READY_TO_MAIN)
             ipcRenderer.send(READY_TO_MAIN, processPath)
         },
         onMessage: (callback) => ipcRenderer.on(MSG_FROM_MAIN, callback),

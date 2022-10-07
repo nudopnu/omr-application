@@ -37,7 +37,7 @@ function startBackgroundProcess(name) {
 
             var html = [
                 "<script>",
-                `console.log("[Subprocess] ${name}");`,
+                `console.log("[Subprocess] ${name.toLocaleUpperCase()}");`,
                 "window.api.setConsole(console);",
                 "window.api.start();",
                 "</script>",
@@ -63,15 +63,11 @@ function startBackgroundProcess(name) {
     /* From Subprocess */
     ipcMain.on(SUBPROCESS_READY, () => {
         console.log("[SUBPROCESS - READY]:".padEnd(25), name.toLocaleUpperCase());
-        // startResolve(`${name} is ready!`)
+        startResolve(`${name} is ready!`)
     });
 
     ipcMain.on(SUBPROCESS_RESPONSE, (_, resp) => {
         console.log("[SUBPROCESS - RESPONSE]:".padEnd(25), name.toLocaleUpperCase(), resp);
-        if (startResolve) {
-            startResolve(`${name} is ready!`)
-            startResolve = null;
-        }
         if (msgResolve) {
             msgResolve(resp);
         }
