@@ -1,11 +1,10 @@
 
-import base64
 import os
-import cv2
 import numpy as np
+import cv2
 import tensorflow as tf
 from Preprocessing.image import apply, sparse, tile_merge_flat
-from commands import command_loop
+from commands import command_loop, imgDecoding, imgEncoding
 
 glob = {}
 
@@ -16,29 +15,18 @@ def loadModel(model_file):
 
 def predict(img64):
     return apply(img64)(
-        lambda img64: _decodeImg(img64),
+        imgDecoding(),
+        lambda img: cv2.cvtColor(img, cv2.COLOR_RGBA2GRAY),
         lambda img: img[:, :, None],
         sparse(),
         tile_merge_flat((256, 256), _predict_tile),
-        lambda img: _encodeImg(img),
+        imgEncoding(),
     )
 
 def _predict_tile(tile):
     res = glob["model"].predict(tile[None, :], verbose = 0)
     res = np.argmax(res[0], 2)
     return res
-
-def _decodeImg(img64):
-    # Convert from base64 to img
-    imgBytes = base64.b64decode(img64, altchars=None, validate=False)
-    img = np.frombuffer(imgBytes, dtype=np.uint8)
-    img = cv2.imdecode(img, cv2.IMREAD_ANYCOLOR)
-    return cv2.cvtColor(img, cv2.COLOR_RGBA2GRAY)
-
-def _encodeImg(img):
-    # Convert result to base64
-    bytes = cv2.imencode(".png", img)[1]
-    return base64.b64encode(bytes)
 
 commands = {
     "loadModel": loadModel,

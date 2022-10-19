@@ -1,31 +1,40 @@
 import base64
+import json
 import cv2
 import numpy as np
 from PIL import ImageColor
 
-print("Ready")
-img64 = input()
+from Preprocessing.image import apply, sparse, tile_merge_flat
+from commands import command_loop, imgDecoding, imgEncoding, reply
 
-# Convert from base64 to img
-imgBytes = base64.b64decode(img64, altchars=None, validate=False)
-img = np.frombuffer(imgBytes, dtype=np.uint8)
-img = cv2.imdecode(img, cv2.IMREAD_ANYCOLOR)
+glob = {}
 
-print("Received image")
-
-while True:
-    hex = input()
-    rgb = ImageColor.getcolor(hex, "RGB")
-
-    res = cv2.cvtColor(img, cv2.COLOR_RGBA2GRAY)
+def setImage(img64):
+    img = imgDecoding()(img64)
+    
+    if len(img.shape) > 2:
+        uc, counts = np.unique(img.reshape(-1, img.shape[2]), axis=0, return_counts=True)
+        uc = ['#{:02x}{:02x}{:02x}'.format(*c) for c in uc]
+        res = cv2.cvtColor(img, cv2.COLOR_RGBA2GRAY)
+    else:
+        uc, counts = np.unique(img.reshape(-1), return_counts=True)
+        uc = uc.tolist()
+        res = img
     
     isSparse = np.sum(img > 0) < np.sum(img == 0)
     if isSparse:
         res = (res > 0).astype(np.uint8) * 255
     res = cv2.cvtColor(res, cv2.COLOR_GRAY2RGB)
-    res[np.all(img==rgb[::-1], axis=2)] = (0, 0, 255)
     
-    # Convert result to base64
-    bytes = cv2.imencode(".png", res)[1]
-    res64 = base64.b64encode(bytes)
-    print(res64)
+    glob["image"] = img
+    glob["disp"] = res
+    glob["uc"] = uc, counts
+    
+    reply("message", list(zip(uc, counts.tolist())), to_str=False)
+
+commands = {
+    "setImage": setImage, 
+    "ping": lambda x: x,
+}
+
+command_loop(commands)

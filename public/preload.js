@@ -27,3 +27,4 @@ contextBridge.exposeInMainWorld('layers', {
 
 provideBackgroundPython("jsontest");
 provideBackgroundPython("predict");
+provideBackgroundPython("highlight");

@@ -12,7 +12,6 @@ function App() {
 
   // image is the original one, tmp is whats displayed
   const [image, setImage] = useState(null);
-  const [tmpImage, settmpImage] = useState(null);
   const [layers, setLayers] = useState([]);
 
   // Prediction
@@ -76,7 +75,6 @@ function App() {
           addLayer={addLayer}
         />
         <LayerPicker layers={layers} setVisibility={setVisibility} />
-        {/* {canvas && <ColorLayers canvas={canvas} updateImage={setImage} />} */}
         <ColorPicker />
       </Toolbar>
     </div>
