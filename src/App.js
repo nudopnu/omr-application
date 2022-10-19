@@ -17,34 +17,16 @@ function App() {
 
   // Prediction
   const [canvas, setCanvas] = useState(null);
-  const [isPredicting, setPredicting] = useState(false);
-  const [isModelLoaded, setIsModelLoaded] = useState(false);
 
-  async function onModelSelect(modelName) {
-    console.log(modelName);
-    await window.predict.sendCommand("loadModel", modelName);
-    setIsModelLoaded(true);
-    console.log("SETTING MODEL", modelName);
+  function getImage() {
+    return canvas.toDataURL().split(",")[1];
   }
 
-  async function onRequestPrediction() {
-    setPredicting(true);
-    let res = await window.predict.sendCommand("predict", canvas.toDataURL().split(",")[1]);
-    setPredicting(false);
-    res = res.payload;
-    let dataUrl = "data:image/png;base64," + res.slice(2, -1)
-    setImage(dataUrl);
-    console.log(dataUrl);
-    const newLayer = {
-      type: 'base64ImageUrl',
-      name: 'Prediction',
-      visible: true,
-      src: dataUrl
-    };
+  function addLayer(newLayer) {
     setLayers([
       ...layers,
       newLayer
-    ])
+    ]);
   }
 
   async function onOpenFiles(files) {
@@ -90,10 +72,8 @@ function App() {
       </WorkArea>
       <Toolbar canvas={canvas}>
         <ModelPicker
-          onModelSelect={onModelSelect}
-          onRequestPrediction={onRequestPrediction}
-          isModelLoaded={isModelLoaded}
-          isPredicting={isPredicting}
+          getImage={getImage}
+          addLayer={addLayer}
         />
         <LayerPicker layers={layers} setVisibility={setVisibility} />
         {/* {canvas && <ColorLayers canvas={canvas} updateImage={setImage} />} */}
