@@ -1,6 +1,6 @@
 import "./LayerPicker.css";
 
-export function LayerPicker({ layers }) {
+export function LayerPicker({ layers, setVisibility }) {
 
     function onDragStart(event, index, layer) {
         event.dataTransfer.setData("text/json", JSON.stringify({
@@ -10,11 +10,22 @@ export function LayerPicker({ layers }) {
         event.dataTransfer.effectAllowed = "link";
     }
 
+    function onClick(index, layer) {
+        console.log(index, layer);
+        setVisibility(index, !layer.visible);
+    }
+
     function renderLayer(index, layer) {
         return (
-            <div className="layerselect" draggable={true} onDragStart={event => onDragStart(event, index, layer)}>
+            <div
+                className="layerselect"
+                draggable={true}
+                onDragStart={event => onDragStart(event, index, layer)}
+                onClick={_event => onClick(index, layer)}
+                key={index}
+            >
                 <div className="eyebox">
-                    <div className="eye"></div>
+                    {layer.visible && <div className="eye"></div>}
                 </div>
                 {index} - {layer.name}
             </div>

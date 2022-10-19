@@ -30,4 +30,6 @@
 
 .layers {
     margin: 10px 0px 10px;
+    display: flex;
+    flex-direction: column-reverse;
 }

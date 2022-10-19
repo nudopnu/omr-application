@@ -65,6 +65,24 @@ function App() {
     }
   }
 
+  function setVisibility(index, visibility) {
+    console.log(layers);
+    let newLayers = []
+    layers.forEach((layer, idx) => {
+      if (idx !== index) {
+        newLayers.push(layer);
+      } else {
+        newLayers.push({
+          ...layer,
+          visible: !layer.visible,
+        });
+      }
+    })
+    console.log(newLayers[0]);
+    console.log(newLayers[1]);
+    setLayers(newLayers);
+  }
+
   return (
     <div className="App">
       <WorkArea image={image} onOpenFiles={onOpenFiles}>
@@ -77,7 +95,7 @@ function App() {
           isModelLoaded={isModelLoaded}
           isPredicting={isPredicting}
         />
-        <LayerPicker layers={layers} />
+        <LayerPicker layers={layers} setVisibility={setVisibility} />
         {/* {canvas && <ColorLayers canvas={canvas} updateImage={setImage} />} */}
         <ColorPicker />
       </Toolbar>
