@@ -1,13 +1,11 @@
 
 import base64
 import os
-import sys
-import json
 import cv2
 import numpy as np
 import tensorflow as tf
-from PIL import Image
 from Preprocessing.image import apply, sparse, tile_merge_flat
+from commands import command_loop
 
 glob = {}
 
@@ -48,26 +46,6 @@ commands = {
     "ping": lambda x: x,
 }
 
-ERROR = "error"
-MESSAGE = "message"
-
-def receive():
-    msg = input()
-    msg = json.loads(msg)
-    type = msg["type"]
-    payload = msg["payload"]
-    return type, payload
-
-def reply(type, payload):
-    print(json.dumps({"type": type, "payload": str(payload)}))
-
-while True:
-    type, payload = receive()
-    if type not in commands:
-        reply(ERROR, "command not found")
-    else:
-        result = commands[type](payload)
-        reply(MESSAGE, result)
-
+command_loop(commands)
 # test: 
 # cat b64.txt | py scripts/predict.py simple_unet_256x256_03.h5 > tmp.txt
