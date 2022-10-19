@@ -30,10 +30,13 @@ button {
     background-color: #005E8E;
     border-radius: 5px;
     padding: 5px;
-    width: 250px;
     height: 40px;
     border: 1px solid #707070;
     cursor: pointer;
+}
+
+button.choose {
+    width: 250px;
 }
 
 button:hover {

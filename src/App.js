@@ -37,6 +37,7 @@ function App() {
     console.log(dataUrl);
     const newLayer = {
       type: 'base64ImageUrl',
+      name: 'Prediction',
       visible: true,
       src: dataUrl
     };
@@ -54,6 +55,7 @@ function App() {
       setCanvas(canvas)
       const newLayer = {
         type: 'base64ImageUrl',
+        name: 'Original',
         visible: true,
         src: dataUrl
       };

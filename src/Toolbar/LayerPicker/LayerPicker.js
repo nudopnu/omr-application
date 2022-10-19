@@ -8,7 +8,7 @@ export function LayerPicker({ layers }) {
                 <div className="eyebox">
                     <div className="eye"></div>
                 </div>
-                {layer.type}
+                {layer.name}
             </div>
         )
     }

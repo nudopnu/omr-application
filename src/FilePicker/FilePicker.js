@@ -21,7 +21,7 @@ export function FilePicker(props) {
                     (!props.loading &&
                         <>
                             <span>Drop Sheet here</span>
-                            <button onClick={handleClick}>or choose from file...</button>
+                            <button onClick={handleClick} className="choose">or choose from file...</button>
                             <input type="file" name="sheet" id="" ref={inp} onChange={handleChange} accept="image/png, image/jpeg" />
                         </>
                     ) ||
