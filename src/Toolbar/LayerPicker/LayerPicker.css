@@ -27,3 +27,7 @@
 .layerselect:hover {
     border: 1px solid #fff;
 }
+
+.layers {
+    margin: 10px 0px 10px;
+}

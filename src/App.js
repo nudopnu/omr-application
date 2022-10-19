@@ -2,9 +2,9 @@ import { useState } from 'react';
 import './App.css';
 import { Layers } from './Layers/Layers';
 import { loadImage } from './lib/Image';
-import { ColorLayers } from './Toolbar/ColorLayers/ColorLayers';
-import { ModelPicker } from './Toolbar/ModelPicker/ModelPicker';
+import { ColorPicker } from './Toolbar/ColorPicker/ColorPicker';
 import { LayerPicker } from './Toolbar/LayerPicker/LayerPicker';
+import { ModelPicker } from './Toolbar/ModelPicker/ModelPicker';
 import { Toolbar } from './Toolbar/Toolbar';
 import { WorkArea } from './WorkArea/WorkArea';
 
@@ -79,6 +79,7 @@ function App() {
         />
         <LayerPicker layers={layers} />
         {/* {canvas && <ColorLayers canvas={canvas} updateImage={setImage} />} */}
+        <ColorPicker />
       </Toolbar>
     </div>
   );
