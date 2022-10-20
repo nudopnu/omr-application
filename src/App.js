@@ -59,8 +59,6 @@ function App() {
         });
       }
     })
-    console.log(newLayers[0]);
-    console.log(newLayers[1]);
     setLayers(newLayers);
   }
 
@@ -75,7 +73,7 @@ function App() {
           addLayer={addLayer}
         />
         <LayerPicker layers={layers} setVisibility={setVisibility} />
-        <ColorPicker />
+        <ColorPicker addLayer={addLayer}/>
       </Toolbar>
     </div>
   );

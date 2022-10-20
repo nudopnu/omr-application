@@ -4,7 +4,6 @@ import cv2
 import numpy as np
 from PIL import ImageColor
 
-from Preprocessing.image import apply, sparse, tile_merge_flat
 from commands import command_loop, imgDecoding, imgEncoding, reply
 
 glob = {}
@@ -32,8 +31,19 @@ def setImage(img64):
     
     reply("message", list(zip(uc, counts.tolist())), to_str=False)
 
+def highlight(color):
+    res = glob["disp"].copy()
+    img = glob["image"]
+    if len(img.shape) > 2:
+        res[np.all(img==ImageColor.getcolor(color, 'RGB'), axis=2)] = (0, 0, 255)
+    else:
+        res[np.where(img == color)] = (0, 0, 255)
+    res = imgEncoding()(res)
+    reply("message", res)
+
 commands = {
     "setImage": setImage, 
+    "highlight": highlight,
     "ping": lambda x: x,
 }
 

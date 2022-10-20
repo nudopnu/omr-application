@@ -3,7 +3,7 @@ import { List } from "../../common/List";
 import { Spinner } from "../../Spinner/Spinner";
 import "./ColorPicker.css"
 
-export function ColorPicker() {
+export function ColorPicker({ addLayer }) {
 
     const [displayText, setDisplayText] = useState("- Drop Layer here -")
     const [titleText, setTitleText] = useState("Filter colors:")
@@ -27,11 +27,35 @@ export function ColorPicker() {
         setAnalyzing(true);
         let colors = await window.highlight.sendCommand("setImage", res.layer.src.split(",")[1]);
         setAnalyzing(false);
-
-        console.log(colors.payload);
-
         setColors(colors.payload);
     }
+
+    async function onSelectColor(color) {
+        console.log(color);
+        let response = await window.highlight.sendCommand("highlight", color[0]);
+        let dataUrl = "data:image/png;base64," + response.payload.slice(2, -1)
+        const newLayer = {
+            type: 'base64ImageUrl',
+            name: 'Original',
+            visible: true,
+            src: dataUrl
+        };
+        addLayer(newLayer)
+    }
+
+    function renderColorItem(item) {
+        return (
+            <div style={sytle}>
+                <span>{item[0]}</span><span>({item[1]})</span>
+            </div>
+        );
+    }
+
+    const sytle = {
+        display: 'flex',
+        width: '100%',
+        justifyContent: 'space-between',
+    };
 
     return (
         <>
@@ -40,7 +64,7 @@ export function ColorPicker() {
                 <span>{displayText}</span>
             </div>
             {isAnalyzing && <Spinner text={"Analyzing..."} />}
-            {!isAnalyzing && colors && <List items={colors} toContent={item => `${item[0]} (${item[1]})`}></List>}
+            {!isAnalyzing && colors && <List items={colors} toContent={renderColorItem} onSelect={onSelectColor}></List>}
         </>
     );
 }
