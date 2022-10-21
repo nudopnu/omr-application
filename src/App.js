@@ -28,6 +28,23 @@ function App() {
     ]);
   }
 
+  function replaceLayer(index, mapfunc) {
+    let newLayers = []
+    layers.forEach((layer, idx) => {
+      if (idx !== index) {
+        newLayers.push(layer);
+      } else {
+        newLayers.push(mapfunc(layer));
+      }
+    });
+    setLayers(newLayers);
+  }
+
+  function deleteLayer(index) {
+    let newLayers = layers.filter((layer, idx) => idx !== index)
+    setLayers(newLayers);
+  }
+
   async function onOpenFiles(files) {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
@@ -46,22 +63,6 @@ function App() {
     }
   }
 
-  function setVisibility(index, visibility) {
-    console.log(layers);
-    let newLayers = []
-    layers.forEach((layer, idx) => {
-      if (idx !== index) {
-        newLayers.push(layer);
-      } else {
-        newLayers.push({
-          ...layer,
-          visible: !layer.visible,
-        });
-      }
-    })
-    setLayers(newLayers);
-  }
-
   return (
     <div className="App">
       <WorkArea image={image} onOpenFiles={onOpenFiles}>
@@ -72,8 +73,8 @@ function App() {
           getImage={getImage}
           addLayer={addLayer}
         />
-        <LayerPicker layers={layers} setVisibility={setVisibility} />
-        <ColorPicker addLayer={addLayer}/>
+        <LayerPicker layers={layers} replaceLayer={replaceLayer} deleteLayer={deleteLayer} />
+        <ColorPicker addLayer={addLayer} />
       </Toolbar>
     </div>
   );

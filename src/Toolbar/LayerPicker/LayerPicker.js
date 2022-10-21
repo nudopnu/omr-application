@@ -1,6 +1,6 @@
 import "./LayerPicker.css";
 
-export function LayerPicker({ layers, setVisibility }) {
+export function LayerPicker({ layers, replaceLayer, deleteLayer }) {
 
     function onDragStart(event, index, layer) {
         event.dataTransfer.setData("text/json", JSON.stringify({
@@ -10,9 +10,17 @@ export function LayerPicker({ layers, setVisibility }) {
         event.dataTransfer.effectAllowed = "link";
     }
 
-    function onClick(index, layer) {
-        console.log(index, layer);
-        setVisibility(index, !layer.visible);
+    function toggleVisibility(index, layer) {
+        replaceLayer(index, oldLayer => ({
+            ...oldLayer,
+            visible: !layer.visible,
+        }));
+    }
+
+    function onDeleteLayer(event, index) {
+        event.stopPropagation();
+        console.log("del");
+        deleteLayer(index);
     }
 
     function renderLayer(index, layer) {
@@ -21,13 +29,18 @@ export function LayerPicker({ layers, setVisibility }) {
                 className="layerselect"
                 draggable={true}
                 onDragStart={event => onDragStart(event, index, layer)}
-                onClick={_event => onClick(index, layer)}
+                onClick={_event => toggleVisibility(index, layer)}
                 key={index}
             >
                 <div className="eyebox">
                     {layer.visible && <div className="eye"></div>}
                 </div>
-                {index} - {layer.name}
+                <div className="layerselecttext">
+                    {index} - {layer.name}
+                </div>
+                <div className="lasyerselectdelete" onClick={event => onDeleteLayer(event, index)}>
+                    X
+                </div>
             </div>
         )
     }

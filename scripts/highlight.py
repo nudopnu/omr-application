@@ -1,5 +1,3 @@
-import base64
-import json
 import cv2
 import numpy as np
 from PIL import ImageColor
@@ -11,10 +9,12 @@ glob = {}
 def setImage(img64):
     img = imgDecoding()(img64)
     
+    # if rgb
     if len(img.shape) > 2:
         uc, counts = np.unique(img.reshape(-1, img.shape[2]), axis=0, return_counts=True)
         uc = ['#{:02x}{:02x}{:02x}'.format(*c) for c in uc]
         res = cv2.cvtColor(img, cv2.COLOR_RGBA2GRAY)
+    # if single-channel
     else:
         uc, counts = np.unique(img.reshape(-1), return_counts=True)
         uc = uc.tolist()

@@ -3,9 +3,8 @@ import { List } from "../../common/List";
 import { Spinner } from "../../Spinner/Spinner";
 import "./ColorPicker.css"
 
-export function ColorPicker({ addLayer }) {
+export function ColorPicker({ addLayer, setLayer, getLayer }) {
 
-    const [displayText, setDisplayText] = useState("- Drop Layer here -")
     const [titleText, setTitleText] = useState("Filter colors:")
     const [hasInit, setInit] = useState(false);
     const [isAnalyzing, setAnalyzing] = useState(false);
@@ -36,7 +35,7 @@ export function ColorPicker({ addLayer }) {
         let dataUrl = "data:image/png;base64," + response.payload.slice(2, -1)
         const newLayer = {
             type: 'base64ImageUrl',
-            name: 'Original',
+            name: 'Highlight',
             visible: true,
             src: dataUrl
         };
@@ -61,10 +60,10 @@ export function ColorPicker({ addLayer }) {
         <>
             <span>{titleText}</span>
             <div onDragOver={onDragOver} onDrop={onDrop} className="layerdrop">
-                <span>{displayText}</span>
+                <span>- Drop Layer here -</span>
             </div>
             {isAnalyzing && <Spinner text={"Analyzing..."} />}
-            {!isAnalyzing && colors && <List items={colors} toContent={renderColorItem} onSelect={onSelectColor}></List>}
+            {!isAnalyzing && colors.length > 0 && <List items={colors} toContent={renderColorItem} onSelect={onSelectColor}></List>}
         </>
     );
 }
