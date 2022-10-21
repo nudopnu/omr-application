@@ -5,15 +5,17 @@ import './WorkArea.css';
 // Thanks to:
 // https://dev.to/stackfindover/zoom-image-point-with-mouse-wheel-11n3
 
+// Hacky way to persist data across re-renders
+let scale = 1;
+let panning = false;
+let pointX = 0;
+let pointY = 0;
+let start = { x: 0, y: 0 };
+
 export function WorkArea(props) {
     const zoom = useRef(null);
     const [isLoading, setLoading] = useState(false);
 
-    let scale = 1,
-        panning = false,
-        pointX = 0,
-        pointY = 0,
-        start = { x: 0, y: 0 };
 
     function setTransform() {
         if (zoom.current) {
