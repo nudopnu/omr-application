@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { AbcEditor } from './AbcEditor/AbcEditor';
 import './App.css';
 import { Layers } from './Layers/Layers';
 import { loadImage } from './lib/Image';
+import { AbcTools } from './Toolbar/AbcTools/AbcTools';
 import { ColorPicker } from './Toolbar/ColorPicker/ColorPicker';
 import { LayerPicker } from './Toolbar/LayerPicker/LayerPicker';
 import { ModelPicker } from './Toolbar/ModelPicker/ModelPicker';
@@ -59,15 +61,16 @@ function App() {
       };
       setLayers([
         newLayer
-      ])
+      ]);
     }
   }
 
   return (
     <div className="App">
-      <WorkArea image={image} onOpenFiles={onOpenFiles}>
+      <WorkArea onOpenFiles={onOpenFiles} layers={layers}>
         <Layers layers={layers} />
       </WorkArea>
+      {layers.filter(layer => layer.type === 'abc-render').length > 0 && <AbcEditor abcLayers={layers.filter(layer => layer.type === 'abc-render')} />}
       <Toolbar canvas={canvas}>
         <ModelPicker
           getImage={getImage}
@@ -75,6 +78,7 @@ function App() {
         />
         <LayerPicker layers={layers} replaceLayer={replaceLayer} deleteLayer={deleteLayer} />
         <ColorPicker addLayer={addLayer} />
+        <AbcTools addLayer={addLayer} />
       </Toolbar>
     </div>
   );

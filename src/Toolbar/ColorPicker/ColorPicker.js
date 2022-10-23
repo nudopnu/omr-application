@@ -10,6 +10,7 @@ export function ColorPicker({ addLayer, setLayer, getLayer }) {
     const [isAnalyzing, setAnalyzing] = useState(false);
 
     const [colors, setColors] = useState([]);
+    const [highlighLayerIndex, setHighlightLayerIndex] = useState(null);
 
     function onDragOver(event) {
         event.preventDefault();

@@ -22,7 +22,7 @@ def setImage(img64):
     
     isSparse = np.sum(img > 0) < np.sum(img == 0)
     if isSparse:
-        res = (res > 0).astype(np.uint8) * 255
+        res = (res == 0).astype(np.uint8) * 255
     res = cv2.cvtColor(res, cv2.COLOR_GRAY2RGB)
     
     glob["image"] = img

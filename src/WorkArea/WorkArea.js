@@ -16,7 +16,6 @@ export function WorkArea(props) {
     const zoom = useRef(null);
     const [isLoading, setLoading] = useState(false);
 
-
     function setTransform() {
         if (zoom.current) {
             zoom.current.style.transform = "translate(" + pointX + "px, " + pointY + "px) scale(" + scale + ")";
@@ -87,8 +86,9 @@ export function WorkArea(props) {
 
     /* Turn off loading when new image arrives */
     useEffect(() => {
+        console.log(props);
         setLoading(false);
-    }, [props.image]);
+    }, [props]);
 
     return (
         <div id='workarea'
@@ -105,7 +105,7 @@ export function WorkArea(props) {
             onDrop={drop}
         >
             {
-                (props.image && !isLoading &&
+                (props.layers && props.layers.length > 0 && !isLoading &&
                     <div id="zoom" ref={zoom} >
                         {props.children}
                     </div>
