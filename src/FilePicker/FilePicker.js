@@ -22,7 +22,7 @@ export function FilePicker(props) {
                         <>
                             <span>Drop Sheet here</span>
                             <button onClick={handleClick} className="choose">or choose from file...</button>
-                            <input type="file" name="sheet" id="" ref={inp} onChange={handleChange} accept="image/png, image/jpeg" />
+                            <input type="file" name="sheet" id="file-input" ref={inp} onChange={handleChange} accept="image/png, image/jpeg" />
                         </>
                     ) ||
                     <Spinner text={"Loading image..."} />

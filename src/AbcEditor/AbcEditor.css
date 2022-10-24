@@ -1,3 +1,5 @@
 .abc-editor {
     font-family: consolas;
+    display: flex;
+    flex-direction: column;
 }
