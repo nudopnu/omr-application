@@ -3,10 +3,9 @@ import abcjs from "abcjs";
 import { ABC_CLASSES } from "../lib/Sheet";
 
 const sheets = [
-    `
-X:1
+    `X:1
 T: Training Sheet 001
-K:E
+K: E
 R: class collection
 L: 1/64
 Q: 1/4=180
@@ -21,8 +20,7 @@ z1z2z3z4z6z8z16z32z64|!arpeggio![A,CE]^^d|
 [V:V1]
 C1- | C1 D2 E3 F4 G6 A8|: c,,1 (d,,2 e,,3 f,,4 g,,6 a,,8):|c128|
 [V:V2]
-[C,E,G,Bd]- |[CEGBd] D2 e3 f4 g6 a8|: C1 D2 E3 F4 G6 A8:|[C,c,]128|
-    `
+[C,E,G,Bd]- |[CEGBd] D2 e3 f4 g6 a8|: C1 D2 E3 F4 G6 A8:|[C,c,]128|`
 ];
 
 export function AbcEditor({ abcLayers }) {
