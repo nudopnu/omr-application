@@ -25,6 +25,10 @@ contextBridge.exposeInMainWorld('layers', {
     highlight: (color) => ipcRenderer.invoke('MSG_TO_HIGHLIGHT', color),
 })
 
+contextBridge.exposeInMainWorld('page', {
+    print: (url) => ipcRenderer.invoke('print', url),
+});
+
 provideBackgroundPython("jsontest");
 provideBackgroundPython("predict");
 provideBackgroundPython("highlight");

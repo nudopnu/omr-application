@@ -29,6 +29,45 @@ function createWindow() {
   startBackgroundProcess("highlight");
   startBackgroundProcess("jsontest");
   startBackgroundProcess("predict");
+  ipcMain.handle('print', (_event, url) => {
+    let win = new BrowserWindow({ title: 'Preview', show: false, autoHideMenuBar: true, height: 800, width: 800 });
+
+    win.loadURL(url);
+
+    const printOptions = {
+      silent: false,
+      printBackground: true,
+      color: true,
+      margin: {
+        marginType: 'printableArea',
+      },
+      landscape: false,
+      pagesPerSheet: 1,
+      collate: false,
+      copies: 1,
+      header: 'Page header',
+      footer: 'Page footer',
+    };
+
+    win.webContents.once('did-finish-load', () => {
+      win.webContents.printToPDF(printOptions).then((data) => {
+        let buf = Buffer.from(data);
+        let url = 'data:application/pdf;base64,' + buf.toString('base64');
+
+        win.webContents.on('ready-to-show', () => {
+          win.show();
+          win.setTitle('Preview');
+        });
+        win.webContents.on('closed', () => win = null);
+        win.loadURL(url);
+
+      })
+        .catch((error) => {
+          console.log(error);
+        });
+    });
+    return 'shown preview window';
+  });
   mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);
   mainWindow.on('closed', () => mainWindow = null);
 }

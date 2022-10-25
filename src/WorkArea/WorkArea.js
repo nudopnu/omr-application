@@ -25,11 +25,13 @@ export function WorkArea(props) {
         []
     );
 
-    function onKeyDown(event) {
-        console.log(event);
-        if (event.ctrlKey && event.key === 'p') {
-            alert('Print!');
-            window.print();
+    async function onKeyDown(event) {
+        console.log(props);
+        if (document.querySelector("#zoom") && event.ctrlKey && event.key === 'p') {
+            let data = document.querySelector("#zoom").innerHTML;
+            let blob = new Blob([data], { type: 'text/html' });
+            let url = URL.createObjectURL(blob);
+            console.log(await window.page.print(url));;
         }
     }
 
