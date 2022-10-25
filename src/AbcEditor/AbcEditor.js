@@ -77,7 +77,7 @@ export function AbcEditor({ abcLayers }) {
                     checked={checked}
                     onChange={event => colorize(event.target.checked)}
                 />
-                Colorize
+                <span>Colorize</span>
             </label>
         </div>
     );

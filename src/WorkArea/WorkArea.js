@@ -11,10 +11,27 @@ let panning = false;
 let pointX = 0;
 let pointY = 0;
 let start = { x: 0, y: 0 };
+let ctrlPListener = false;
 
 export function WorkArea(props) {
     const zoom = useRef(null);
     const [isLoading, setLoading] = useState(false);
+
+
+    useEffect(
+        () => {
+            document.addEventListener("keydown", onKeyDown);
+        },
+        []
+    );
+
+    function onKeyDown(event) {
+        console.log(event);
+        if (event.ctrlKey && event.key === 'p') {
+            alert('Print!');
+            window.print();
+        }
+    }
 
     function setTransform() {
         if (zoom.current) {
@@ -22,21 +39,21 @@ export function WorkArea(props) {
         }
     }
 
-    function onmouseenter(e) {
+    function onMouseEnter(e) {
         panning = e.buttons;
     }
 
-    function onmousedown(e) {
+    function onMouseDown(e) {
         e.preventDefault();
         start = { x: e.clientX - pointX, y: e.clientY - pointY };
         panning = true;
     }
 
-    function onmouseup(e) {
+    function onMouseUp(e) {
         panning = false;
     }
 
-    function onmousemove(e) {
+    function onMouseMove(e) {
         e.preventDefault();
         if (!panning) {
             return;
@@ -94,15 +111,18 @@ export function WorkArea(props) {
         <div id='workarea'
             /* For zoom operations */
             onWheel={onWheel}
-            onMouseMove={onmousemove}
-            onMouseDown={onmousedown}
-            onMouseEnter={onmouseenter}
-            onMouseUp={onmouseup}
+            onMouseMove={onMouseMove}
+            onMouseDown={onMouseDown}
+            onMouseEnter={onMouseEnter}
+            onMouseUp={onMouseUp}
 
             /* for file opening */
             onDragEnter={dragenter}
             onDragOver={dragover}
             onDrop={drop}
+
+            /* for printing */
+            onKeyDown={onKeyDown}
         >
             {
                 (props.layers && props.layers.length > 0 && !isLoading &&
