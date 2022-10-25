@@ -20,7 +20,7 @@ export function FilePicker(props) {
                 {
                     (!props.loading &&
                         <>
-                            <span>Drop Sheet here</span>
+                            <span>Drop Sheet Here</span>
                             <button onClick={handleClick} className="choose">or choose from file...</button>
                             <input type="file" name="sheet" id="file-input" ref={inp} onChange={handleChange} accept="image/png, image/jpeg" />
                         </>
