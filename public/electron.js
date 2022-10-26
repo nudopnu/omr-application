@@ -31,7 +31,6 @@ function createWindow() {
   startBackgroundProcess("predict");
   ipcMain.handle('print', (_event, url) => {
     let win = new BrowserWindow({ title: 'Preview', show: false, autoHideMenuBar: true, height: 800, width: 800 });
-
     win.loadURL(url);
 
     const printOptions = {
@@ -67,6 +66,21 @@ function createWindow() {
         });
     });
     return 'shown preview window';
+  });
+  ipcMain.handle('capture', async (_event, url, width, height) => {
+    console.log(width, height);
+    return new Promise((resolve, reject) => {
+      let win = new BrowserWindow({ title: 'Preview', show: false, autoHideMenuBar: true, maxWidth: width * 2, maxHeight: height * 2 });
+      win.loadURL(url);
+      win.setContentSize(width, height);
+      win.webContents.once('did-finish-load', async () => {
+        win.webContents.executeJavaScript("document.body.style.margin='0';");
+        setTimeout(async () => {
+          const nativeImage = await win.webContents.capturePage();
+          resolve(nativeImage.toDataURL());
+        }, 100);
+      });
+    });
   });
   mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);
   mainWindow.on('closed', () => mainWindow = null);

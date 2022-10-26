@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { AbcEditor } from './AbcEditor/AbcEditor';
 import './App.css';
 import { Layers } from './Layers/Layers';
-import { loadImage } from './lib/Image';
+import { loadImage, uriToCanvas } from './lib/Image';
 import { AbcTools } from './Toolbar/AbcTools/AbcTools';
 import { ColorPicker } from './Toolbar/ColorPicker/ColorPicker';
 import { LayerPicker } from './Toolbar/LayerPicker/LayerPicker';
@@ -24,6 +24,11 @@ function App() {
   }
 
   function addLayer(newLayer) {
+    console.log("before", layers, newLayer);
+    if (layers.length === 0 && newLayer.type === 'base64ImageUrl') {
+      setImage(newLayer.src);
+      setCanvas(uriToCanvas(newLayer.src));
+    }
     setLayers([
       ...layers,
       newLayer
@@ -67,11 +72,11 @@ function App() {
 
   return (
     <div className="App">
-      <WorkArea onOpenFiles={onOpenFiles} layers={layers}>
+      <WorkArea onOpenFiles={onOpenFiles} layers={layers} addLayer={addLayer}>
         <Layers layers={layers} />
       </WorkArea>
       {layers.filter(layer => layer.type === 'abc-render').length > 0 && <AbcEditor abcLayers={layers.filter(layer => layer.type === 'abc-render')} />}
-      <Toolbar canvas={canvas}>
+      <Toolbar>
         <ModelPicker
           getImage={getImage}
           addLayer={addLayer}

@@ -27,6 +27,7 @@ contextBridge.exposeInMainWorld('layers', {
 
 contextBridge.exposeInMainWorld('page', {
     print: (url) => ipcRenderer.invoke('print', url),
+    capture: (url, width, height) => ipcRenderer.invoke('capture', url, width, height),
 });
 
 provideBackgroundPython("jsontest");

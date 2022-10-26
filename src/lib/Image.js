@@ -2,8 +2,16 @@ export function drawDataURIOnCanvas(strDataURI, canvas) {
     let img = new window.Image();
     img.addEventListener("load", () => {
         canvas.getContext("2d").drawImage(img, 0, 0);
+        canvas.width = img.width;
+        canvas.height = img.height;
     });
     img.setAttribute("src", strDataURI);
+}
+
+export function uriToCanvas(dataUri) {
+    const canvas = document.createElement('canvas')
+    drawDataURIOnCanvas(dataUri, canvas);
+    return canvas
 }
 
 export function readAsDataURL(bytes, callback) {

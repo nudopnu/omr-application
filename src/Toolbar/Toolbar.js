@@ -1,8 +1,7 @@
-import { Children, useState } from 'react';
-import { ModelPicker } from './ModelPicker/ModelPicker';
-import './Toolbar.css'
+import { Children } from 'react';
+import './Toolbar.css';
 
-export function Toolbar({ canvas, children }) {
+export function Toolbar({ children }) {
 
     return (
         <div id="toolbar">

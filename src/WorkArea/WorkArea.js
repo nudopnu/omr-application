@@ -13,7 +13,7 @@ let pointY = 0;
 let start = { x: 0, y: 0 };
 let ctrlPListener = false;
 
-export function WorkArea(props) {
+export function WorkArea({ layers, children, onOpenFiles, addLayer }) {
     const zoom = useRef(null);
     const [isLoading, setLoading] = useState(false);
 
@@ -26,12 +26,49 @@ export function WorkArea(props) {
     );
 
     async function onKeyDown(event) {
-        console.log(props);
-        if (document.querySelector("#zoom") && event.ctrlKey && event.key === 'p') {
-            let data = document.querySelector("#zoom").innerHTML;
-            let blob = new Blob([data], { type: 'text/html' });
-            let url = URL.createObjectURL(blob);
-            console.log(await window.page.print(url));;
+        if (document.querySelector("#zoom") && event.ctrlKey) {
+            if (event.key === 'k') {
+                const elem = document.querySelector("#workarea-content");
+                let { width, height } = elem.children[0].getClientRects()[0]
+                width = Math.ceil(width);
+                height = Math.ceil(height);
+
+                elem.style.width = `${width}px`;
+                elem.style.height = `${height}px`;
+
+                let data = elem.outerHTML;
+                let blob = new Blob([data], { type: 'text/html' });
+                let url = URL.createObjectURL(blob);
+
+                elem.style.width = '';
+                elem.style.height = '';
+
+                const res = await window.page.capture(url, width, height);
+                const newLayer = {
+                    type: 'base64ImageUrl',
+                    name: 'Rasterized',
+                    visible: true,
+                    src: res
+                };
+                addLayer(newLayer);
+            }
+            else if (event.key === 'p') {
+                const elem = document.querySelector("#workarea-content");
+                let data = elem.outerHTML;
+                let blob = new Blob([data], { type: 'text/html' });
+                let url = URL.createObjectURL(blob);
+                await window.page.print(url);
+            }
+            else if (event.key === 'd') {
+                const elem = document.querySelector("[role='img']");
+                let data = elem.outerHTML;
+                let blob = new Blob([data], { type: 'image/svg+xml' });
+                let url = URL.createObjectURL(blob);
+                let a = document.createElement("a");
+                a.href = url;
+                a.download = "sheet.svg";
+                a.click();
+            }
         }
     }
 
@@ -92,22 +129,21 @@ export function WorkArea(props) {
         /* Delegate responsibility */
         const files = e.dataTransfer.files;
         setLoading(true);
-        props.onOpenFiles(files);
+        onOpenFiles(files);
     }
 
     function onFilesReceive(files) {
         /* Delegate responsibility */
         if (!isLoading) {
             setLoading(true);
-            props.onOpenFiles(files)
+            onOpenFiles(files)
         }
     }
 
     /* Turn off loading when new image arrives */
     useEffect(() => {
-        console.log(props);
         setLoading(false);
-    }, [props]);
+    }, [layers]);
 
     return (
         <div id='workarea'
@@ -127,9 +163,11 @@ export function WorkArea(props) {
             onKeyDown={onKeyDown}
         >
             {
-                (props.layers && props.layers.length > 0 && !isLoading &&
+                (layers && layers.length > 0 && !isLoading &&
                     <div id="zoom" ref={zoom} >
-                        {props.children}
+                        <div id="workarea-content">
+                            {children}
+                        </div>
                     </div>
                 ) || (
                     <FilePicker loading={isLoading} onFilesReceive={onFilesReceive} />
