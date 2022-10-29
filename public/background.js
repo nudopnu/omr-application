@@ -6,8 +6,8 @@ const path = require('path');
 
 
 
-function startBackgroundProcess(name) {
-    
+function startBackgroundProcess(name, devTools = false) {
+
     let hiddenWindows = {};
     let hasStarted = false;
     let startResolve;
@@ -45,7 +45,8 @@ function startBackgroundProcess(name) {
                 "</script>",
             ].join("");
             hiddenWindows[name].loadURL("data:text/html;charset=utf-8," + encodeURI(html));
-            hiddenWindows[name].webContents.openDevTools();
+            if (devTools)
+                hiddenWindows[name].webContents.openDevTools();
 
             hiddenWindows[name].on('closed', () => {
                 hiddenWindows[name] = null;

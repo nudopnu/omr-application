@@ -49,16 +49,17 @@ export function AbcEditor({ abcLayers }) {
             Object.keys(ABC_CLASSES).forEach(key => {
                 const [selector, segColorA, segColorB] = ABC_CLASSES[key];
                 document.querySelectorAll(selector).forEach(elem => {
-                    elem.style.stroke = segColorB;
-                    elem.style.fill = segColorB;
+                    elem.style.color = segColorB;
+                    // elem.style.fill = segColorB;
                 })
             });
         } else {
             Object.keys(ABC_CLASSES).forEach(key => {
                 const [selector, segColorA, segColorB] = ABC_CLASSES[key];
                 document.querySelectorAll(selector).forEach(elem => {
-                    elem.style.stroke = '';
-                    elem.style.fill = '';
+                    // elem.style.stroke = '';
+                    // elem.style.fill = '';
+                    elem.style.color = '';
                 })
             });
         }

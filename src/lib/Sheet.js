@@ -102,7 +102,7 @@ const classes = {
 
 export const ABC_CLASSES = {
     'background': ['#abc-render', "#000000", "#FFFFFF"],
-    'NoteheadBlack': ['.abcjs-note[class*="abcjs-d"]:not(.abcjs-d0-5, .abcjs-d1, .abcjs-d2) > path:not([data-name*="accidental"], [data-name*="dot"], [data-name*=flag], [data-name*="scripts"], [class])', '#010101', '#8287FF'],
+    'NoteheadBlack': ['.abcjs-note[class*="abcjs-d"]:not(.abcjs-d0-5, .abcjs-d1, .abcjs-d2) > path:not([data-name*="accidental"], [data-name*="dot"], [data-name*=flag], [data-name*="scripts"], [class]), [data-name="noteheads.quarter"]', '#010101', '#8287FF'],
     'NoteheadHalf': ['.abcjs-note.abcjs-d0-5 > path:not([data-name*="accidental"], [data-name*="dot"], [data-name*="scripts"], [class])', '#020202', '#BDE6BF'],
     'NoteheadWhole': ['.abcjs-note.abcjs-d1 > path:not([data-name*="accidental"], [data-name*="dot"], [data-name*="scripts"], [class])', '#030303', '#2F5282'],
     // doublewhole: .abcjs-note.abcjs-d2 > path:not([data-name*="accidental"], [data-name*="dot"], [data-name*=flag], [data-name*="scripts"], [class])

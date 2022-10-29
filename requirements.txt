@@ -1,1 +1,5 @@
-tensorflowjs
+numpy
+opencv-contrib-python
+python-shell
+tensorflow
+pillow
