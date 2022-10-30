@@ -60,14 +60,23 @@ export function generateRandomSheet(settings) {
     res += "V: V2 clef=bass\n";
 
     let bassNotesRange = [];
-    let noteDurationsRange = [];
     let accidentalsRange = [];
 
     /* Generate note durations-range */
+    let noteDurationsRange = [];
     settings.notes.subsettings.durations.subsettings.forEach(setting => {
         if (setting.value) {
             let duration = durationFromName[setting.name];
-            noteDurationsRange.push(`${duration}`);
+            noteDurationsRange.push(duration);
+        }
+    });
+
+    /* Generate rest durations-range */
+    let restDurationsRange = [];
+    settings.rests.subsettings.durations.subsettings.forEach(setting => {
+        if (setting.value) {
+            let duration = durationFromName[setting.name];
+            restDurationsRange.push(duration);
         }
     });
 
@@ -135,6 +144,7 @@ export function generateRandomSheet(settings) {
         const numNotes = randIntInRange(minNotesPerStaff, maxNotesPerStaff);
         const numRests = randIntInRange(minRestsPerStaff, maxRestsPerStaff);
 
+        /* Generate Notes */
         let trebleChunks = new RandChunks(trebleNotesRange, sumNumSimNotes);
         let bassChunks = new RandChunks(bassNotesRange, sumNumSimNotes);
         let trebleNoteDurationChunks = new RandChunks(noteDurationsRange, numSimNotes.length);
@@ -160,20 +170,101 @@ export function generateRandomSheet(settings) {
             }
         }
 
+        /* Add accidentals to some notes */
+        let startIdx = randIntInRange(0, trebleGlyphs.length)
+        for (let i = 0; i < accidentalsRange.length; i++) {
+            const accidental = accidentalsRange[i];
+            const glyph = trebleGlyphs[(startIdx + 7 * i) % trebleGlyphs.length];
+            const notesIdx = randIntInRange(0, glyph.notes.length);
+            glyph.notes[notesIdx] = accidental + glyph.notes[notesIdx];
+            console.log(accidentalsRange, glyph.notes[notesIdx]);
+        }
+
+
+        /* Generate Rests */
+        for (let i = 0; i < restDurationsRange.length; i++) {
+            const duration = restDurationsRange[i];
+            trebleGlyphs.push({
+                type: 'rest',
+                duration: duration,
+            });
+            bassGlyphs.push({
+                type: 'rest',
+                duration: duration,
+            });
+        }
+
+        /* Additional rests to make lines same duration */
+        let totalTrebleDuration = 0;
+        let totalBassDuration = 0;
+        let deltaDuration = 0;
+        let deficiteGlyphs;
+        for (let i = 0; i < trebleGlyphs.length; i++) {
+            const { duration } = trebleGlyphs[i];
+            totalTrebleDuration += duration;
+        }
+        for (let i = 0; i < bassGlyphs.length; i++) {
+            const { duration } = bassGlyphs[i];
+            totalBassDuration += duration;
+        }
+        if (totalTrebleDuration > totalBassDuration) {
+            deltaDuration = totalTrebleDuration - totalBassDuration;
+            deficiteGlyphs = bassGlyphs;
+        }
+        else if (totalTrebleDuration < totalBassDuration) {
+            deltaDuration = totalBassDuration - totalTrebleDuration;
+            deficiteGlyphs = trebleGlyphs;
+        }
+        const tmpDurations = [64, 32, 16, 8, 4, 2, 1];
+        while (deltaDuration > 0) {
+            for (let i = 0; i < tmpDurations.length; i++) {
+                const duration = tmpDurations[i];
+                if (deltaDuration >= duration) {
+                    deficiteGlyphs.push({
+                        type: 'rest',
+                        duration: duration,
+                    });
+                    deltaDuration -= duration;
+                }
+            }
+        }
+
+        /* Shuffle glyphs */
+        shuffleArray(bassGlyphs);
+        shuffleArray(trebleGlyphs);
+
+        /* Convert treble notes to abc */
         res += "[V:V1]\n";
         for (let i = 0; i < trebleGlyphs.length; i++) {
-            if (trebleGlyphs[i].type === 'chord') {
-                const { notes, duration } = trebleGlyphs[i];
+            const glyph = trebleGlyphs[i];
+            if ((i + 1) % 4 === 0) {
+                res += "|";
+            }
+            if (glyph.type === 'chord') {
+                const { notes, duration } = glyph;
                 res += `[${notes.join("")}]${duration}`;
+            }
+            else if (glyph.type === 'rest') {
+                const { duration } = glyph;
+                res += ` z${duration}`;
             }
         };
         res += "|\n";
 
+        /* Convert bass notes to abc */
         res += "[V:V2]\n";
         for (let i = 0; i < bassGlyphs.length; i++) {
-            if (bassGlyphs[i].type === 'chord') {
-                const { notes, duration } = bassGlyphs[i];
+            const glyph = bassGlyphs[i];
+            if ((i + 1) % 4 === 0) {
+                res += "|";
+            }
+            if (glyph.type === 'chord') {
+                const { notes, duration } = glyph;
                 res += `[${notes.join("")}]${duration}`;
+            }
+            else if (glyph.type === 'rest') {
+                const { duration } = glyph;
+                res += ` z${duration}`;
             }
         };
         res += "|\n";
@@ -289,8 +380,8 @@ export const DEFAULF_GENERATOR_SETTINGS = {
                 },
                 rangeNotesPerStaff: {
                     name: 'Range number of notes per staff', type: 'RANGE', subsettings: [
-                        { name: 'Low', type: 'NUMBER', value: 40 },
-                        { name: 'High', type: 'NUMBER', value: 40 },
+                        { name: 'Low', type: 'NUMBER', value: 50 },
+                        { name: 'High', type: 'NUMBER', value: 50 },
                     ]
                 },
                 rangeNumOfSimNotes: {
@@ -307,11 +398,11 @@ export const DEFAULF_GENERATOR_SETTINGS = {
                 },
                 accidentals: {
                     name: 'Accidentals', type: 'FLAGS', subsettings: [
-                        { name: 'Double-flat', type: 'BOOL', value: false },
-                        { name: 'Flat', type: 'BOOL', value: false },
-                        { name: 'Natural', type: 'BOOL', value: false },
-                        { name: 'Sharp', type: 'BOOL', value: false },
-                        { name: 'Double-Sharp', type: 'BOOL', value: false },
+                        { name: 'Double-flat', type: 'BOOL', value: true },
+                        { name: 'Flat', type: 'BOOL', value: true },
+                        { name: 'Natural', type: 'BOOL', value: true },
+                        { name: 'Sharp', type: 'BOOL', value: true },
+                        { name: 'Double-Sharp', type: 'BOOL', value: true },
                     ]
                 }
             }
@@ -319,14 +410,16 @@ export const DEFAULF_GENERATOR_SETTINGS = {
         rests: {
             type: 'Category', subsettings: {
                 durations: {
-                    name: 'Durations', subsettings: {
-                        doubleWhole: { name: 'Double-whole', type: 'BOOL', value: false },
-                        whole: { name: 'Whole', type: 'BOOL', value: false },
-                        half: { name: 'Half', type: 'BOOL', value: false },
-                        n8th: { name: '8th', type: 'BOOL', value: false },
-                        n32nd: { name: '32nd', type: 'BOOL', value: false },
-                        n64th: { name: '64th', type: 'BOOL', value: false },
-                    }
+                    name: 'Durations', type: 'FLAGS', subsettings: [
+                        { name: 'Double-whole', type: 'BOOL', value: false },
+                        { name: 'Whole', type: 'BOOL', value: true },
+                        { name: 'Half', type: 'BOOL', value: true },
+                        { name: 'Quarter', type: 'BOOL', value: true },
+                        { name: '8th', type: 'BOOL', value: true },
+                        { name: '16th', type: 'BOOL', value: true },
+                        { name: '32nd', type: 'BOOL', value: true },
+                        { name: '64th', type: 'BOOL', value: true },
+                    ]
                 },
                 rangeRestsPerStaff: {
                     name: 'Range number of rests per staff', type: 'RANGE', subsettings: [

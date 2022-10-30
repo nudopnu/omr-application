@@ -69,8 +69,10 @@ export function AbcEditor({ abcLayers }) {
                             return
                     }
                     elem.style.color = segColorB;
-                    // elem.style.fill = segColorB;
                 })
+                if (document.querySelectorAll(selector).length === 0) {
+                    console.log("[NOT FOUND]:", key);
+                }
             });
         } else {
             Object.keys(ABC_CLASSES).forEach(key => {
@@ -81,11 +83,10 @@ export function AbcEditor({ abcLayers }) {
                         const t = 0.001
                         const { width, height } = elem.getBoundingClientRect();
                         const aspectRatio = width / height;
-                        if (Math.abs(aspectRatio - fetchOps.aspectRatio) > t)
+                        let condition = fetchOps.condition ? fetchOps.condition : (a, b) => Math.abs(a - b) > t;
+                        if (condition(aspectRatio, fetchOps.aspectRatio))
                             return
                     }
-                    // elem.style.stroke = '';
-                    // elem.style.fill = '';
                     elem.style.color = '';
                 })
             });
@@ -106,8 +107,8 @@ export function AbcEditor({ abcLayers }) {
                     onChange={event => colorize(event.target.checked)}
                 />
                 <span>Colorize</span>
-                <button onClick={onClickRandom}>Random</button>
             </label>
+            <button onClick={onClickRandom}>Random</button>
         </div>
     );
 }
