@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import abcjs from "abcjs";
-import { ABC_CLASSES } from "../lib/Sheet";
+import { ABC_CLASSES, DEFAULF_GENERATOR_SETTINGS, generateRandomSheet } from "../lib/Sheet";
 
 const sheets = [
     `X:1
@@ -40,6 +40,13 @@ export function AbcEditor({ abcLayers }) {
         console.log(log[0]);
     }
 
+    function onClickRandom() {
+        let abc = generateRandomSheet(DEFAULF_GENERATOR_SETTINGS.settings);
+        console.log(abc);
+        setValue(abc);
+        abcjs.renderAbc('abc-content', abc, abcOptions);
+    }
+
 
     function colorize(flag) {
         console.log(flag);
@@ -47,16 +54,32 @@ export function AbcEditor({ abcLayers }) {
 
         if (flag) {
             Object.keys(ABC_CLASSES).forEach(key => {
-                const [selector, segColorA, segColorB] = ABC_CLASSES[key];
+                const [fetchOps, segColorA, segColorB] = ABC_CLASSES[key];
+                const { selector } = fetchOps
                 document.querySelectorAll(selector).forEach(elem => {
+                    if (fetchOps.aspectRatio) {
+                        const t = 0.001
+                        const { width, height } = elem.getBoundingClientRect();
+                        const aspectRatio = width / height;
+                        if (Math.abs(aspectRatio - fetchOps.aspectRatio) > t)
+                            return
+                    }
                     elem.style.color = segColorB;
                     // elem.style.fill = segColorB;
                 })
             });
         } else {
             Object.keys(ABC_CLASSES).forEach(key => {
-                const [selector, segColorA, segColorB] = ABC_CLASSES[key];
+                const [fetchOps, segColorA, segColorB] = ABC_CLASSES[key];
+                const { selector } = fetchOps
                 document.querySelectorAll(selector).forEach(elem => {
+                    if (fetchOps.aspectRatio) {
+                        const t = 0.001
+                        const { width, height } = elem.getBoundingClientRect();
+                        const aspectRatio = width / height;
+                        if (Math.abs(aspectRatio - fetchOps.aspectRatio) > t)
+                            return
+                    }
                     // elem.style.stroke = '';
                     // elem.style.fill = '';
                     elem.style.color = '';
@@ -79,6 +102,7 @@ export function AbcEditor({ abcLayers }) {
                     onChange={event => colorize(event.target.checked)}
                 />
                 <span>Colorize</span>
+                <button onClick={onClickRandom}>Random</button>
             </label>
         </div>
     );
