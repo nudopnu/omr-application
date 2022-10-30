@@ -32,11 +32,13 @@ export function AbcEditor({ abcLayers }) {
         viewportVertical: true,
         add_classes: true,
         selectTypes: [],
+        viewportHorizontal: true,
     };
 
     function handleChange(event) {
         setValue(event.target.value);
         let log = abcjs.renderAbc('abc-content', event.target.value, abcOptions);
+        setChecked(false);
         console.log(log[0]);
     }
 
@@ -44,6 +46,7 @@ export function AbcEditor({ abcLayers }) {
         let abc = generateRandomSheet(DEFAULF_GENERATOR_SETTINGS.settings);
         console.log(abc);
         setValue(abc);
+        setChecked(false);
         abcjs.renderAbc('abc-content', abc, abcOptions);
     }
 
@@ -61,7 +64,8 @@ export function AbcEditor({ abcLayers }) {
                         const t = 0.001
                         const { width, height } = elem.getBoundingClientRect();
                         const aspectRatio = width / height;
-                        if (Math.abs(aspectRatio - fetchOps.aspectRatio) > t)
+                        let condition = fetchOps.condition ? fetchOps.condition : (a, b) => Math.abs(a - b) > t;
+                        if (condition(aspectRatio, fetchOps.aspectRatio))
                             return
                     }
                     elem.style.color = segColorB;

@@ -49,6 +49,8 @@ Object.assign(RandChunks.prototype, randRangeProto);
 export function generateRandomSheet(settings) {
     let res = "X:1\n";
 
+    res += "T: Random Sheet\n";
+
     /* Set minimal duration */
     res += "L:1/64\n";
 
@@ -223,6 +225,8 @@ export const ABC_CLASSES = {
     'Staff': [{ selector: '.abcjs-staff' }, '#080808', '#9E90AF'],
     'LedgerLine': [{ selector: ".abcjs-ledger" }, "090909", "#018700"],
     'BarLine': [{ selector: ".abcjs-bar > :not([data-name*='dot'])", aspectRatio: 0.019 }, "0A0A0A", "#00ACC6"],
+    'BarLineLong': [{ selector: "g:not([class]) > path:not([class])" }, "0A0A0A", "#00ACC6"],
+    'BarLineLong2': [{ selector: "path[data-name*=bar]", aspectRatio: 0.003, condition: (a, b) => a < b }, "0A0A0A", "#00ACC6"],
     'BarLineThick': [{ selector: ".abcjs-bar > :not([data-name*='dot'])", aspectRatio: 0.129 }, "0B0B0B", "#97FF00"],
     'ClefF': [{ selector: '.abcjs-staff-extra > [data-name*="clefs.F"]' }, "0C0C0C", "#BCB6FF"],
     'ClefG': [{ selector: '.abcjs-staff-extra > [data-name*="clefs.G"]' }, "0D0D0D", "#0000DD"],
@@ -285,8 +289,8 @@ export const DEFAULF_GENERATOR_SETTINGS = {
                 },
                 rangeNotesPerStaff: {
                     name: 'Range number of notes per staff', type: 'RANGE', subsettings: [
-                        { name: 'Low', type: 'NUMBER', value: 20 },
-                        { name: 'High', type: 'NUMBER', value: 150 },
+                        { name: 'Low', type: 'NUMBER', value: 40 },
+                        { name: 'High', type: 'NUMBER', value: 40 },
                     ]
                 },
                 rangeNumOfSimNotes: {
