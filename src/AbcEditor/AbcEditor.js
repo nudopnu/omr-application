@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import abcjs from "abcjs";
 import { ABC_CLASSES, DEFAULF_GENERATOR_SETTINGS, generateRandomSheet } from "../lib/Sheet";
+import "./AbcEditor.css";
 
 const sheets = [
     `X:1

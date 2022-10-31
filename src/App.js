@@ -20,14 +20,15 @@ function App() {
   const [canvas, setCanvas] = useState(null);
 
   function getImage() {
+    console.log(canvas);
     return canvas.toDataURL().split(",")[1];
   }
 
-  function addLayer(newLayer) {
-    console.log("before", layers, newLayer);
+  async function addLayer(newLayer) {
     if (layers.length === 0 && newLayer.type === 'base64ImageUrl') {
       setImage(newLayer.src);
-      setCanvas(uriToCanvas(newLayer.src));
+      const canvas = await uriToCanvas(newLayer.src);
+      setCanvas(canvas);
     }
     setLayers([
       ...layers,

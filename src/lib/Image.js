@@ -1,16 +1,22 @@
-export function drawDataURIOnCanvas(strDataURI, canvas) {
-    let img = new window.Image();
-    img.addEventListener("load", () => {
-        canvas.getContext("2d").drawImage(img, 0, 0);
-        canvas.width = img.width;
-        canvas.height = img.height;
-    });
-    img.setAttribute("src", strDataURI);
+export function drawDataURIOnCanvas(strDataURI) {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext("2d");
+    return new Promise((resolve, reject) => {
+        let img = new Image();
+        document.body.appendChild(canvas)
+        img.src = strDataURI;
+        img.onload = function () {
+            /* Important: first set the size, then draw */
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            resolve(canvas);
+        }
+    })
 }
 
-export function uriToCanvas(dataUri) {
-    const canvas = document.createElement('canvas')
-    drawDataURIOnCanvas(dataUri, canvas);
+export async function uriToCanvas(dataUri) {
+    const canvas = await drawDataURIOnCanvas(dataUri);
     return canvas
 }
 

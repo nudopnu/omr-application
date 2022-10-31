@@ -47,7 +47,6 @@ export function ModelPicker({ getImage, addLayer }) {
         (async () => {
             if (hasInit)
                 return;
-            console.log("Starting because", hasInit);
             setHasInit(true);
             await window.predict.start();
             const modelnames = await window.python.getModels();
