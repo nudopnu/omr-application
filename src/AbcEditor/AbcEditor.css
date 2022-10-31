@@ -15,3 +15,9 @@ textarea {
     background-color: #222;
     color: #eee;
 }
+
+svg {
+    page-break-inside: avoid;
+}
+
+@page { margin: 0; }

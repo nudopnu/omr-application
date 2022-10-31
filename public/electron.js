@@ -37,9 +37,7 @@ function createWindow() {
       silent: false,
       printBackground: true,
       color: true,
-      margin: {
-        marginType: 'printableArea',
-      },
+      marginsType: 1,
       landscape: false,
       pagesPerSheet: 1,
       collate: false,

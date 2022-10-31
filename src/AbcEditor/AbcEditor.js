@@ -34,6 +34,7 @@ export function AbcEditor({ abcLayers }) {
         add_classes: true,
         selectTypes: [],
         viewportHorizontal: true,
+        oneSvgPerLine: true,
     };
 
     function handleChange(event) {
