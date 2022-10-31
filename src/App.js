@@ -25,15 +25,17 @@ function App() {
   }
 
   async function addLayer(newLayer) {
-    if (layers.length === 0 && newLayer.type === 'base64ImageUrl') {
+    if (layers.filter(layer => layer.type === 'base64ImageUrl').length === 0 && newLayer.type === 'base64ImageUrl') {
       setImage(newLayer.src);
       const canvas = await uriToCanvas(newLayer.src);
       setCanvas(canvas);
     }
-    setLayers([
+    const newLayers = [
       ...layers,
       newLayer
-    ]);
+    ];
+    setLayers(newLayers);
+    console.log(newLayers);
   }
 
   function replaceLayer(index, mapfunc) {
@@ -48,8 +50,16 @@ function App() {
     setLayers(newLayers);
   }
 
-  function deleteLayer(index) {
-    let newLayers = layers.filter((layer, idx) => idx !== index)
+  async function deleteLayer(index) {
+    if (layers[index].type === 'base64ImageUrl') {
+      const remainingImages = layers.filter(layer => layer.type === 'base64ImageUrl');
+      if (remainingImages.length > 0) {
+        setImage(remainingImages[0].src);
+        const canvas = await uriToCanvas(remainingImages[0].src);
+        setCanvas(canvas);
+      }
+    }
+    let newLayers = layers.filter((layer, idx) => idx !== index);
     setLayers(newLayers);
   }
 
@@ -76,7 +86,9 @@ function App() {
       <WorkArea onOpenFiles={onOpenFiles} layers={layers} addLayer={addLayer}>
         <Layers layers={layers} />
       </WorkArea>
-      {layers.filter(layer => layer.type === 'abc-render').length > 0 && <AbcEditor abcLayers={layers.filter(layer => layer.type === 'abc-render')} />}
+      {layers.filter(layer => layer.type === 'abc-render').length > 0 &&
+        <AbcEditor abcLayers={layers.filter(layer => layer.type === 'abc-render')} addLayer={addLayer} />
+      }
       <Toolbar>
         <ModelPicker
           getImage={getImage}

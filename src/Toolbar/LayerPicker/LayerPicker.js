@@ -24,9 +24,12 @@ export function LayerPicker({ layers, replaceLayer, deleteLayer }) {
     }
 
     function renderLayer(index, layer) {
+        let classname = "layerselect";
+        console.log(layer.type);
+        if (layer.type === "abc-render") { classname += " dynamic"; }
         return (
             <div
-                className="layerselect"
+                className={classname}
                 draggable={true}
                 onDragStart={event => onDragStart(event, index, layer)}
                 onClick={_event => toggleVisibility(index, layer)}

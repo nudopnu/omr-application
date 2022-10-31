@@ -1,10 +1,10 @@
 .layer {
-    position: absolute;
+  position: absolute;
 }
 
 #abc-render {
-    width: 2480px;
-    height: 3508px;
-    background-color: white;
-    color: black;
+  width: 2480px;
+  height: 3508px;
+  background-color: white;
+  color: black;
 }

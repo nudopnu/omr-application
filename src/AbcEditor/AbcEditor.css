@@ -1,23 +1,35 @@
 #abc-editor {
-    display: flex;
-    flex-direction: column;
-    border: 1px solid #707070;
-    border-width: 1px 0px 1px 1px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #707070;
+  border-width: 1px 0px 1px 1px;
+}
+
+#abc-editor {
+  padding: 20px 20px;
+}
+
+#abc-editor > button {
+  margin: 0px 0px 10px;
 }
 
 label {
-    display: block;
-    font-size: calc(10px + 0.5vmin);
-    padding: 10px;
+  display: block;
+  font-size: calc(10px + 0.5vmin);
+  padding: 10px;
 }
 
 textarea {
-    background-color: #222;
-    color: #eee;
+  background-color: #222;
+  color: #eee;
+  min-width: 200px;
+  width: 200px;
 }
 
 svg {
-    page-break-inside: avoid;
+  page-break-inside: avoid;
 }
 
-@page { margin: 0; }
+@page {
+  margin: 0;
+}

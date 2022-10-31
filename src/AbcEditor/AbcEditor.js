@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import abcjs from "abcjs";
 import { ABC_CLASSES, DEFAULF_GENERATOR_SETTINGS, generateRandomSheet } from "../lib/Sheet";
 import "./AbcEditor.css";
+import { Buffer } from 'buffer';
 
 const sheets = [
     `X:1
@@ -24,7 +25,7 @@ C1- | C1 D2 E3 F4 G6 A8|: c,,1 (d,,2 e,,3 f,,4 g,,6 a,,8):|c128|
 [C,E,G,Bd]- |[CEGBd] D2 e3 f4 g6 a8|: C1 D2 E3 F4 G6 A8:|[C,c,]128|`
 ];
 
-export function AbcEditor({ abcLayers }) {
+export function AbcEditor({ abcLayers, addLayer }) {
     const [value, setValue] = useState(sheets[0]);
     const [checked, setChecked] = useState(false);
 
@@ -34,7 +35,6 @@ export function AbcEditor({ abcLayers }) {
         add_classes: true,
         selectTypes: [],
         viewportHorizontal: true,
-        oneSvgPerLine: true,
     };
 
     function handleChange(event) {
@@ -50,6 +50,56 @@ export function AbcEditor({ abcLayers }) {
         setValue(abc);
         setChecked(false);
         abcjs.renderAbc('abc-content', abc, abcOptions);
+    }
+
+    function onClickConvert() {
+
+        const svgElement = document.querySelector('.abcjs-container > svg');
+        svgElement.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+
+        // svgElement.setAttribute("shape-rendering", "crispEdges");
+        // svgElement.style.filter = 'url(#crispify)';
+        // const defs = document.createElement("defs");
+        // defs.innerHTML = `<filter id="crispify">
+        // <feComponentTransfer>
+        // <feFuncA type="discrete" tableValues="0 1"/>
+        // </feComponentTransfer>
+        // </filter>`;
+        // svgElement.appendChild(defs);
+
+        /* Create canvas to draw image on */
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext("2d");
+
+        /* Turn svg to dataurl for image */
+        const svg = svgElement.outerHTML;
+        const blob = new Blob([svg], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+        const image = document.createElement('img');
+
+        image.addEventListener('load', () => URL.revokeObjectURL(url), { once: true });
+        image.addEventListener('load', () => {
+            canvas.width = 2480;
+            canvas.height = 3508;
+
+            /* Add white background */
+            ctx.fillStyle = "white";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.drawImage(image, 0, 0);
+
+            const dataUrl = canvas.toDataURL('image/png');
+            console.log(dataUrl);
+            addLayer({
+                type: 'base64ImageUrl',
+                name: 'Rasterized',
+                visible: true,
+                src: dataUrl
+            });
+        });
+        image.addEventListener('error', () => console.log("Error rasterizing image"));
+        image.src = url;
+        console.log(svg, image);
     }
 
 
@@ -108,9 +158,10 @@ export function AbcEditor({ abcLayers }) {
                     checked={checked}
                     onChange={event => colorize(event.target.checked)}
                 />
-                <span>Colorize</span>
+                <span>Preview ground truth</span>
             </label>
-            <button onClick={onClickRandom}>Random</button>
+            <button onClick={onClickRandom}>Random Piano Sheet</button>
+            <button onClick={onClickConvert}>Convert to PNG</button>
         </div>
     );
 }

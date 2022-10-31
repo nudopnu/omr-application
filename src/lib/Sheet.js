@@ -49,7 +49,7 @@ Object.assign(RandChunks.prototype, randRangeProto);
 export function generateRandomSheet(settings) {
     let res = "X:1\n";
 
-    res += "T: Random Sheet\n";
+    res += "T: Random Piano Sheet\n";
 
     /* Set minimal duration */
     res += "L:1/64\n";

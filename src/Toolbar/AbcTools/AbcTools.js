@@ -9,8 +9,8 @@ export function AbcTools({ addLayer }) {
     }
     return (
         <>
-            <span>Abc Tools</span>
-            <button onClick={onCreateNew}>Create New</button>
+            <span style={{ margin: '10px 0px', display: 'block'}}>Abc Tools</span>
+            <button onClick={onCreateNew}>Open Editor</button>
         </>
     );
 }
