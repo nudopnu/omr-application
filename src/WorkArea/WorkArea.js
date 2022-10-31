@@ -57,7 +57,7 @@ export function WorkArea({ layers, children, onOpenFiles, addLayer }) {
                 let data = elem.outerHTML;
                 let blob = new Blob([data], { type: 'text/html' });
                 let url = URL.createObjectURL(blob);
-                await window.page.print(url);
+                await window.page.print(url, true);
             }
             else if (event.key === 'd') {
                 const elem = document.querySelector("[role='img']");

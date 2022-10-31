@@ -52,6 +52,25 @@ export function AbcEditor({ abcLayers, addLayer }) {
         abcjs.renderAbc('abc-content', abc, abcOptions);
     }
 
+    async function onClickConvert2() {
+        const elem = document.querySelector("#workarea-content");
+        let data = elem.outerHTML;
+        let blob = new Blob([data], { type: 'text/html' });
+        let url = URL.createObjectURL(blob);
+        const pdf = await window.page.print(url, false);
+        const dpi = 280;
+        const res = await window.page.pdf2png(pdf, dpi);
+        // console.log(res.slice(0, 100));
+        const dataUrl = "data:image/png;base64," + res;
+        const newLayer = {
+            type: 'base64ImageUrl',
+            name: 'Rasterized',
+            visible: true,
+            src: dataUrl
+        };
+        addLayer(newLayer);
+        console.log(dataUrl);
+    }
     function onClickConvert() {
 
         const svgElement = document.querySelector('.abcjs-container > svg');
@@ -162,6 +181,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
             </label>
             <button onClick={onClickRandom}>Random Piano Sheet</button>
             <button onClick={onClickConvert}>Convert to PNG</button>
+            <button onClick={onClickConvert2}>Generate XY</button>
         </div>
     );
 }
