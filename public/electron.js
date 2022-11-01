@@ -48,9 +48,11 @@ function createWindow() {
         copies: 1,
         header: 'Page header',
         footer: 'Page footer',
+        pageSize: 'A4',
       };
 
-      win.webContents.once('did-finish-load', () => {
+      win.webContents.once('did-finish-load', async () => {
+        await win.webContents.executeJavaScript("document.body.style.margin='0';");
         win.webContents.printToPDF(printOptions).then((data) => {
           let buf = Buffer.from(data);
           let url = 'data:application/pdf;base64,' + buf.toString('base64');

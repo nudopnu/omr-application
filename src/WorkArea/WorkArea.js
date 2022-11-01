@@ -53,10 +53,23 @@ export function WorkArea({ layers, children, onOpenFiles, addLayer }) {
                 addLayer(newLayer);
             }
             else if (event.key === 'p') {
-                const elem = document.querySelector("#workarea-content");
-                let data = elem.outerHTML;
+
+                /* Work on a clone */
+                const refElem = document.querySelector("#workarea-content");
+                const cloneElem = refElem.cloneNode(true);
+
+                /* Make each layer to a new page */
+                [...cloneElem.children].forEach(child => {
+                    child.style.width = `100%`;
+                    child.style.setProperty('page-break-after', 'always');
+                })
+
+                /* Convert innerHTML to objecturl */
+                let data = cloneElem.innerHTML;
                 let blob = new Blob([data], { type: 'text/html' });
                 let url = URL.createObjectURL(blob);
+
+                /* Send to main process */
                 await window.page.print(url, true);
             }
             else if (event.key === 'd') {
