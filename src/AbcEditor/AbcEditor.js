@@ -76,10 +76,12 @@ export function AbcEditor({ abcLayers, addLayer }) {
 
         /* Generate masks */
         keys.forEach(key => {
+            console.log(key);
             let abcClone = abcRef.cloneNode(true);
+            abcClone.style.setProperty('background-color', '#000');
             abcClone.style.setProperty('color', '#fff0');
             abcClone.style.setProperty('height', '100%');
-            colorize([key], true, abcClone, _key => 'black');
+            colorize([key], true, abcClone, _key => 'white');
             cloneElem.appendChild(abcClone);
         });
 
@@ -149,6 +151,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
     function validate(abcElem = document) {
         const keys = Object.keys(ABC_CLASSES);
         let hintText = [];
+        let presentKeys = [];
 
         keys.forEach(key => {
             ABC_CLASSES[key].access.forEach(acc => {
@@ -158,20 +161,22 @@ export function AbcEditor({ abcLayers, addLayer }) {
                     if (aspectRatio) {
                         const t = 0.001
                         const { width, height } = elem.getBoundingClientRect();
-                        const aspectRatio = width / height;
+                        const ar = width / height;
                         let cond = condition ? condition : (a, b) => Math.abs(a - b) > t;
-                        if (cond(aspectRatio, aspectRatio))
+                        if (cond(ar, aspectRatio))
                             return
                     }
                     isPresent = true;
                 });
                 if (!isPresent)
                     hintText.push(`[NOT FOUND]: ${key}`);
+                else
+                    presentKeys.push(key);
             });
         });
 
         setHints(hintText)
-
+        return presentKeys;
     }
 
     function colorize(keys, flag, abcElem = document, getColor = (key => ABC_CLASSES[key].colors[1])) {
@@ -183,9 +188,9 @@ export function AbcEditor({ abcLayers, addLayer }) {
                     if (aspectRatio) {
                         const t = 0.001
                         const { width, height } = elem.getBoundingClientRect();
-                        const aspectRatio = width / height;
+                        const ar = width / height;
                         let cond = condition ? condition : (a, b) => Math.abs(a - b) > t;
-                        if (cond(aspectRatio, aspectRatio))
+                        if (cond(ar, aspectRatio))
                             return
                     }
                     elem.style.color = flag ? getColor(key) : '';

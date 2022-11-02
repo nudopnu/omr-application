@@ -315,7 +315,7 @@ export const ABC_CLASSES = {
     'NoteheadWhole': { access: [{ selector: '.abcjs-note.abcjs-d1 > path:not([data-name*="accidental"], [data-name*="dot"], [data-name*="scripts"], [class])' }], colors: ['#030303', '#2F5282'] },
     'Stem': { access: [{ selector: '.abcjs-stem' }], colors: ['#040404', '#85A301'] },
     'Beam': { access: [{ selector: '.abcjs-beam-elem' }], colors: ['#050505', '#6B05E8'] },
-    'Arc': { access: [{ selector: '.abcjs-slur,.abcjs-tie' }], colors: ['#060606', '#75BC4F'] },
+    // 'Arc': { access: [{ selector: '.abcjs-slur,.abcjs-tie' }], colors: ['#060606', '#75BC4F'] },
     'Brace': { access: [{ selector: '.abcjs-brace' }], colors: ['#070707', '#8C3BFF'] },
     'Staff': { access: [{ selector: '.abcjs-staff' }], colors: ['#080808', '#9E90AF'] },
     'LedgerLine': { access: [{ selector: ".abcjs-ledger" }], colors: ["090909", "#018700"] },
@@ -326,7 +326,7 @@ export const ABC_CLASSES = {
             { selector: "path[data-name*=bar]", aspectRatio: 0.003, condition: (a, b) => a < b }
         ], colors: ["0A0A0A", "#00ACC6"]
     },
-    'BarLineThick': { access: [{ selector: ".abcjs-bar > :not([data-name*='dot'])", aspectRatio: 0.129 }], colors: ["0B0B0B", "#97FF00"] },
+    // 'BarLineThick': { access: [{ selector: ".abcjs-bar > :not([data-name*='dot'])", aspectRatio: 0.129 }], colors: ["0B0B0B", "#97FF00"] },
     'ClefF': { access: [{ selector: '.abcjs-staff-extra > [data-name*="clefs.F"]' }], colors: ["0C0C0C", "#BCB6FF"] },
     'ClefG': { access: [{ selector: '.abcjs-staff-extra > [data-name*="clefs.G"]' }], colors: ["0D0D0D", "#0000DD"] },
     'Sharp': { access: [{ selector: '[data-name*="accidentals.sharp"]' }], colors: ["0E0E0E", "#C8FFF9"] },
@@ -342,7 +342,7 @@ export const ABC_CLASSES = {
     'Flag16thDown': { access: [{ selector: '[data-name*="flags.d16th"]' }], colors: ["191919", "#915282"] },
     'Flag32ndDown': { access: [{ selector: '[data-name*="flags.d32nd"]' }], colors: ["1A1A1A", "#A00072"] },
     'Flag64thDown': { access: [{ selector: '[data-name*="flags.d64th"]' }], colors: ["1B1B1B", "#569A54"] },
-    'AugmentationDot': { access: [{ selector: '.abcjs-note > [data-name*="dots.dot"]' }], colors: ["1D1D1D", "#4D33FF"] },
+    // 'AugmentationDot': { access: [{ selector: '.abcjs-note > [data-name*="dots.dot"]' }], colors: ["1D1D1D", "#4D33FF"] },
     'RestWhole': { access: [{ selector: '[data-name="rests.whole"]' }], colors: ["1F1F1F", "#FFCD44"] },
     'RestHalf': { access: [{ selector: '[data-name="rests.half"]' }], colors: ["202020", "#8201CF"] },
     'RestQuarter': { access: [{ selector: '[data-name="rests.quarter"]' }], colors: ["212121", "#4DFDFF"] },
