@@ -69,7 +69,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
         const abcRef = document.querySelector('#abc-render');
         let abcClone = abcRef.cloneNode(true);
         abcClone.style.setProperty('height', '100%');
-        const keys = Object.keys(ABC_CLASSES);
+        const keys = Object.keys(ABC_CLASSES).sort(elem => elem.order);
         colorize(keys, true, abcClone);
         cloneElem.appendChild(abcClone);
 
@@ -152,9 +152,10 @@ export function AbcEditor({ abcLayers, addLayer }) {
     }
 
     function validate(abcElem = document) {
-        const keys = Object.keys(ABC_CLASSES);
+        const keys = Object.keys(ABC_CLASSES).sort(elem => elem.order);
         let hintText = [];
         let presentKeys = [];
+        setHints(["Cheking..."])
 
         keys.forEach(key => {
             ABC_CLASSES[key].access.forEach(acc => {
@@ -182,7 +183,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
             hintText = ["All classes present"]
         }
         console.log(hintText);
-        setHints(hintText)
+        setHints(["Cheking...", ...hintText])
         return presentKeys;
     }
 
@@ -208,7 +209,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
     }
 
     useEffect(() => {
-        const keys = Object.keys(ABC_CLASSES);
+        const keys = Object.keys(ABC_CLASSES).sort(elem => elem.order);
         colorize(keys, checked);
     }, [checked])
 
