@@ -27,6 +27,7 @@ C1- | C1 D2 E3 F4 G6 A8|: c,,1 (d,,2 e,,3 f,,4 g,,6 a,,8):|c128|
 
 export function AbcEditor({ abcLayers, addLayer }) {
     const [value, setValue] = useState(sheets[0]);
+    const [hints, setHints] = useState([]);
     const [checked, setChecked] = useState(false);
 
     const abcOptions = {
@@ -50,26 +51,50 @@ export function AbcEditor({ abcLayers, addLayer }) {
         setValue(abc);
         setChecked(false);
         abcjs.renderAbc('abc-content', abc, abcOptions);
+        validate();
     }
 
     async function onClickConvert2() {
-        const elem = document.querySelector("#workarea-content");
-        let data = elem.outerHTML;
+        /* Work on a clone */
+        const refElem = document.querySelector("#workarea-content");
+        const cloneElem = refElem.cloneNode(true);
+
+        /* Make each layer to a new page */
+        [...cloneElem.children].forEach(child => {
+            child.style.width = `100%`;
+            child.style.height = `100%`;
+            child.style.setProperty('page-break-after', 'always');
+        })
+
+        /* Generate DeepScores-style labels */
+        const abcRef = document.querySelector('#abc-render');
+        let abcClone = abcRef.cloneNode(true);
+        abcClone.style.setProperty('height', '100%');
+        const keys = Object.keys(ABC_CLASSES);
+        colorize(keys, true, abcClone);
+        cloneElem.appendChild(abcClone);
+
+        /* Generate masks */
+        keys.forEach(key => {
+            let abcClone = abcRef.cloneNode(true);
+            abcClone.style.setProperty('color', '#fff0');
+            abcClone.style.setProperty('height', '100%');
+            colorize([key], true, abcClone, _key => 'black');
+            cloneElem.appendChild(abcClone);
+        });
+
+        /* Convert innerHTML to objecturl */
+        let data = cloneElem.innerHTML;
         let blob = new Blob([data], { type: 'text/html' });
         let url = URL.createObjectURL(blob);
+
+        /* Send to main process */
         const pdf = await window.page.print(url, false);
+
+        /* Convert pdf to png using ImageMagick */
         const dpi = 280;
-        const res = await window.page.pdf2png(pdf, dpi);
-        // console.log(res.slice(0, 100));
-        const dataUrl = "data:image/png;base64," + res;
-        const newLayer = {
-            type: 'base64ImageUrl',
-            name: 'Rasterized',
-            visible: true,
-            src: dataUrl
-        };
-        addLayer(newLayer);
-        console.log(dataUrl);
+        await window.page.pdf2png(pdf, dpi);
+        console.log("Done");
     }
     function onClickConvert() {
 
@@ -121,48 +146,59 @@ export function AbcEditor({ abcLayers, addLayer }) {
         console.log(svg, image);
     }
 
+    function validate(abcElem = document) {
+        const keys = Object.keys(ABC_CLASSES);
+        let hintText = [];
 
-    function colorize(flag) {
-        console.log(flag);
-        setChecked(flag);
-
-        if (flag) {
-            Object.keys(ABC_CLASSES).forEach(key => {
-                const [fetchOps, segColorA, segColorB] = ABC_CLASSES[key];
-                const { selector } = fetchOps
-                document.querySelectorAll(selector).forEach(elem => {
-                    if (fetchOps.aspectRatio) {
+        keys.forEach(key => {
+            ABC_CLASSES[key].access.forEach(acc => {
+                const { selector, aspectRatio, condition } = acc;
+                let isPresent = false;
+                abcElem.querySelectorAll(selector).forEach(elem => {
+                    if (aspectRatio) {
                         const t = 0.001
                         const { width, height } = elem.getBoundingClientRect();
                         const aspectRatio = width / height;
-                        let condition = fetchOps.condition ? fetchOps.condition : (a, b) => Math.abs(a - b) > t;
-                        if (condition(aspectRatio, fetchOps.aspectRatio))
+                        let cond = condition ? condition : (a, b) => Math.abs(a - b) > t;
+                        if (cond(aspectRatio, aspectRatio))
                             return
                     }
-                    elem.style.color = segColorB;
-                })
-                if (document.querySelectorAll(selector).length === 0) {
-                    console.log("[NOT FOUND]:", key);
-                }
+                    isPresent = true;
+                });
+                if (!isPresent)
+                    hintText.push(`[NOT FOUND]: ${key}`);
             });
-        } else {
-            Object.keys(ABC_CLASSES).forEach(key => {
-                const [fetchOps, segColorA, segColorB] = ABC_CLASSES[key];
-                const { selector } = fetchOps
-                document.querySelectorAll(selector).forEach(elem => {
-                    if (fetchOps.aspectRatio) {
-                        const t = 0.001
-                        const { width, height } = elem.getBoundingClientRect();
-                        const aspectRatio = width / height;
-                        let condition = fetchOps.condition ? fetchOps.condition : (a, b) => Math.abs(a - b) > t;
-                        if (condition(aspectRatio, fetchOps.aspectRatio))
-                            return
-                    }
-                    elem.style.color = '';
-                })
-            });
-        }
+        });
+
+        setHints(hintText)
+
     }
+
+    function colorize(keys, flag, abcElem = document, getColor = (key => ABC_CLASSES[key].colors[1])) {
+
+        keys.forEach(key => {
+            ABC_CLASSES[key].access.forEach(acc => {
+                const { selector, aspectRatio, condition } = acc;
+                abcElem.querySelectorAll(selector).forEach(elem => {
+                    if (aspectRatio) {
+                        const t = 0.001
+                        const { width, height } = elem.getBoundingClientRect();
+                        const aspectRatio = width / height;
+                        let cond = condition ? condition : (a, b) => Math.abs(a - b) > t;
+                        if (cond(aspectRatio, aspectRatio))
+                            return
+                    }
+                    elem.style.color = flag ? getColor(key) : '';
+                })
+            });
+        });
+
+    }
+
+    useEffect(() => {
+        const keys = Object.keys(ABC_CLASSES);
+        colorize(keys, checked);
+    }, [checked])
 
     useEffect(() => {
         abcjs.renderAbc('abc-content', value, abcOptions);
@@ -175,13 +211,14 @@ export function AbcEditor({ abcLayers, addLayer }) {
                 <input
                     type="checkbox"
                     checked={checked}
-                    onChange={event => colorize(event.target.checked)}
+                    onChange={_event => setChecked(!checked)}
                 />
                 <span>Preview ground truth</span>
             </label>
             <button onClick={onClickRandom}>Random Piano Sheet</button>
             <button onClick={onClickConvert}>Convert to PNG</button>
             <button onClick={onClickConvert2}>Generate XY</button>
+            <div id="hints">{hints.map(hint => <div key={hint}>{hint}</div>)}</div>
         </div>
     );
 }

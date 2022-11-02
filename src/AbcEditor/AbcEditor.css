@@ -30,6 +30,10 @@ svg {
   page-break-inside: avoid;
 }
 
+#hints {
+  font-size: 10px;
+}
+
 @page {
   margin: 0;
 }
