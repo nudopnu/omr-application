@@ -40,9 +40,8 @@ export function AbcEditor({ abcLayers, addLayer }) {
 
     function handleChange(event) {
         setValue(event.target.value);
-        let log = abcjs.renderAbc('abc-content', event.target.value, abcOptions);
+        abcjs.renderAbc('abc-content', event.target.value, abcOptions);
         setChecked(false);
-        console.log(log[0]);
     }
 
     function onClickRandom() {
@@ -91,11 +90,15 @@ export function AbcEditor({ abcLayers, addLayer }) {
         let url = URL.createObjectURL(blob);
 
         /* Send to main process */
+        setHints(["Generating pdf..."])
         const pdf = await window.page.print(url, false);
+        setHints([...hints, "Done."]);
 
         /* Convert pdf to png using ImageMagick */
+        setHints([...hints, "Converting to PNG..."]);
         const dpi = 280;
         await window.page.pdf2png(pdf, dpi);
+        setHints([...hints, "Done."]);
         console.log("Done");
     }
     function onClickConvert() {
@@ -175,6 +178,10 @@ export function AbcEditor({ abcLayers, addLayer }) {
             });
         });
 
+        if (hintText.length === 0) {
+            hintText = ["All classes present"]
+        }
+        console.log(hintText);
         setHints(hintText)
         return presentKeys;
     }
@@ -223,6 +230,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
             <button onClick={onClickRandom}>Random Piano Sheet</button>
             <button onClick={onClickConvert}>Convert to PNG</button>
             <button onClick={onClickConvert2}>Generate XY</button>
+            <button onClick={() => validate()}>Validate</button>
             <div id="hints">{hints.map(hint => <div key={hint}>{hint}</div>)}</div>
         </div>
     );
