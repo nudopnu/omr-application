@@ -42,6 +42,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
         setValue(event.target.value);
         abcjs.renderAbc('abc-content', event.target.value, abcOptions);
         setChecked(false);
+        setHints([]);
     }
 
     function onClickRandom() {
@@ -54,6 +55,8 @@ export function AbcEditor({ abcLayers, addLayer }) {
     }
 
     async function onClickConvert2() {
+        let hintText = [];
+
         /* Work on a clone */
         const refElem = document.querySelector("#workarea-content");
         const cloneElem = refElem.cloneNode(true);
@@ -73,9 +76,16 @@ export function AbcEditor({ abcLayers, addLayer }) {
         colorize(keys, true, abcClone);
         cloneElem.appendChild(abcClone);
 
+        /* Generate gray-valued labels */
+        abcClone = abcRef.cloneNode(true);
+        abcClone.style.setProperty('background-color', '#000');
+        abcClone.style.setProperty('height', '100%');
+        const hexGrey = key => ABC_CLASSES[key].order.toString(16).padStart(2, '0')
+        colorize(keys, true, abcClone, key => `#${hexGrey(key)}${hexGrey(key)}${hexGrey(key)}`);
+        cloneElem.appendChild(abcClone);
+
         /* Generate masks */
         keys.forEach(key => {
-            console.log(key);
             let abcClone = abcRef.cloneNode(true);
             abcClone.style.setProperty('background-color', '#000');
             abcClone.style.setProperty('color', '#fff0');
@@ -90,16 +100,19 @@ export function AbcEditor({ abcLayers, addLayer }) {
         let url = URL.createObjectURL(blob);
 
         /* Send to main process */
-        setHints(["Generating pdf..."])
+        hintText = ["Generating pdf..."];
+        setHints(hintText)
         const pdf = await window.page.print(url, false);
-        setHints([...hints, "Done."]);
+        hintText = [...hintText, "Done."]
+        setHints(hintText)
 
         /* Convert pdf to png using ImageMagick */
-        setHints([...hints, "Converting to PNG..."]);
+        hintText = [...hintText, "Converting to PNG..."]
+        setHints(hintText)
         const dpi = 280;
         await window.page.pdf2png(pdf, dpi);
-        setHints([...hints, "Done."]);
-        console.log("Done");
+        hintText = [...hintText, "Done."]
+        setHints(hintText)
     }
     function onClickConvert() {
 
@@ -188,7 +201,6 @@ export function AbcEditor({ abcLayers, addLayer }) {
     }
 
     function colorize(keys, flag, abcElem = document, getColor = (key => ABC_CLASSES[key].colors[1])) {
-
         keys.forEach(key => {
             ABC_CLASSES[key].access.forEach(acc => {
                 const { selector, aspectRatio, condition } = acc;
@@ -232,7 +244,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
             <button onClick={onClickConvert}>Convert to PNG</button>
             <button onClick={onClickConvert2}>Generate XY</button>
             <button onClick={() => validate()}>Validate</button>
-            <div id="hints">{hints.map(hint => <div key={hint}>{hint}</div>)}</div>
+            <div id="hints">{hints.map((hint, idx) => <div key={idx}>{hint}</div>)}</div>
         </div>
     );
 }

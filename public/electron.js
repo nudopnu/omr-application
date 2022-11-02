@@ -56,6 +56,7 @@ function createWindow() {
         win.webContents.printToPDF(printOptions).then((data) => {
           let buf = Buffer.from(data);
           let url = 'data:application/pdf;base64,' + buf.toString('base64');
+          console.log(url);
 
           if (show) {
             win.webContents.on('ready-to-show', () => {
