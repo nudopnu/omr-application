@@ -25,6 +25,8 @@ C1- | C1 D2 E3 F4 G6 A8|: c,,1 (d,,2 e,,3 f,,4 g,,6 a,,8):|c128|
 [C,E,G,Bd]- |[CEGBd] D2 e3 f4 g6 a8|: C1 D2 E3 F4 G6 A8:|[C,c,]128|`
 ];
 
+let _listeners = []
+
 export function AbcEditor({ abcLayers, addLayer }) {
     const [value, setValue] = useState(sheets[0]);
     const [hints, setHints] = useState([]);
@@ -37,6 +39,10 @@ export function AbcEditor({ abcLayers, addLayer }) {
         selectTypes: [],
         viewportHorizontal: true,
     };
+
+    window.addEventListener('resize', event => {
+        document.querySelector('#abc-content').style.setProperty('width', '100%');
+    });
 
     function handleChange(event) {
         setValue(event.target.value);
