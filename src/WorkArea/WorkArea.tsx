@@ -1,4 +1,5 @@
-import { React, useEffect, useRef, useState } from "react";
+import React from 'react';
+import { useEffect, useRef, useState } from "react";
 import { FilePicker } from "../FilePicker/FilePicker";
 import './WorkArea.css';
 
@@ -11,10 +12,9 @@ let panning = false;
 let pointX = 0;
 let pointY = 0;
 let start = { x: 0, y: 0 };
-let ctrlPListener = false;
 
 export function WorkArea({ layers, children, onOpenFiles, addLayer }) {
-    const zoom = useRef(null);
+    const zoom = useRef<HTMLDivElement | null>(null);
     const [isLoading, setLoading] = useState(false);
 
 
@@ -27,23 +27,24 @@ export function WorkArea({ layers, children, onOpenFiles, addLayer }) {
 
     async function onKeyDown(event) {
         if (document.querySelector("#zoom") && event.ctrlKey) {
+            const refElem = document.querySelector("#workarea-content") as HTMLElement;
+            if (!refElem) return;
             if (event.key === 'k') {
-                const elem = document.querySelector("#workarea-content");
-                let { width, height } = elem.children[0].getClientRects()[0]
+                let { width, height } = refElem.children[0].getClientRects()[0]
                 width = Math.ceil(width);
                 height = Math.ceil(height);
 
-                elem.style.width = `${width}px`;
-                elem.style.height = `${height}px`;
+                refElem.style.width = `${width}px`;
+                refElem.style.height = `${height}px`;
 
-                let data = elem.outerHTML;
+                let data = refElem.outerHTML;
                 let blob = new Blob([data], { type: 'text/html' });
                 let url = URL.createObjectURL(blob);
 
-                elem.style.width = '';
-                elem.style.height = '';
+                refElem.style.width = '';
+                refElem.style.height = '';
 
-                const res = await window.page.capture(url, width, height);
+                const res = await (window as any).page.capture(url, width, height);
                 const newLayer = {
                     type: 'base64ImageUrl',
                     name: 'Rasterized',
@@ -55,11 +56,10 @@ export function WorkArea({ layers, children, onOpenFiles, addLayer }) {
             else if (event.key === 'p') {
 
                 /* Work on a clone */
-                const refElem = document.querySelector("#workarea-content");
-                const cloneElem = refElem.cloneNode(true);
+                const cloneElem = refElem.cloneNode(true) as HTMLElement;
 
                 /* Make each layer to a new page */
-                [...cloneElem.children].forEach(child => {
+                ([...cloneElem.children] as HTMLElement[]).forEach(child => {
                     child.style.width = `100%`;
                     child.style.setProperty('page-break-after', 'always');
                 })
@@ -70,10 +70,11 @@ export function WorkArea({ layers, children, onOpenFiles, addLayer }) {
                 let url = URL.createObjectURL(blob);
 
                 /* Send to main process */
-                await window.page.print(url, true);
+                await (window as any).page.print(url, true);
             }
             else if (event.key === 'd') {
                 const elem = document.querySelector("[role='img']");
+                if (!elem) return;
                 let data = elem.outerHTML;
                 let blob = new Blob([data], { type: 'image/svg+xml' });
                 let url = URL.createObjectURL(blob);

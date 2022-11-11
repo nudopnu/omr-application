@@ -1,6 +1,9 @@
+import React from 'react';
+
 import { useState } from 'react';
 import { AbcEditor } from './AbcEditor/AbcEditor';
 import './App.css';
+import { ImageLayer, LayerUT as uLayer } from './Layers/Layer';
 import { Layers } from './Layers/Layers';
 import { loadImage, uriToCanvas } from './lib/Image';
 import { AbcTools } from './Toolbar/AbcTools/AbcTools';
@@ -13,15 +16,18 @@ import { WorkArea } from './WorkArea/WorkArea';
 function App() {
 
   // image is the original one, tmp is whats displayed
-  const [image, setImage] = useState(null);
-  const [layers, setLayers] = useState([]);
+  const [image, setImage] = useState<string>("");
+  const [layers, setLayers] = useState<uLayer[]>([]);
 
   // Prediction
   const [canvas, setCanvas] = useState(null);
 
   function getImage() {
     console.log(canvas);
-    return canvas.toDataURL().split(",")[1];
+    if (!canvas) {
+      throw new Error("Canvas not ready!");
+    }
+    return (canvas as HTMLCanvasElement).toDataURL().split(",")[1];
   }
 
   async function addLayer(newLayer) {
@@ -39,7 +45,7 @@ function App() {
   }
 
   function replaceLayer(index, mapfunc) {
-    let newLayers = []
+    let newLayers: uLayer[] = [];
     layers.forEach((layer, idx) => {
       if (idx !== index) {
         newLayers.push(layer);
@@ -52,7 +58,7 @@ function App() {
 
   async function deleteLayer(index) {
     if (layers[index].type === 'base64ImageUrl') {
-      const remainingImages = layers.filter(layer => layer.type === 'base64ImageUrl');
+      const remainingImages: ImageLayer[] = layers.filter(layer => layer.type === 'base64ImageUrl');
       if (remainingImages.length > 0) {
         setImage(remainingImages[0].src);
         const canvas = await uriToCanvas(remainingImages[0].src);

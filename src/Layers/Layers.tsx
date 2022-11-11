@@ -1,4 +1,6 @@
-import "./Layers.css"
+import React from 'react';
+import "./Layers.css";
+
 export function Layers({ layers }) {
 
     function renderLayer(idx, layer) {

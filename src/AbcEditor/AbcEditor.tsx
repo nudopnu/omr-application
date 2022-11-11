@@ -1,8 +1,10 @@
+import React from 'react';
+import abcjs, { AbcVisualParams } from "abcjs";
 import { useEffect, useState } from "react";
-import abcjs from "abcjs";
 import { ABC_CLASSES, DEFAULF_GENERATOR_SETTINGS, generateRandomSheet } from "../lib/Sheet";
 import "./AbcEditor.css";
-import { Buffer } from 'buffer';
+import { AbcConverter } from '../lib/Music/AbcUtils/AbcConverter';
+import { SheetGenerator } from '../lib/Music/SheetGenerator/SheetGenerator';
 
 const sheets = [
     `X:1
@@ -28,11 +30,11 @@ C1- | C1 D2 E3 F4 G6 A8|: c,,1 (d,,2 e,,3 f,,4 g,,6 a,,8):|c128|
 let _listeners = []
 
 export function AbcEditor({ abcLayers, addLayer }) {
-    const [value, setValue] = useState(sheets[0]);
-    const [hints, setHints] = useState([]);
+    const [value, setValue] = useState<string>(sheets[0]);
+    const [hints, setHints] = useState<string[]>([]);
     const [checked, setChecked] = useState(false);
 
-    const abcOptions = {
+    const abcOptions: AbcVisualParams = {
         responsive: "resize",
         viewportVertical: true,
         add_classes: true,
@@ -41,7 +43,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
     };
 
     window.addEventListener('resize', event => {
-        document.querySelector('#abc-content').style.setProperty('width', '100%');
+        (document.querySelector('#abc-content')! as HTMLElement).style.setProperty('width', '100%');
     });
 
     function handleChange(event) {
@@ -60,15 +62,26 @@ export function AbcEditor({ abcLayers, addLayer }) {
         validate();
     }
 
+    function onClickRandom2() {
+        const sheet = SheetGenerator.generateScaleSheet();
+        let abc = AbcConverter.fromSheet(sheet);
+        console.log(abc);
+        setValue(abc);
+        setChecked(false);
+        abcjs.renderAbc('abc-content', abc, abcOptions);
+        validate();
+    }
+
     async function onClickConvert2() {
-        let hintText = [];
+        let hintText: string[] = [];
 
         /* Work on a clone */
-        const refElem = document.querySelector("#workarea-content");
-        const cloneElem = refElem.cloneNode(true);
+        const refElem = document.querySelector("#workarea-content") as HTMLElement;
+        if (!refElem) throw new Error("Editor not initialized!");
+        const cloneElem = refElem.cloneNode(true) as HTMLElement;
 
         /* Make each layer to a new page */
-        [...cloneElem.children].forEach(child => {
+        ([...cloneElem.children] as HTMLElement[]).forEach(child => {
             child.style.width = `100%`;
             child.style.height = `100%`;
             child.style.setProperty('page-break-after', 'always');
@@ -76,14 +89,15 @@ export function AbcEditor({ abcLayers, addLayer }) {
 
         /* Generate DeepScores-style labels */
         const abcRef = document.querySelector('#abc-render');
-        let abcClone = abcRef.cloneNode(true);
+        if (!abcRef) throw new Error("Editor not initialized!");
+        let abcClone = abcRef.cloneNode(true) as HTMLElement;
         abcClone.style.setProperty('height', '100%');
-        const keys = Object.keys(ABC_CLASSES).sort(elem => elem.order);
+        const keys = Object.keys(ABC_CLASSES).sort(elem => ABC_CLASSES[elem].order);
         colorize(keys, true, abcClone);
         cloneElem.appendChild(abcClone);
 
         /* Generate gray-valued labels */
-        abcClone = abcRef.cloneNode(true);
+        abcClone = abcRef.cloneNode(true) as HTMLElement;
         abcClone.style.setProperty('background-color', '#000');
         abcClone.style.setProperty('height', '100%');
         const hexGrey = key => ABC_CLASSES[key].order.toString(16).padStart(2, '0')
@@ -92,7 +106,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
 
         /* Generate masks */
         keys.forEach(key => {
-            let abcClone = abcRef.cloneNode(true);
+            let abcClone = abcRef.cloneNode(true) as HTMLElement;
             abcClone.style.setProperty('background-color', '#000');
             abcClone.style.setProperty('color', '#fff0');
             abcClone.style.setProperty('height', '100%');
@@ -108,7 +122,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
         /* Send to main process */
         hintText = ["Generating pdf..."];
         setHints(hintText)
-        const pdf = await window.page.print(url, false);
+        const pdf = await (window as any).page.print(url, false);
         hintText = [...hintText, "Done."]
         setHints(hintText)
 
@@ -116,13 +130,13 @@ export function AbcEditor({ abcLayers, addLayer }) {
         hintText = [...hintText, "Converting to PNG..."]
         setHints(hintText)
         const dpi = 280;
-        await window.page.pdf2png(pdf, dpi);
+        await (window as any).page.pdf2png(pdf, dpi);
         hintText = [...hintText, "Done."]
         setHints(hintText)
     }
     function onClickConvert() {
 
-        const svgElement = document.querySelector('.abcjs-container > svg');
+        const svgElement = document.querySelector('.abcjs-container > svg') as HTMLElement;
         svgElement.setAttribute("xmlns", "http://www.w3.org/2000/svg");
 
         // svgElement.setAttribute("shape-rendering", "crispEdges");
@@ -137,7 +151,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
 
         /* Create canvas to draw image on */
         const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext("2d");
+        const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 
         /* Turn svg to dataurl for image */
         const svg = svgElement.outerHTML;
@@ -171,9 +185,9 @@ export function AbcEditor({ abcLayers, addLayer }) {
     }
 
     function validate(abcElem = document) {
-        const keys = Object.keys(ABC_CLASSES).sort(elem => elem.order);
-        let hintText = [];
-        let presentKeys = [];
+        const keys = Object.keys(ABC_CLASSES).sort(elem => ABC_CLASSES[elem].order);
+        let hintText: string[] = [];
+        let presentKeys: string[] = [];
         setHints(["Cheking..."])
 
         keys.forEach(key => {
@@ -206,7 +220,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
         return presentKeys;
     }
 
-    function colorize(keys, flag, abcElem = document, getColor = (key => ABC_CLASSES[key].colors[1])) {
+    function colorize(keys, flag, abcElem: HTMLElement = (document as any), getColor = (key => ABC_CLASSES[key].colors[1])) {
         keys.forEach(key => {
             ABC_CLASSES[key].access.forEach(acc => {
                 const { selector, aspectRatio, condition } = acc;
@@ -227,7 +241,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
     }
 
     useEffect(() => {
-        const keys = Object.keys(ABC_CLASSES).sort(elem => elem.order);
+        const keys = Object.keys(ABC_CLASSES).sort(elem => ABC_CLASSES[elem].order);
         colorize(keys, checked);
     }, [checked])
 
@@ -237,7 +251,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
 
     return (
         <div id="abc-editor">
-            <textarea value={value} onChange={handleChange} id="" cols="30" rows="10"></textarea>
+            <textarea value={value} onChange={handleChange} id="" cols={30} rows={10}></textarea>
             <label>
                 <input
                     type="checkbox"
@@ -247,6 +261,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
                 <span>Preview ground truth</span>
             </label>
             <button onClick={onClickRandom}>Random Piano Sheet</button>
+            <button onClick={onClickRandom2}>Random Scale Sheet</button>
             <button onClick={onClickConvert}>Convert to PNG</button>
             <button onClick={onClickConvert2}>Generate XY</button>
             <button onClick={() => validate()}>Validate</button>

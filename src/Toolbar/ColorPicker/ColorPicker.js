@@ -3,7 +3,7 @@ import { List } from "../../common/List";
 import { Spinner } from "../../Spinner/Spinner";
 import "./ColorPicker.css"
 
-export function ColorPicker({ addLayer, setLayer, getLayer }) {
+export function ColorPicker({ addLayer }) {
 
     const [titleText, setTitleText] = useState("Filter colors:")
     const [hasInit, setInit] = useState(false);
