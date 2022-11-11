@@ -1,4 +1,4 @@
-import { AnyGlyph, Glyph } from "../Sheet/Glyph";
+import { AnyGlyph } from "../Sheet/Glyph";
 import { KeySignature } from "../Sheet/KeySignature";
 import { Sheet } from "../Sheet/Sheet";
 import { AbcPitches } from "./AbcPitches";
