@@ -1,4 +1,5 @@
-import { Rest } from "../Sheet/Glyph";
+import { Meter } from "../AbcUtils/Meter";
+import { KeyGlyph, Repeat, Rest } from "../Sheet/Glyph";
 import { KeySignature } from "../Sheet/KeySignature";
 import { Sheet } from "../Sheet/Sheet";
 
@@ -17,7 +18,17 @@ export class SheetGenerator {
 
         const sys = sheet.addSystem();
         const rests = [-3, -2, -1, 1, 2, 3, 4].map(duration => ({ duration: duration, type: 'rest' } as Rest));
-        sys.staffs[0].addGlyphs(rests);
+        sys.staffs[0].setClef("bass");
+        sys.staffs[0].setKey(new KeySignature("Cb"));
+        sys.staffs[0].setMeter(Meter.fromType("fraction", "0123456789", "0987654321"))
+        const glyphs = [
+            new Repeat(),
+            ...rests,
+            new Repeat(false),
+            new KeyGlyph("alto", new KeySignature("C#")),
+            new KeyGlyph("treble-8", new KeySignature("C")),
+        ];
+        sys.staffs[0].addGlyphs(glyphs);
 
         return sheet;
     }

@@ -1,6 +1,8 @@
 export const Clefs = [
     'treble',
+    'treble-8',
     'bass',
+    'bass-8',
     'alto',
 ] as const;
 

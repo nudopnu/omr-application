@@ -1,17 +1,17 @@
-export const AbcMeterTypes = [
+export const MeterTypes = [
     'none',
     'C',
     'C|',
     'fraction',
 ] as const;
 
-export type AbcMeterType = typeof AbcMeterTypes[number];
+export type MeterType = typeof MeterTypes[number];
 
 
 
-export class AbcMeter implements AbcMeter {
+export class Meter implements Meter {
 
-    static fromType(type: AbcMeterType, a?: number, b?: number): AbcMeter {
+    static fromType(type: MeterType, a?: number | string, b?: number | string): Meter {
         if (type === 'C') {
             a = 4;
             b = 4;
@@ -20,13 +20,13 @@ export class AbcMeter implements AbcMeter {
             a = 2;
             b = 2;
         }
-        return new AbcMeter(type, a!, b!);
+        return new Meter(type, a!, b!);
     }
 
     private constructor(
-        public type: AbcMeterType,
-        public a: number,
-        public b: number,
+        public type: MeterType,
+        public a: number | string,
+        public b: number | string,
     ) { }
 
     toAbcString(): string {
