@@ -1,3 +1,4 @@
+import { Rest } from "../Sheet/Glyph";
 import { KeySignature } from "../Sheet/KeySignature";
 import { Sheet } from "../Sheet/Sheet";
 
@@ -6,13 +7,17 @@ export class SheetGenerator {
     static generateScaleSheet(): Sheet {
         const sheet = new Sheet();
 
-        const sys = sheet.addSystem();
-        const notes = new KeySignature('C', 'Ionian').toScale(5, 1);
-        console.log(notes);
-        
-        sys.staffs[0].addNotes(notes);
+        [-3, -2, -1, 1, 2, 3, 4, 5].forEach(duration => {
+            const sys = sheet.addSystem();
+            const startOctave = 4;
+            const numberOfNotes = 27;
+            const notes = new KeySignature('C', 'Ionian').toScale(startOctave, duration, numberOfNotes);
+            sys.staffs[0].addNotes(notes);
+        });
 
-        console.log(sheet);
+        const sys = sheet.addSystem();
+        const rests = [-3, -2, -1, 1, 2, 3, 4].map(duration => ({ duration: duration, type: 'rest' } as Rest));
+        sys.staffs[0].addGlyphs(rests);
 
         return sheet;
     }

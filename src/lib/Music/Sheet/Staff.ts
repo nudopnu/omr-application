@@ -10,10 +10,11 @@ export class Staff {
         public options?: StaffOptions,
     ) { }
 
-    addNotes(notes: Note[]) {
+    addNotes(notes: Note[], duration?: number) {
+        duration = duration ? duration : this.sheet.options.defaultDuration;
         this.glyphs.push(
             ...notes
-                .map(note => new Chord([note], this.sheet.options.defaultDuration))
+                .map(note => new Chord([note], note.duration))
         )
     }
 
