@@ -1,11 +1,11 @@
 export const BarLineTypes = [
-    'single',
-    'double',
-    'start',
-    'end',
-    'repeat-start',
-    'repeat-end',
-    'repeat-double',
+    'SINGLE',
+    'DOUBLE',
+    'START',
+    'END',
+    'REPEAT_START',
+    'REPEAT_END',
+    'REPEAT_DOUBLE',
 ] as const;
 
 export type BarLineType = typeof BarLineTypes[number];

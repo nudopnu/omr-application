@@ -21,6 +21,10 @@ export class Staff {
         )
     }
 
+    getNotes(): ChordGlyph[] {
+        return this.glyphs.filter(glyph => glyph.type === "chord") as ChordGlyph[];
+    }
+
     addGlyphs(glyphs: Glyph[]) {
         this.glyphs.push(...glyphs);
     }

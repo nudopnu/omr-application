@@ -1,6 +1,7 @@
 import { Note } from "../Note";
 import { BarLineType } from "./BarLine";
 import { Clef } from "./Clef";
+import { DecorationType } from "./Decoration";
 import { KeySignature } from "./KeySignature";
 
 export const GlyphTypes = [
@@ -24,6 +25,7 @@ export class ChordGlyph implements IGlyph {
         public notes: Note[],
         public duration: number = 1,
         public beam: ('start' | 'end' | 'middle' | null) = null,
+        public ornament: DecorationType = "NONE",
     ) { }
 }
 
@@ -44,7 +46,7 @@ export class MultiMeasureRest implements IGlyph {
 export class BarLineGlyph implements IGlyph {
     readonly type = 'barline';
     constructor(
-        public barLineType: BarLineType = "single",
+        public barLineType: BarLineType = "SINGLE",
         public explicit: boolean = true,
     ) { }
 }

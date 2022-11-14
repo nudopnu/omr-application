@@ -1,8 +1,7 @@
-import { Glyph, ChordGlyph } from "../Sheet/Glyph";
+import { ChordGlyph, Glyph } from "../Sheet/Glyph";
 import { KeySignature } from "../Sheet/KeySignature";
 import { Sheet } from "../Sheet/Sheet";
 import { SheetOptions } from "../Sheet/SheetOptions";
-import { AbcPitches } from "./AbcPitches";
 import { AbcStrings } from "./AbcStrings";
 
 export class AbcConverter {
@@ -55,12 +54,15 @@ export class AbcConverter {
         const { key } = sheetOptions;
         let res = "";
         if (glyph.type === "chord") {
-            res += this.chordToString(glyph, res, key);
+            res += this.chordToString(glyph, key);
             res += this.durationToString(glyph.duration);
         }
         else if (glyph.type === "rest") {
             res += " z";
             res += this.durationToString(glyph.duration);
+        }
+        else if (glyph.type === "multi-measure-rest") {
+            res += " Z" + glyph.duration;
         }
         else if (glyph.type === "barline" && glyph.explicit) {
             res += AbcStrings.Barline[glyph.barLineType];
@@ -71,8 +73,14 @@ export class AbcConverter {
         return res
     }
 
-    static chordToString(glyph: ChordGlyph, res: string, key: KeySignature) {
+    static chordToString(glyph: ChordGlyph, key: KeySignature) {
+        let res = "";
+
+        /* Put whitespace if not connected to previous */
         if (glyph.beam === null || glyph.beam === "start") res += " ";
+
+        /* Add Ornament */
+        res += AbcStrings.Accent[glyph.ornament];
 
         /* Process notes */
         glyph.notes.forEach(note => {
@@ -82,7 +90,7 @@ export class AbcConverter {
             /* Match pitch of note to key signature */
             let match = key.relativeMidis.indexOf(pitch);
             if (match !== -1) {
-                res += AbcPitches[match];
+                res += AbcStrings.Pitches[match];
             }
 
             /* Shift note according to its octave */
