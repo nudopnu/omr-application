@@ -51,7 +51,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
         setHints([]);
     }
 
-    function onClickRandom() {
+    function onClickGenerateRandom() {
         let abc = generateRandomSheet(DEFAULF_GENERATOR_SETTINGS.settings);
         console.log(abc);
         setValue(abc);
@@ -60,8 +60,18 @@ export function AbcEditor({ abcLayers, addLayer }) {
         validate();
     }
 
-    function onClickRandom2() {
+    function onClickGenerateScale() {
         const sheet = SheetGenerator.generateScaleSheet();
+        let abc = AbcConverter.fromSheet(sheet);
+        console.log(abc);
+        setValue(abc);
+        setChecked(false);
+        abcjs.renderAbc('abc-content', abc, abcOptions);
+        validate();
+    }
+    
+    function onClickGenerateOrnaments() {
+        const sheet = SheetGenerator.generateOrnamentsSheet();
         let abc = AbcConverter.fromSheet(sheet);
         console.log(abc);
         setValue(abc);
@@ -258,8 +268,9 @@ export function AbcEditor({ abcLayers, addLayer }) {
                 />
                 <span>Preview ground truth</span>
             </label>
-            <button onClick={onClickRandom}>Random Piano Sheet</button>
-            <button onClick={onClickRandom2}>Random Scale Sheet</button>
+            <button onClick={onClickGenerateRandom}>Random Piano Sheet</button>
+            <button onClick={onClickGenerateScale}>Scale Sheet</button>
+            <button onClick={onClickGenerateOrnaments}>Ornaments Sheet</button>
             <button onClick={onClickConvert}>Convert to PNG</button>
             <button onClick={onClickConvert2}>Generate XY</button>
             <button onClick={() => validate()}>Validate</button>

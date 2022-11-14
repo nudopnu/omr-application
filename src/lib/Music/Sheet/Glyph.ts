@@ -1,10 +1,12 @@
 import { Note } from "../Note";
+import { BarLineType } from "./BarLine";
 import { Clef } from "./Clef";
 import { KeySignature } from "./KeySignature";
 
 export const GlyphTypes = [
     'chord',
     'rest',
+    'multi-measure-rest',
     'repeat',
     'barline',
     'key',
@@ -16,7 +18,7 @@ export interface IGlyph {
     type: GlyphType;
 }
 
-export class Chord implements IGlyph {
+export class ChordGlyph implements IGlyph {
     readonly type = 'chord';
     constructor(
         public notes: Note[],
@@ -25,23 +27,24 @@ export class Chord implements IGlyph {
     ) { }
 }
 
-export class Rest implements IGlyph {
+export class RestGlyph implements IGlyph {
     readonly type = 'rest';
     constructor(
         public duration: number,
     ) { }
 }
 
-export class Repeat implements IGlyph {
-    readonly type = 'repeat';
+export class MultiMeasureRest implements IGlyph {
+    readonly type = "multi-measure-rest";
     constructor(
-        public isStart: boolean = true,
+        public duration: number | string,
     ) { }
 }
 
-export class BarLine implements IGlyph {
+export class BarLineGlyph implements IGlyph {
     readonly type = 'barline';
     constructor(
+        public barLineType: BarLineType = "single",
         public explicit: boolean = true,
     ) { }
 }
@@ -55,9 +58,9 @@ export class KeyGlyph implements IGlyph {
 }
 
 export type Glyph =
-    | Chord
-    | Rest
-    | Repeat
-    | BarLine
+    | ChordGlyph
+    | RestGlyph
+    | BarLineGlyph
+    | MultiMeasureRest
     | KeyGlyph
     ;

@@ -1,8 +1,9 @@
-import { Glyph, Chord } from "../Sheet/Glyph";
+import { Glyph, ChordGlyph } from "../Sheet/Glyph";
 import { KeySignature } from "../Sheet/KeySignature";
 import { Sheet } from "../Sheet/Sheet";
 import { SheetOptions } from "../Sheet/SheetOptions";
 import { AbcPitches } from "./AbcPitches";
+import { AbcStrings } from "./AbcStrings";
 
 export class AbcConverter {
     static fromSheet(sheet: Sheet): string {
@@ -61,15 +62,8 @@ export class AbcConverter {
             res += " z";
             res += this.durationToString(glyph.duration);
         }
-        else if (glyph.type === "repeat") {
-            if (glyph.isStart) {
-                res += " |:";
-            } else {
-                res += ":| ";
-            }
-        }
         else if (glyph.type === "barline" && glyph.explicit) {
-            res += "|";
+            res += AbcStrings.Barline[glyph.barLineType];
         }
         else if (glyph.type === "key") {
             res += ` [K:${glyph.key.key} ${glyph.key.mode} clef=${glyph.clef}] `
@@ -77,7 +71,7 @@ export class AbcConverter {
         return res
     }
 
-    static chordToString(glyph: Chord, res: string, key: KeySignature) {
+    static chordToString(glyph: ChordGlyph, res: string, key: KeySignature) {
         if (glyph.beam === null || glyph.beam === "start") res += " ";
 
         /* Process notes */
