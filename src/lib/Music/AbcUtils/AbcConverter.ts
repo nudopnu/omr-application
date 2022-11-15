@@ -79,8 +79,12 @@ export class AbcConverter {
         /* Put whitespace if not connected to previous */
         if (glyph.beam === null || glyph.beam === "start") res += " ";
 
+        /* Add Tuple */
+        if (glyph.startTuple > 1) res += `(${glyph.startTuple})`;
+
         /* Add Ornaments */
         glyph.ornaments.forEach(ornament => res += AbcStrings.Accent[ornament]);
+        if (glyph.dynamic) res += `!${glyph.dynamic}!`;
 
         /* Process notes */
         glyph.notes.forEach(note => {

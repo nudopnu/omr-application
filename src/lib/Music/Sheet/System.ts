@@ -30,4 +30,8 @@ export class System {
     private constructor(
         public staffs: Staff[] = [],
     ) { }
+
+    getStaff(idx = 0): Staff {
+        return this.staffs[idx];
+    }
 }
