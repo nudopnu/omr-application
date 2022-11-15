@@ -25,7 +25,8 @@ export class ChordGlyph implements IGlyph {
         public notes: Note[],
         public duration: number = 1,
         public beam: ('start' | 'end' | 'middle' | null) = null,
-        public ornament: DecorationType = "NONE",
+        public ornaments: DecorationType[] = [],
+        public arpeggiated: boolean = false,
     ) { }
 }
 

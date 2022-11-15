@@ -19,6 +19,11 @@ export class AbcStrings {
         ACCENT: "L",
         TENUTO: "!tenuto!",
         BREATH: "!breath!",
+        ROLL: "!roll!",
+        PRALLTRILLER: "!pralltriller!",
+        MORDENT: "!mordent!",
+        TURN: "!turn!",
+        SLIDE: "!slide!",
     };
 
     static readonly Barline: AbcBarLineMapping = {

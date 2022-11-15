@@ -79,8 +79,8 @@ export class AbcConverter {
         /* Put whitespace if not connected to previous */
         if (glyph.beam === null || glyph.beam === "start") res += " ";
 
-        /* Add Ornament */
-        res += AbcStrings.Accent[glyph.ornament];
+        /* Add Ornaments */
+        glyph.ornaments.forEach(ornament => res += AbcStrings.Accent[ornament]);
 
         /* Process notes */
         glyph.notes.forEach(note => {

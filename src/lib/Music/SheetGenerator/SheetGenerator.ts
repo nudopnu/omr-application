@@ -45,7 +45,7 @@ export class SheetGenerator {
         const duration = 2;
         const notes = new KeySignature('C', 'Ionian').toScale(startOctave, duration, numberOfNotes);
         sys.staffs[0].addNotes(notes);
-        sys.staffs[0].getNotes().forEach((note, i) => note.ornament = DecorationTypes[i % DecorationTypes.length]);
+        sys.staffs[0].getNotes().forEach((note, i) => note.ornaments = [DecorationTypes[i % (DecorationTypes.length - 1) + 1]]);
 
         return sheet;
     }

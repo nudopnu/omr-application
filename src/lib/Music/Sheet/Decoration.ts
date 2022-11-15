@@ -11,6 +11,11 @@ export const DecorationTypes = [
     'ACCENT',
     'TENUTO',
     'BREATH',
+    'ROLL',
+    'PRALLTRILLER',
+    'MORDENT',
+    'TURN',
+    'SLIDE',
 ] as const;
 
 export type DecorationType = typeof DecorationTypes[number];
