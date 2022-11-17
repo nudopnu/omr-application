@@ -60,6 +60,7 @@ export class SheetGenerator {
             .forEach((note, i) => {
                 note.dynamic = Dynamics[i];
                 note.notes[0].accidental = "DOUBLEFLAT";
+                if (i < 4) note.tremolo = i + 1;
             });
 
         sheet.systems[1]

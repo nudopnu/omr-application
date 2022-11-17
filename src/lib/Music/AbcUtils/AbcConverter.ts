@@ -85,6 +85,7 @@ export class AbcConverter {
         /* Add Ornaments */
         glyph.ornaments.forEach(ornament => res += AbcStrings.Accent[ornament]);
         if (glyph.dynamic) res += `!${glyph.dynamic}!`;
+        if (glyph.tremolo) res += `!${AbcStrings.Tremolo[glyph.tremolo]}!`;
 
         /* Process notes */
         glyph.notes.forEach(note => {
@@ -101,6 +102,8 @@ export class AbcConverter {
             if (match !== -1) {
                 res += AbcStrings.Pitches[match];
             }
+
+            //TODO: automatically add accidentals
 
             /* Shift note according to its octave */
             if (octave < 5)

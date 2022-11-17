@@ -50,6 +50,13 @@ export class AbcStrings {
         'B',
     ];
 
+    static readonly Tremolo = [
+        '/',
+        '//',
+        '///',
+        '////',
+    ];
+
     static readonly Octave = {
         LOWER: ",",
         HIGHER: "'",

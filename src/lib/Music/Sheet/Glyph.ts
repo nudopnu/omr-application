@@ -48,6 +48,7 @@ export class ChordGlyph implements IGlyph {
         public ornaments: DecorationType[] = [],
         public dynamic: Optional<Dynamic> = undefined,
         public startTuple: number = 0,
+        public tremolo: number = 0,
         public arpeggiated: boolean = false,
         public punctuated: boolean = false,
     ) { }
