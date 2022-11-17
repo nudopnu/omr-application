@@ -1,5 +1,6 @@
 import { Meter } from "../AbcUtils/Meter";
 import { Note } from "../Note";
+import { ChordGroup } from "./ChordGroup";
 import { Clef } from "./Clef";
 import { Glyph, ChordGlyph } from "./Glyph";
 import { KeySignature } from "./KeySignature";
@@ -23,6 +24,10 @@ export class Staff {
 
     getNotes(): ChordGlyph[] {
         return this.glyphs.filter(glyph => glyph.type === "chord") as ChordGlyph[];
+    }
+
+    getNoteGroup(startIdx: number, endIdx: number): ChordGroup {
+        return new ChordGroup(this.getNotes().slice(startIdx, endIdx));
     }
 
     addGlyphs(glyphs: Glyph[]) {

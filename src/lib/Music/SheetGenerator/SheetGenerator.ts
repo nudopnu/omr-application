@@ -43,8 +43,9 @@ export class SheetGenerator {
 
         const tupletSizes = [2, 3, 4, 5, 6];
         const tupletNotesNumber: number = tupletSizes.reduce((sum, a) => sum + a, 0);;
+        const placeholders = "e".repeat(tupletNotesNumber);
 
-        [Dynamics, DecorationTypes, "e".repeat(tupletNotesNumber)].forEach(list => {
+        [Dynamics, DecorationTypes, placeholders, placeholders].forEach(list => {
             const sys = sheet.addSystem();
             const startOctave = 4;
             const numberOfNotes = list.length;
@@ -63,13 +64,22 @@ export class SheetGenerator {
             .getNotes()
             .forEach((note, i) => note.ornaments = [DecorationTypes[i]]);
 
-        const tupletNotes =
-            sheet.systems[2]
-                .getStaff()
-                .getNotes();
+        const tupletStaff = sheet.systems[2].getStaff();
         let tmp = 0;
         tupletSizes.forEach((n) => {
-            tupletNotes[tmp].startTuple = n;
+            const noteGroup = tupletStaff.getNoteGroup(tmp, tmp + n);
+            noteGroup.nTuplet();
+            tmp += n;
+        });
+
+        const tupletStaffConnected = sheet.systems[3].getStaff();
+        tupletStaffConnected.getNotes()
+            .forEach(note => note.duration = 1);
+        tmp = 0;
+        tupletSizes.forEach((n) => {
+            const noteGroup = tupletStaffConnected.getNoteGroup(tmp, tmp + n);
+            noteGroup.beam();
+            noteGroup.nTuplet();
             tmp += n;
         });
 

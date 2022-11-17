@@ -65,19 +65,10 @@ export class KeyGlyph implements IGlyph {
     ) { }
 }
 
-export class NTuplet implements IGlyph {
-    readonly type = "n-tuplet";
-    n: number;
-    constructor(
-        public innerNotes: ChordGlyph[],
-    ) { this.n = innerNotes.length; }
-}
-
 export type Glyph =
     | ChordGlyph
     | RestGlyph
     | BarLineGlyph
     | MultiMeasureRest
     | KeyGlyph
-    | NTuplet
     ;
