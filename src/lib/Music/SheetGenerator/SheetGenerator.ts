@@ -1,7 +1,7 @@
 import { Meter } from "../AbcUtils/Meter";
 import { DecorationTypes } from "../Sheet/Decoration";
 import { Dynamics } from "../Sheet/Dynamics";
-import { BarLineGlyph, KeyGlyph, MultiMeasureRest, RestGlyph } from "../Sheet/Glyph";
+import { BarLineGlyph, KeyGlyph, MultiMeasureRest, NoteGlyph, RestGlyph } from "../Sheet/Glyph";
 import { KeySignature } from "../Sheet/KeySignature";
 import { Sheet } from "../Sheet/Sheet";
 
@@ -16,7 +16,7 @@ export class SheetGenerator {
             const startOctave = 4;
             const numberOfNotes = 27;
             const notes = new KeySignature('C', 'Ionian').toScale(startOctave, duration, numberOfNotes);
-            sys.staffs[0].addNotes(notes);
+            sys.staffs[0].addNotes(NoteGlyph.fromNotes(notes));
         });
 
         const sys = sheet.addSystem();
@@ -51,20 +51,31 @@ export class SheetGenerator {
             const numberOfNotes = list.length;
             const duration = 2;
             const notes = new KeySignature('C', 'Ionian').toScale(startOctave, duration, numberOfNotes);
-            sys.getStaff().addNotes(notes);
+            sys.getStaff().addNotes(NoteGlyph.fromNotes(notes));
         });
 
         sheet.systems[0]
             .getStaff()
             .getNotes()
-            .forEach((note, i) => note.dynamic = Dynamics[i]);
+            .forEach((note, i) => {
+                note.dynamic = Dynamics[i];
+                note.notes[0].accidental = "DOUBLEFLAT";
+            });
 
         sheet.systems[1]
             .getStaff()
             .getNotes()
-            .forEach((note, i) => note.ornaments = [DecorationTypes[i]]);
+            .forEach((note, i) => {
+                note.ornaments = [DecorationTypes[i]];
+                note.notes[0].accidental = "FLAT";
+                if (i === 0) note.punctuated = true;
+            });
 
         const tupletStaff = sheet.systems[2].getStaff();
+        tupletStaff.getNotes()
+            .forEach(note => {
+                note.notes[0].accidental = "NATURAL";
+            });
         let tmp = 0;
         tupletSizes.forEach((n) => {
             const noteGroup = tupletStaff.getNoteGroup(tmp, tmp + n);
@@ -74,7 +85,10 @@ export class SheetGenerator {
 
         const tupletStaffConnected = sheet.systems[3].getStaff();
         tupletStaffConnected.getNotes()
-            .forEach(note => note.duration = 1);
+            .forEach(note => {
+                note.duration = 1;
+                note.notes[0].accidental = "SHARP";
+            });
         tmp = 0;
         tupletSizes.forEach((n) => {
             const noteGroup = tupletStaffConnected.getNoteGroup(tmp, tmp + n);

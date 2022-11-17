@@ -1,9 +1,9 @@
 export const Accidentals = [
-    'doubleflat',
-    'flat',
-    'natural',
-    'sharp',
-    'doublesharp',
+    'DOUBLEFLAT',
+    'FLAT',
+    'NATURAL',
+    'SHARP',
+    'DOUBLESHARP',
 ] as const;
 
 export type Accidental = typeof Accidentals[number];

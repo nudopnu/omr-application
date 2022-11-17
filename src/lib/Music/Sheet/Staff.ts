@@ -1,8 +1,7 @@
 import { Meter } from "../AbcUtils/Meter";
-import { Note } from "../Note";
 import { ChordGroup } from "./ChordGroup";
 import { Clef } from "./Clef";
-import { Glyph, ChordGlyph } from "./Glyph";
+import { ChordGlyph, Glyph, NoteGlyph } from "./Glyph";
 import { KeySignature } from "./KeySignature";
 import { Sheet } from "./Sheet";
 import { StaffOptions } from "./StaffOptions";
@@ -14,7 +13,7 @@ export class Staff {
         public options?: StaffOptions,
     ) { }
 
-    addNotes(notes: Note[], duration?: number) {
+    addNotes(notes: NoteGlyph[], duration?: number) {
         duration = duration ? duration : this.sheet.options.defaultDuration;
         this.glyphs.push(
             ...notes

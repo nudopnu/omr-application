@@ -1,8 +1,10 @@
+import { Accidental } from "../Sheet/Accidental";
 import { BarLineType } from "../Sheet/BarLine";
 import { DecorationType } from "../Sheet/Decoration";
 
 export type AbcBarLineMapping = { [key in BarLineType]: string }
 export type AbcDecorationMapping = { [key in DecorationType]: string }
+export type AbcAccidentalMapping = { [key in Accidental]: string }
 
 export class AbcStrings {
 
@@ -45,4 +47,17 @@ export class AbcStrings {
         'A',
         'B',
     ];
+
+    static readonly Octave = {
+        LOWER: ",",
+        HIGHER: "'",
+    }
+
+    static readonly Accidental: AbcAccidentalMapping = {
+        DOUBLEFLAT: "__",
+        FLAT: "_",
+        NATURAL: "=",
+        SHARP: "^",
+        DOUBLESHARP: "^^",
+    };
 }

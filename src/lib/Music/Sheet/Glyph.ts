@@ -1,5 +1,6 @@
 import { Optional } from "../../Optional";
 import { Note } from "../Note";
+import { Accidental } from "./Accidental";
 import { BarLineType } from "./BarLine";
 import { Clef } from "./Clef";
 import { DecorationType } from "./Decoration";
@@ -7,6 +8,7 @@ import { Dynamic } from "./Dynamics";
 import { KeySignature } from "./KeySignature";
 
 export const GlyphTypes = [
+    'note',
     'chord',
     'rest',
     'multi-measure-rest',
@@ -22,16 +24,32 @@ export interface IGlyph {
     type: GlyphType;
 }
 
+export class NoteGlyph implements Note, IGlyph {
+    readonly type = 'note';
+    static fromNote(note: Note, forcedAccidental: Optional<Accidental> = undefined): NoteGlyph {
+        return new NoteGlyph(note.midi, note.duration, forcedAccidental);
+    }
+    static fromNotes(notes: Note[]): NoteGlyph[] {
+        return notes.map(note => this.fromNote(note));
+    }
+    private constructor(
+        public midi: number,
+        public duration: number,
+        public accidental: Optional<Accidental> = undefined,
+    ) { }
+}
+
 export class ChordGlyph implements IGlyph {
     readonly type = 'chord';
     constructor(
-        public notes: Note[],
+        public notes: NoteGlyph[],
         public duration: number = 1,
         public beam: ('start' | 'end' | 'middle' | null) = null,
         public ornaments: DecorationType[] = [],
         public dynamic: Optional<Dynamic> = undefined,
         public startTuple: number = 0,
         public arpeggiated: boolean = false,
+        public punctuated: boolean = false,
     ) { }
 }
 
@@ -39,6 +57,7 @@ export class RestGlyph implements IGlyph {
     readonly type = 'rest';
     constructor(
         public duration: number,
+        public punctuated: boolean = false,
     ) { }
 }
 
