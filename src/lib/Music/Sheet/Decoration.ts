@@ -16,6 +16,8 @@ export const DecorationTypes = [
     'MORDENT',
     'TURN',
     'SLIDE',
+    'MARCATO',
+    'STACCATISSIMO',
 ] as const;
 
 export type DecorationType = typeof DecorationTypes[number];

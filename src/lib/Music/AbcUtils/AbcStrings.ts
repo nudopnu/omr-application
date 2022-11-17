@@ -26,6 +26,8 @@ export class AbcStrings {
         MORDENT: "!mordent!",
         TURN: "!turn!",
         SLIDE: "!slide!",
+        MARCATO: "!^!",
+        STACCATISSIMO: "!wedge!",
     };
 
     static readonly Barline: AbcBarLineMapping = {
