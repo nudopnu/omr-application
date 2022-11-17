@@ -77,7 +77,7 @@ export class AbcConverter {
         let res = "";
 
         /* Put whitespace if not connected to previous */
-        if (glyph.beam === null || glyph.beam === "START") res += " ";
+        if (glyph.beam == null || glyph.beam === "START") res += " ";
 
         /* Add Creshendo / Diminuendo */
         if (glyph.creshendo === "START") res += `!${AbcStrings.Creshendo.START}!`;
