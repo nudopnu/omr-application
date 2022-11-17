@@ -9,6 +9,7 @@ export const Clefs = [
     'alto2',
     'tenor',
     'perc',
+    'none',
 ] as const;
 
 export type Clef = typeof Clefs[number];

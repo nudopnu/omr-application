@@ -20,6 +20,14 @@ export const GlyphTypes = [
 
 export type GlyphType = typeof GlyphTypes[number];
 
+export const PartTypes = [
+    'START',
+    'MIDDLE',
+    'END',
+] as const;
+
+export type PartType = typeof PartTypes[number];
+
 export interface IGlyph {
     type: GlyphType;
 }
@@ -44,9 +52,11 @@ export class ChordGlyph implements IGlyph {
     constructor(
         public notes: NoteGlyph[],
         public duration: number = 1,
-        public beam: ('start' | 'end' | 'middle' | null) = null,
-        public ornaments: DecorationType[] = [],
+        public beam: Optional<PartType> = undefined,
         public dynamic: Optional<Dynamic> = undefined,
+        public creshendo: Optional<PartType> = undefined,
+        public diminuendo: Optional<PartType> = undefined,
+        public ornaments: DecorationType[] = [],
         public startTuple: number = 0,
         public tremolo: number = 0,
         public arpeggiated: boolean = false,

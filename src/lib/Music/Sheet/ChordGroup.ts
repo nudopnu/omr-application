@@ -1,6 +1,7 @@
 import { ChordGlyph } from "./Glyph";
 
 export class ChordGroup {
+
     constructor(
         public innerNotes: ChordGlyph[],
         public enclosed: boolean = false,
@@ -10,9 +11,9 @@ export class ChordGroup {
         if (connect) {
             this.innerNotes
                 .slice(1, this.innerNotes.length - 1)
-                .forEach(note => note.beam = "middle");
-            this.innerNotes[0].beam = "start";
-            this.innerNotes[this.innerNotes.length - 1].beam = "end";
+                .forEach(note => note.beam = "MIDDLE");
+            this.innerNotes[0].beam = "START";
+            this.innerNotes[this.innerNotes.length - 1].beam = "END";
         } else {
             this.innerNotes
                 .forEach(note => note.beam = null);
@@ -24,6 +25,24 @@ export class ChordGroup {
             this.innerNotes[0].startTuple = this.innerNotes.length;
         } else {
             this.innerNotes[0].startTuple = 0;
+        }
+    }
+
+    creshendo(apply: boolean = true) {
+        if (apply) {
+            this.innerNotes[0].creshendo = "START";
+            this.innerNotes[this.innerNotes.length - 1].creshendo = "END";
+        } else {
+            this.innerNotes.forEach(note => note.creshendo = null);
+        }
+    }
+
+    diminuendo(apply: boolean = true) {
+        if (apply) {
+            this.innerNotes[0].diminuendo = "START";
+            this.innerNotes[this.innerNotes.length - 1].diminuendo = "END";
+        } else {
+            this.innerNotes.forEach(note => note.diminuendo = null);
         }
     }
 

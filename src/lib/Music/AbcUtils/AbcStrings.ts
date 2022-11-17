@@ -38,7 +38,7 @@ export class AbcStrings {
         REPEAT_START: '|:',
         SINGLE: "|",
         START: "[|",
-    }
+    };
 
     static readonly Pitches = [
         'C',
@@ -60,7 +60,7 @@ export class AbcStrings {
     static readonly Octave = {
         LOWER: ",",
         HIGHER: "'",
-    }
+    };
 
     static readonly Accidental: AbcAccidentalMapping = {
         DOUBLEFLAT: "__",
@@ -69,4 +69,15 @@ export class AbcStrings {
         SHARP: "^",
         DOUBLESHARP: "^^",
     };
+
+    static readonly Creshendo = {
+        START: "<(",
+        END: "<)",
+    };
+
+    static readonly Diminuendo = {
+        START: ">(",
+        END: ">)",
+    };
+
 }

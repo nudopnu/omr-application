@@ -78,9 +78,11 @@ export class SheetGenerator {
                 note.notes[0].accidental = "NATURAL";
             });
         let tmp = 0;
-        tupletSizes.forEach((n) => {
+        tupletSizes.forEach((n, idx) => {
             const noteGroup = tupletStaff.getNoteGroup(tmp, tmp + n);
             noteGroup.nTuplet();
+            if (idx % 2) noteGroup.diminuendo();
+            else noteGroup.creshendo();
             tmp += n;
         });
 
@@ -91,10 +93,12 @@ export class SheetGenerator {
                 note.notes[0].accidental = "SHARP";
             });
         tmp = 0;
-        tupletSizes.forEach((n) => {
+        tupletSizes.forEach((n, idx) => {
             const noteGroup = tupletStaffConnected.getNoteGroup(tmp, tmp + n);
             noteGroup.beam();
             noteGroup.nTuplet();
+            if (idx % 2) noteGroup.creshendo();
+            else noteGroup.diminuendo();
             tmp += n;
         });
 
