@@ -46,6 +46,15 @@ export class ChordGroup {
         }
     }
 
+    slur(apply: boolean = true) {
+        if (apply) {
+            this.innerNotes[0].slur = "START";
+            this.innerNotes[this.innerNotes.length - 1].slur = "END";
+        } else {
+            this.innerNotes.forEach(note => note.slur = null);
+        }
+    }
+
     forEach(callback: (note: ChordGlyph) => void) {
         this.innerNotes.forEach(callback);
     }

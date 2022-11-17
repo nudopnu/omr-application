@@ -56,6 +56,8 @@ export class ChordGlyph implements IGlyph {
         public dynamic: Optional<Dynamic> = undefined,
         public creshendo: Optional<PartType> = undefined,
         public diminuendo: Optional<PartType> = undefined,
+        public slur: Optional<PartType> = undefined,
+        public tie: Optional<PartType> = undefined,
         public ornaments: DecorationType[] = [],
         public startTuple: number = 0,
         public tremolo: number = 0,

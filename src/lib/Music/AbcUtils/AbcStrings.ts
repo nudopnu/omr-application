@@ -80,4 +80,11 @@ export class AbcStrings {
         END: ">)",
     };
 
+    static readonly TIE = "-";
+
+    static readonly Slur = {
+        START: "(",
+        END: ")",
+    };
+
 }

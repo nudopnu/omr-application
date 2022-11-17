@@ -81,6 +81,7 @@ export class SheetGenerator {
         tupletSizes.forEach((n, idx) => {
             const noteGroup = tupletStaff.getNoteGroup(tmp, tmp + n);
             noteGroup.nTuplet();
+            noteGroup.slur();
             if (idx % 2) noteGroup.diminuendo();
             else noteGroup.creshendo();
             tmp += n;

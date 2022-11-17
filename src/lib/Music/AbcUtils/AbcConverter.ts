@@ -85,6 +85,10 @@ export class AbcConverter {
         if (glyph.diminuendo === "START") res += `!${AbcStrings.Diminuendo.START}!`;
         if (glyph.diminuendo === "END") res += `!${AbcStrings.Diminuendo.END}!`;
 
+        /* Add Slur / Tie */
+        if (glyph.slur === "START") res += AbcStrings.Slur.START;
+        if (glyph.tie === "END") res += AbcStrings.TIE;
+
         /* Add Tuple */
         if (glyph.startTuple > 1) res += `(${glyph.startTuple})`;
 
@@ -122,6 +126,10 @@ export class AbcConverter {
         if (glyph.notes.length > 1) {
             res = `[${res}]`;
         }
+
+        /* Add Slur / Tie */
+        if (glyph.slur === "END") res += AbcStrings.Slur.END;
+        if (glyph.tie === "START") res += AbcStrings.TIE;
 
         return res;
     }
