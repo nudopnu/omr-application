@@ -19,7 +19,7 @@ export function SvgFilter() {
                 <feMorphology operator="dilate" radius="1" />
             </filter>
             {/* Created with https://fffuel.co/nnnoise/ */}
-            <filter id="noise" >
+            <filter id="noise" x='0%' y='0%' width='100%' height="100%">
                 <feTurbulence type="turbulence" baseFrequency="0.15" numOctaves="14" seed="15" result="turbulence"></feTurbulence>
                 <feSpecularLighting surfaceScale="15" specularConstant="1" specularExponent="200" lightingColor="hsl(23, 0%, 100%)" in="turbulence" result="specularLighting">
                     <feDistantLight azimuth="3" elevation="100"></feDistantLight>
@@ -34,8 +34,6 @@ export function SvgFilter() {
                 <feComponentTransfer>
                     <feFuncA type="discrete" tableValues="0 1" />
                 </feComponentTransfer>
-                <feMorphology operator="dilate" radius="1" />
-                <feMorphology operator="erode" radius="1" />
 
             </filter>
             <filter>

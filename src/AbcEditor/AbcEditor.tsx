@@ -75,8 +75,11 @@ export function AbcEditor({ abcLayers, addLayer }) {
         root.render(<SvgFilter />);
 
         /* Apply filters */
+        const rotation = 2;
         ([...document.querySelectorAll('svg > g')] as HTMLElement[]).forEach(element => {
             element.style.setProperty('filter', 'url(#displacementFilter)');
+            element.style.setProperty('transform-box', 'fill-box');
+            element.style.setProperty('transform', `rotate(${rotation}deg)`);
         });
 
         /* Apply staff thickness */
