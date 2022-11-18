@@ -32,7 +32,7 @@ C1- | C1 D2 E3 F4 G6 A8|: c,,1 (d,,2 e,,3 f,,4 g,,6 a,,8):|c128|
 export function AbcEditor({ abcLayers, addLayer }) {
     const [value, setValue] = useState<string>(sheets[0]);
     const [hints, setHints] = useState<string[]>([]);
-    const [checked, setChecked] = useState(false);
+    const [checked, setChecked] = useState<boolean>(false);
 
     const abcOptions: AbcVisualParams = {
         responsive: "resize",
@@ -79,8 +79,14 @@ export function AbcEditor({ abcLayers, addLayer }) {
         ([...document.querySelectorAll('svg > g')] as HTMLElement[]).forEach(element => {
             element.style.setProperty('filter', 'url(#displacementFilter)');
             element.style.setProperty('transform-box', 'fill-box');
+            /* Add per-staff rotation */
             element.style.setProperty('transform', `rotate(${rotation}deg)`);
         });
+
+        /* Apply 3d rotation */
+        // (document.querySelector('svg') as SVGElement)
+        //     .style
+        //     .setProperty('transform', 'perspective(25cm) scale(.8) rotateX(4deg) rotateY(4deg)');
 
         /* Apply staff thickness */
         ([...document.querySelectorAll('.abcjs-staff > path')] as HTMLElement[]).forEach(elem => {
@@ -102,7 +108,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
         noise.setAttribute('width', '100%');
         noise.setAttribute('height', '100%');
         noise.style.setProperty('filter', 'url(#noise)');
-        abcContentContainer.appendChild(noise);
+        // abcContentContainer.appendChild(noise);
 
     }
 
@@ -332,6 +338,10 @@ export function AbcEditor({ abcLayers, addLayer }) {
             <button onClick={onClickGenerateOrnaments}>Ornaments Sheet</button>
             <button onClick={onClickConvert}>Convert to PNG</button>
             <button onClick={onClickConvert2}>Generate XY</button>
+            <div>
+                <div>Turbulence</div>
+                <input type="range" min={0} max={100} value={value}/>
+            </div>
             <button onClick={() => validate()}>Validate</button>
             <div id="hints">{hints.map((hint, idx) => <div key={idx}>{hint}</div>)}</div>
         </div>

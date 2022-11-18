@@ -46,7 +46,7 @@ export function SvgFilter() {
             {/* Taken from https://tympanus.net/codrops/2019/02/19/svg-filter-effects-creating-texture-with-feturbulence/ */}
             <filter id='paper' x='0%' y='0%' width='100%' height="100%">
                 <feTurbulence type="fractalNoise" baseFrequency='0.04' result='noise' numOctaves="5" />
-                <feDiffuseLighting in='noise' lighting-color='white' surfaceScale='1'>
+                <feDiffuseLighting in='noise' lightingColor='white' surfaceScale='1'>
                     <feDistantLight azimuth='45' elevation='60' />
                 </feDiffuseLighting>
             </filter>
