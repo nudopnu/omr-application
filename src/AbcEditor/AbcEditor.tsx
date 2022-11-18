@@ -5,6 +5,8 @@ import { ABC_CLASSES, DEFAULF_GENERATOR_SETTINGS, generateRandomSheet } from "..
 import "./AbcEditor.css";
 import { AbcConverter } from '../lib/Music/AbcUtils/AbcConverter';
 import { SheetGenerator } from '../lib/Music/SheetGenerator/SheetGenerator';
+import { createRoot } from 'react-dom/client';
+import { SvgFilter } from './SvgFilter';
 
 const sheets = [
     `X:1
@@ -47,18 +49,58 @@ export function AbcEditor({ abcLayers, addLayer }) {
     function handleChange(event) {
         setValue(event.target.value);
         abcjs.renderAbc('abc-content', event.target.value, abcOptions);
-        fixFont();
+        postProcess();
         setChecked(false);
         setHints([]);
     }
 
-    function fixFont() {
-        ([...document.querySelectorAll('[font-family="Times"], [font-family="Helvetica"]')] as HTMLElement[]).forEach(elem => {
-            // console.log(elem);
-            elem.style.setProperty('font-family', "'Times New Roman', serif");
+    function postProcess() {
+        ([...document.querySelectorAll('[font-family="Times"]')] as HTMLElement[]).forEach(elem => {
+            console.log(elem);
+            elem.style.setProperty('font-family', "Maestro");
+            elem.style.setProperty('font-size', '22px');
+        });
+        ([...document.querySelectorAll('[font-family="Helvetica"]')] as HTMLElement[]).forEach(elem => {
+            console.log(elem);
+            elem.style.setProperty('font-family', "Maestro");
             elem.style.setProperty('font-weight', 'bold');
             elem.style.setProperty('font-size', 'small');
         });
+
+        /* Inject filter defs */
+        const abcContentContainer = document.querySelector('.abcjs-inner > svg') as HTMLElement;
+        const defContainer = document.createElement('defs');
+        abcContentContainer.appendChild(defContainer)
+        const root = createRoot(defContainer);
+        root.render(<SvgFilter />);
+
+        /* Apply filters */
+        ([...document.querySelectorAll('svg > g')] as HTMLElement[]).forEach(element => {
+            element.style.setProperty('filter', 'url(#displacementFilter)');
+        });
+
+        /* Apply staff thickness */
+        ([...document.querySelectorAll('.abcjs-staff > path')] as HTMLElement[]).forEach(elem => {
+            const scaleX = 1;
+            const scaleY = 2;
+            elem.style.setProperty("transform", `scale(${scaleX}, ${scaleY})`);
+            elem.style.setProperty('transform-box', 'fill-box');
+        });
+
+        /* Add background paper */
+        const paper = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
+        paper.setAttribute('width', '100%');
+        paper.setAttribute('height', '100%');
+        paper.style.setProperty('filter', 'url(#paper)');
+        abcContentContainer.insertBefore(paper, abcContentContainer.firstChild);
+
+        /* Add background noise */
+        const noise = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
+        noise.setAttribute('width', '100%');
+        noise.setAttribute('height', '100%');
+        noise.style.setProperty('filter', 'url(#noise)');
+        abcContentContainer.appendChild(noise);
+
     }
 
     function onClickGenerateRandom() {
@@ -67,7 +109,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
         setValue(abc);
         setChecked(false);
         abcjs.renderAbc('abc-content', abc, abcOptions);
-        fixFont();
+        postProcess();
         validate();
     }
 
@@ -78,7 +120,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
         setValue(abc);
         setChecked(false);
         abcjs.renderAbc('abc-content', abc, abcOptions);
-        fixFont();
+        postProcess();
         validate();
     }
 
@@ -89,7 +131,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
         setValue(abc);
         setChecked(false);
         abcjs.renderAbc('abc-content', abc, abcOptions);
-        fixFont();
+        postProcess();
         validate();
     }
 
@@ -268,7 +310,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
 
     useEffect(() => {
         abcjs.renderAbc('abc-content', value, abcOptions);
-        fixFont();
+        postProcess();
     }, [])
 
     return (
