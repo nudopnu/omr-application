@@ -44,6 +44,7 @@ export class NoteGlyph implements Note, IGlyph {
         public midi: number,
         public duration: number,
         public accidental: Optional<Accidental> = undefined,
+        public fingering: Optional<number> = undefined,
     ) { }
 }
 

@@ -75,6 +75,7 @@ export class AbcConverter {
 
     static chordToString(glyph: ChordGlyph, key: KeySignature) {
         let res = "";
+        let fingering = "";
 
         /* Put whitespace if not connected to previous */
         if (glyph.beam == null || glyph.beam === "START") res += " ";

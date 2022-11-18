@@ -177,7 +177,6 @@ export function generateRandomSheet(settings) {
             const glyph = trebleGlyphs[(startIdx + 7 * i) % trebleGlyphs.length];
             const notesIdx = randIntInRange(0, glyph.notes.length);
             glyph.notes[notesIdx] = accidental + glyph.notes[notesIdx];
-            console.log(accidentalsRange, glyph.notes[notesIdx]);
         }
 
 

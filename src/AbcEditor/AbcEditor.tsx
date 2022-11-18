@@ -47,8 +47,18 @@ export function AbcEditor({ abcLayers, addLayer }) {
     function handleChange(event) {
         setValue(event.target.value);
         abcjs.renderAbc('abc-content', event.target.value, abcOptions);
+        fixFont();
         setChecked(false);
         setHints([]);
+    }
+
+    function fixFont() {
+        ([...document.querySelectorAll('[font-family="Times"], [font-family="Helvetica"]')] as HTMLElement[]).forEach(elem => {
+            // console.log(elem);
+            elem.style.setProperty('font-family', "'Times New Roman', serif");
+            elem.style.setProperty('font-weight', 'bold');
+            elem.style.setProperty('font-size', 'small');
+        });
     }
 
     function onClickGenerateRandom() {
@@ -57,6 +67,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
         setValue(abc);
         setChecked(false);
         abcjs.renderAbc('abc-content', abc, abcOptions);
+        fixFont();
         validate();
     }
 
@@ -67,9 +78,10 @@ export function AbcEditor({ abcLayers, addLayer }) {
         setValue(abc);
         setChecked(false);
         abcjs.renderAbc('abc-content', abc, abcOptions);
+        fixFont();
         validate();
     }
-    
+
     function onClickGenerateOrnaments() {
         const sheet = SheetGenerator.generateOrnamentsSheet();
         let abc = AbcConverter.fromSheet(sheet);
@@ -77,6 +89,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
         setValue(abc);
         setChecked(false);
         abcjs.renderAbc('abc-content', abc, abcOptions);
+        fixFont();
         validate();
     }
 
@@ -255,6 +268,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
 
     useEffect(() => {
         abcjs.renderAbc('abc-content', value, abcOptions);
+        fixFont();
     }, [])
 
     return (
