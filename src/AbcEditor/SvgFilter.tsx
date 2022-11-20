@@ -1,16 +1,14 @@
 import React from 'react'
 
-export function SvgFilter() {
+export function SvgFilter({ turbulenceFrequency, turbulenceStrength }) {
 
-    const scale = 5;
-    const frequency = 0.05;
 
     return (
         <svg>
             {/* Taken from https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feDisplacementMap */}
             <filter id="displacementFilter">
-                <feTurbulence type="turbulence" baseFrequency={frequency} numOctaves="2" result="turbulence"></feTurbulence>
-                <feDisplacementMap in2="turbulence" in="SourceGraphic" scale={scale} xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+                <feTurbulence type="turbulence" baseFrequency={turbulenceFrequency} numOctaves="1000" result="turbulence"></feTurbulence>
+                <feDisplacementMap in2="turbulence" in="SourceGraphic" scale={turbulenceStrength} xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
             </filter>
             <filter id="erode">
                 <feMorphology operator="erode" radius="2" />

@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
 import abcjs, { AbcVisualParams } from "abcjs";
-import { useEffect, useState } from "react";
 import { ABC_CLASSES, DEFAULF_GENERATOR_SETTINGS, generateRandomSheet } from "../lib/Sheet";
 import "./AbcEditor.css";
 import { AbcConverter } from '../lib/Music/AbcUtils/AbcConverter';
@@ -33,6 +32,13 @@ export function AbcEditor({ abcLayers, addLayer }) {
     const [value, setValue] = useState<string>(sheets[0]);
     const [hints, setHints] = useState<string[]>([]);
     const [checked, setChecked] = useState<boolean>(false);
+    const [turbulenceFrequency, setTurbulenceFrequency] = useState<number>(0);
+    const [turbulenceStrength, setTurbulenceStrength] = useState<number>(0);
+    const [staffLineThickness, setStaffLineThickness] = useState<number>(1);
+    const [verticalScale, setVerticalScale] = useState<number>(1);
+    const [rotation, setRotation] = useState<number>(0);
+
+    let definitionsRoot;
 
     const abcOptions: AbcVisualParams = {
         responsive: "resize",
@@ -71,17 +77,17 @@ export function AbcEditor({ abcLayers, addLayer }) {
         const abcContentContainer = document.querySelector('.abcjs-inner > svg') as HTMLElement;
         const defContainer = document.createElement('defs');
         abcContentContainer.appendChild(defContainer)
-        const root = createRoot(defContainer);
-        root.render(<SvgFilter />);
+        definitionsRoot = createRoot(defContainer);
+        definitionsRoot.render(<SvgFilter turbulenceFrequency={turbulenceFrequency} turbulenceStrength={turbulenceStrength} />);
 
         /* Apply filters */
-        const rotation = 2;
         ([...document.querySelectorAll('svg > g')] as HTMLElement[]).forEach(element => {
             element.style.setProperty('filter', 'url(#displacementFilter)');
             element.style.setProperty('transform-box', 'fill-box');
-            /* Add per-staff rotation */
-            element.style.setProperty('transform', `rotate(${rotation}deg)`);
         });
+
+        /* Apply per-staff rotation */
+        updateRotation();
 
         /* Apply 3d rotation */
         // (document.querySelector('svg') as SVGElement)
@@ -89,19 +95,15 @@ export function AbcEditor({ abcLayers, addLayer }) {
         //     .setProperty('transform', 'perspective(25cm) scale(.8) rotateX(4deg) rotateY(4deg)');
 
         /* Apply staff thickness */
-        ([...document.querySelectorAll('.abcjs-staff > path')] as HTMLElement[]).forEach(elem => {
-            const scaleX = 1;
-            const scaleY = 2;
-            elem.style.setProperty("transform", `scale(${scaleX}, ${scaleY})`);
-            elem.style.setProperty('transform-box', 'fill-box');
-        });
+        const scaleX = 1;
+        scaleStafflines(scaleX, staffLineThickness);
 
         /* Add background paper */
-        const paper = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
-        paper.setAttribute('width', '100%');
-        paper.setAttribute('height', '100%');
-        paper.style.setProperty('filter', 'url(#paper)');
-        abcContentContainer.insertBefore(paper, abcContentContainer.firstChild);
+        // const paper = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
+        // paper.setAttribute('width', '100%');
+        // paper.setAttribute('height', '100%');
+        // paper.style.setProperty('filter', 'url(#paper)');
+        // abcContentContainer.insertBefore(paper, abcContentContainer.firstChild);
 
         /* Add background noise */
         const noise = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
@@ -110,6 +112,19 @@ export function AbcEditor({ abcLayers, addLayer }) {
         noise.style.setProperty('filter', 'url(#noise)');
         // abcContentContainer.appendChild(noise);
 
+    }
+
+    function updateRotation() {
+        ([...document.querySelectorAll('svg > g')] as HTMLElement[]).forEach(element => {
+            element.style.setProperty('transform', `rotate(${rotation}deg) scale(1, ${verticalScale})`);
+        });
+    }
+
+    function scaleStafflines(scaleX: number, scaleY: number) {
+        ([...document.querySelectorAll('.abcjs-staff > path')] as HTMLElement[]).forEach(elem => {
+            elem.style.setProperty("transform", `scale(${scaleX}, ${scaleY})`);
+            elem.style.setProperty('transform-box', 'fill-box');
+        });
     }
 
     function onClickGenerateRandom() {
@@ -320,30 +335,61 @@ export function AbcEditor({ abcLayers, addLayer }) {
     useEffect(() => {
         abcjs.renderAbc('abc-content', value, abcOptions);
         postProcess();
+    }, [turbulenceFrequency, turbulenceStrength, staffLineThickness, rotation, verticalScale]);
+
+
+    useEffect(() => {
+        abcjs.renderAbc('abc-content', value, abcOptions);
+        postProcess();
     }, [])
 
     return (
         <div id="abc-editor">
-            <textarea value={value} onChange={handleChange} id="" cols={30} rows={10}></textarea>
-            <label>
-                <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={_event => setChecked(!checked)}
-                />
-                <span>Preview ground truth</span>
-            </label>
-            <button onClick={onClickGenerateRandom}>Random Piano Sheet</button>
-            <button onClick={onClickGenerateScale}>Scale Sheet</button>
-            <button onClick={onClickGenerateOrnaments}>Ornaments Sheet</button>
-            <button onClick={onClickConvert}>Convert to PNG</button>
-            <button onClick={onClickConvert2}>Generate XY</button>
-            <div>
-                <div>Turbulence</div>
-                <input type="range" min={0} max={100} value={value}/>
+            <div id="abc-editor-inner">
+                <textarea value={value} onChange={handleChange} id="" cols={30} rows={10}></textarea>
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={_event => setChecked(!checked)}
+                    />
+                    <span>Preview ground truth</span>
+                </label>
+                <button onClick={onClickGenerateRandom}>Random Piano Sheet</button>
+                <button onClick={onClickGenerateScale}>Scale Sheet</button>
+                <button onClick={onClickGenerateOrnaments}>Ornaments Sheet</button>
+                <button onClick={onClickConvert}>Convert to PNG</button>
+                <button onClick={onClickConvert2}>Generate XY</button>
+                <div id='settings'>
+                    <div className='setting'>
+                        <span>Staffline thickness:</span>
+                        <input type="range" min={0.1} max={5} step={0.1} value={staffLineThickness} onChange={e => setStaffLineThickness(e.target.valueAsNumber)} />
+                        {staffLineThickness}
+                    </div>
+                    <div className='setting'>
+                        <span>Turbulence Frequency:</span>
+                        <input type="range" min={0} max={0.1} step={0.001} value={turbulenceFrequency} onChange={e => setTurbulenceFrequency(e.target.valueAsNumber)} />
+                        {turbulenceFrequency}
+                    </div>
+                    <div className='setting'>
+                        <span>Turbulence Strength:</span>
+                        <input type="range" min={0} max={10} step={0.1} value={turbulenceStrength} onChange={e => setTurbulenceStrength(e.target.valueAsNumber)} />
+                        {turbulenceStrength}
+                    </div>
+                    <div className='setting'>
+                        <span>Rotation:</span>
+                        <input type="range" min={-3} max={3} step={0.1} value={rotation} onChange={e => setRotation(e.target.valueAsNumber)} />
+                        {rotation}
+                    </div>
+                    <div className='setting'>
+                        <span>Vertical Shrink:</span>
+                        <input type="range" min={.5} max={1} step={0.1} value={verticalScale} onChange={e => setVerticalScale(e.target.valueAsNumber)} />
+                        {verticalScale}
+                    </div>
+                </div>
+                <button onClick={() => validate()}>Validate</button>
+                <div id="hints">{hints.map((hint, idx) => <div key={idx}>{hint}</div>)}</div>
             </div>
-            <button onClick={() => validate()}>Validate</button>
-            <div id="hints">{hints.map((hint, idx) => <div key={idx}>{hint}</div>)}</div>
         </div>
     );
 }
