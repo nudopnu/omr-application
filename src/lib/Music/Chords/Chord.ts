@@ -39,11 +39,13 @@ export class Chord {
     constructor(
         public intervals: number[],
         public octave?: number,
+        public inversion = 0,
     ) { }
 
     toGlyph(key: KeySignature, arpeggiate?: boolean, duration: number = 1): ChordGlyph {
         let tmp = this.octave ? this.octave * 12 : 0;
         const relativePitches = this.intervals.map(interval => tmp += interval);
+        [...Array(this.inversion).keys()].forEach(i => relativePitches[i] += 12);
         const notes = relativePitches.map(relativePitch => key.getNote(relativePitch, duration));
         return ChordGlyph.fromNotes(notes, arpeggiate);
     }

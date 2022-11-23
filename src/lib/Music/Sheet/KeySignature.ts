@@ -41,7 +41,7 @@ export class KeySignature {
         }
     }
 
-    getChord(romanNumeral: RomanNumeral, type: ChordType, octave?: number): Chord {
+    getChord(romanNumeral: RomanNumeral, type: ChordType, octave?: number, inversion = 0): Chord {
         let intervals: number[] = [];
         const start = RomanNumerals.indexOf(romanNumeral);
         let tmp = this.relativeMidis[start];
@@ -62,6 +62,6 @@ export class KeySignature {
                 tmp += this.intervals[(start + idx) % 7];
             });
         }
-        return new Chord(intervals, octave);
+        return new Chord(intervals, octave, inversion);
     }
 }

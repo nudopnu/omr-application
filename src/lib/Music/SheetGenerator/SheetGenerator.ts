@@ -124,7 +124,11 @@ export class SheetGenerator {
 
         const CIonian = new KeySignature('C', 'Ionian');
         const chordSystem = sheet.addSystem();
-        const chordGlyphs = RomanNumerals.map((romanNumeral, idx) => CIonian.getChord(romanNumeral, "seventh", 5).toGlyph(CIonian, true, idx % 5 + 1));
+        const chordGlyphs = RomanNumerals
+            .map((romanNumeral, idx) =>
+                CIonian.getChord(romanNumeral, "seventh", 5, idx % 4)
+                    .toGlyph(CIonian, true, idx % 5 + 1)
+            );
         chordSystem.getStaff().addGlyphs(chordGlyphs);
         console.log(chordGlyphs);
 
