@@ -1,6 +1,8 @@
+import { Chord, ChordType, RomanNumeral, RomanNumerals } from "../Chords/Chord";
 import { AnyKeyPitch } from "../KeyPitch";
 import { ModeType, ModeTypes } from "../Mode";
 import { Note } from "../Note";
+import { NoteGlyph } from "./Glyph";
 
 export class KeySignature {
 
@@ -29,4 +31,39 @@ export class KeySignature {
         } as Note));
     }
 
+    getNote(midi: number, preferedAccidental: "FLAT" | "SHARP" = 'FLAT') {
+        const pitch = midi % 12;
+        let match = this.relativeMidis.indexOf(pitch);
+        if (match !== -1) {
+            return NoteGlyph.fromNote({ duration: 1, midi: midi } as Note);
+        } else {
+            return NoteGlyph.fromNote({ duration: 1, midi: midi } as Note, preferedAccidental);
+        }
+    }
+
+    getChord(romanNumeral: RomanNumeral, type: ChordType, octave?: number): Chord {
+        let intervals: number[] = [];
+        const start = RomanNumerals.indexOf(romanNumeral);
+        let tmp = this.relativeMidis[start];
+        if (type === "triad") {
+            [...Array(6).keys()].forEach(idx => {
+                if (idx % 2 === 0) {
+                    intervals.push(tmp);
+                    tmp = 0;
+                }
+                tmp += this.intervals[(start + idx) % 7];
+            });
+        } else if (type === "seventh") {
+            [...Array(8).keys()].forEach(idx => {
+                if (idx % 2 === 0) {
+                    intervals.push(tmp);
+                    tmp = 0;
+                }
+                tmp += this.intervals[(start + idx) % 7];
+            });
+        }
+        console.log(intervals);
+
+        return new Chord(intervals, octave);
+    }
 }

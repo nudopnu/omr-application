@@ -1,5 +1,6 @@
 export const DecorationTypes = [
     'NONE',
+    'ARPEGGIO',
     'STACCATO',
     'FERMATA',
     'FERMATA_INVERTED',

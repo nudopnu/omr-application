@@ -25,7 +25,7 @@ export class Staff {
         return this.glyphs.filter(glyph => glyph.type === "chord") as ChordGlyph[];
     }
 
-    getNoteGroup(startIdx: number, endIdx: number): ChordGroup {
+    getNoteGroup(startIdx?: number, endIdx?: number): ChordGroup {
         return new ChordGroup(this.getNotes().slice(startIdx, endIdx));
     }
 

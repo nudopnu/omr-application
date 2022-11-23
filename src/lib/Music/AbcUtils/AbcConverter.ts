@@ -75,10 +75,6 @@ export class AbcConverter {
 
     static chordToString(glyph: ChordGlyph, key: KeySignature) {
         let res = "";
-        let fingering = "";
-
-        /* Put whitespace if not connected to previous */
-        if (glyph.beam == null || glyph.beam === "START") res += " ";
 
         /* Add Creshendo / Diminuendo */
         if (glyph.creshendo === "START") res += `!${AbcStrings.Creshendo.START}!`;
@@ -103,6 +99,11 @@ export class AbcConverter {
             let pitch = note.midi % 12;
             let octave = (note.midi - pitch) / 12;
 
+            /* Add fingering if present */
+            if (note.fingering !== undefined) {
+                res += `!${note.fingering}!`;
+            }
+
             /* Prepend enforced accidental if present */
             if (note.accidental) {
                 res += AbcStrings.Accidental[note.accidental];
@@ -126,11 +127,17 @@ export class AbcConverter {
         /* Wrap into a chord if multiple notes present */
         if (glyph.notes.length > 1) {
             res = `[${res}]`;
+            if (glyph.arpeggiated) {
+                res = AbcStrings.Accent["ARPEGGIO"] + res;
+            }
         }
 
         /* Add Slur / Tie */
         if (glyph.slur === "END") res += AbcStrings.Slur.END;
         if (glyph.tie === "START") res += AbcStrings.TIE;
+
+        /* Put whitespace if not connected to previous */
+        if (glyph.beam == null || glyph.beam === "START") res = " " + res;
 
         return res;
     }

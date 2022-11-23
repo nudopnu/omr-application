@@ -28,6 +28,7 @@ export class AbcStrings {
         SLIDE: "!slide!",
         MARCATO: "!^!",
         STACCATISSIMO: "!wedge!",
+        ARPEGGIO: "!arpeggio!",
     };
 
     static readonly Barline: AbcBarLineMapping = {

@@ -62,12 +62,10 @@ export function AbcEditor({ abcLayers, addLayer }) {
 
     function postProcess() {
         ([...document.querySelectorAll('[font-family="Times"]')] as HTMLElement[]).forEach(elem => {
-            console.log(elem);
             elem.style.setProperty('font-family', "Maestro");
             elem.style.setProperty('font-size', '22px');
         });
         ([...document.querySelectorAll('[font-family="Helvetica"]')] as HTMLElement[]).forEach(elem => {
-            console.log(elem);
             elem.style.setProperty('font-family', "Maestro");
             elem.style.setProperty('font-weight', 'bold');
             elem.style.setProperty('font-size', 'small');

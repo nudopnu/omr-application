@@ -50,6 +50,7 @@ export class NoteGlyph implements Note, IGlyph {
 
 export class ChordGlyph implements IGlyph {
     readonly type = 'chord';
+
     constructor(
         public notes: NoteGlyph[],
         public duration: number = 1,
@@ -65,6 +66,13 @@ export class ChordGlyph implements IGlyph {
         public arpeggiated: boolean = false,
         public punctuated: boolean = false,
     ) { }
+
+    static fromNotes(notes: Note[], arpeggiate?: boolean): ChordGlyph {
+        const noteGlpyhs: NoteGlyph[] = notes.map(note => NoteGlyph.fromNote(note));
+        const chordGlyph = new ChordGlyph(noteGlpyhs);
+        chordGlyph.arpeggiated = arpeggiate ? arpeggiate : false;
+        return chordGlyph;
+    }
 }
 
 export class RestGlyph implements IGlyph {

@@ -1,4 +1,6 @@
 import { Meter } from "../AbcUtils/Meter";
+import { Chord, RomanNumerals } from "../Chords/Chord";
+import { Accidentals } from "../Sheet/Accidental";
 import { DecorationTypes } from "../Sheet/Decoration";
 import { Dynamics } from "../Sheet/Dynamics";
 import { BarLineGlyph, KeyGlyph, MultiMeasureRest, NoteGlyph, RestGlyph } from "../Sheet/Glyph";
@@ -41,11 +43,18 @@ export class SheetGenerator {
     static generateOrnamentsSheet(): Sheet {
         const sheet = new Sheet();
 
-        const tupletSizes = [2, 3, 4, 5, 6];
-        const tupletNotesNumber: number = tupletSizes.reduce((sum, a) => sum + a, 0);;
-        const placeholders = "e".repeat(tupletNotesNumber);
+        const tupletSizesA = [2, 3, 4, 5, 6];
+        const tupletSizesB = [7, 8, 9];
+        const tupletNotesNumberA: number = tupletSizesA.reduce((sum, a) => sum + a, 0);;
+        const tupletNotesNumberB: number = tupletSizesB.reduce((sum, a) => sum + a, 0);;
+        const placeholdersA = "e".repeat(tupletNotesNumberA);
+        const placeholdersB = "e".repeat(tupletNotesNumberB);
+        const placeholders = [
+            placeholdersA, placeholdersB,
+            placeholdersA, placeholdersB,
+        ];
 
-        [Dynamics, DecorationTypes, placeholders, placeholders].forEach(list => {
+        [Dynamics, DecorationTypes, ...placeholders].forEach(list => {
             const sys = sheet.addSystem();
             const startOctave = 4;
             const numberOfNotes = list.length;
@@ -62,6 +71,7 @@ export class SheetGenerator {
                 note.notes[0].accidental = "DOUBLEFLAT";
                 if (i < 4) note.tremolo = i + 1;
             });
+        sheet.systems[0].getStaff().setMeter(Meter.fromType("C"));
 
         sheet.systems[1]
             .getStaff()
@@ -71,37 +81,49 @@ export class SheetGenerator {
                 note.notes[0].accidental = "FLAT";
                 if (i === 0) note.punctuated = true;
             });
+        sheet.systems[1].getStaff().setMeter(Meter.fromType("C|"));
 
-        const tupletStaff = sheet.systems[2].getStaff();
-        tupletStaff.getNotes()
-            .forEach(note => {
-                note.notes[0].accidental = "NATURAL";
+        [tupletSizesA, tupletSizesB].forEach((tupletSizes, i) => {
+            const tupletStaff = sheet.systems[2 + i].getStaff();
+            tupletStaff.getNotes()
+                .forEach(note => {
+                    note.notes[0].accidental = Accidentals[i + 2];
+                });
+            let tmp = 0;
+            tupletSizes.forEach((n, idx) => {
+                const noteGroup = tupletStaff.getNoteGroup(tmp, tmp + n);
+                noteGroup.nTuplet();
+                noteGroup.slur();
+                if (idx % 2) noteGroup.diminuendo();
+                else noteGroup.creshendo();
+                tmp += n;
             });
-        let tmp = 0;
-        tupletSizes.forEach((n, idx) => {
-            const noteGroup = tupletStaff.getNoteGroup(tmp, tmp + n);
-            noteGroup.nTuplet();
-            noteGroup.slur();
-            if (idx % 2) noteGroup.diminuendo();
-            else noteGroup.creshendo();
-            tmp += n;
         });
 
-        const tupletStaffConnected = sheet.systems[3].getStaff();
-        tupletStaffConnected.getNotes()
-            .forEach(note => {
-                note.duration = 1;
-                note.notes[0].accidental = "SHARP";
+        [tupletSizesA, tupletSizesB].forEach((tupletSizes, i) => {
+            const tupletStaff = sheet.systems[4 + i].getStaff();
+            tupletStaff.getNotes()
+                .forEach((note, idx) => {
+                    note.notes[0].accidental = Accidentals[i + 2];
+                    note.duration = 1;
+                    if (idx < 6) note.notes[0].fingering = idx;
+                });
+            let tmp = 0;
+            tupletSizes.forEach((n, idx) => {
+                const noteGroup = tupletStaff.getNoteGroup(tmp, tmp + n);
+                noteGroup.nTuplet();
+                noteGroup.beam();
+                noteGroup.slur();
+                if (idx % 2) noteGroup.creshendo();
+                else noteGroup.diminuendo();
+                tmp += n;
             });
-        tmp = 0;
-        tupletSizes.forEach((n, idx) => {
-            const noteGroup = tupletStaffConnected.getNoteGroup(tmp, tmp + n);
-            noteGroup.beam();
-            noteGroup.nTuplet();
-            if (idx % 2) noteGroup.creshendo();
-            else noteGroup.diminuendo();
-            tmp += n;
         });
+
+        const CIonian = new KeySignature('C', 'Ionian');
+        const chordSystem = sheet.addSystem();
+        const chordGlyphs = RomanNumerals.map(romanNumeral => CIonian.getChord(romanNumeral, "triad", 5).toGlyph(CIonian, true));
+        chordSystem.getStaff().addGlyphs(chordGlyphs);
 
         return sheet;
     }
