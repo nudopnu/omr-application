@@ -54,7 +54,9 @@ export class SheetGenerator {
             placeholdersA, placeholdersB,
         ];
 
-        [Dynamics, DecorationTypes, ...placeholders].forEach(list => {
+        const filteredDecorationTypes = DecorationTypes.filter(type => type !== "ARPEGGIO");
+
+        [Dynamics, filteredDecorationTypes, ...placeholders].forEach(list => {
             const sys = sheet.addSystem();
             const startOctave = 4;
             const numberOfNotes = list.length;
@@ -77,7 +79,7 @@ export class SheetGenerator {
             .getStaff()
             .getNotes()
             .forEach((note, i) => {
-                note.ornaments = [DecorationTypes[i]];
+                note.ornaments = [filteredDecorationTypes[i]];
                 note.notes[0].accidental = "FLAT";
                 if (i === 0) note.punctuated = true;
             });
