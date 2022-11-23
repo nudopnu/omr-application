@@ -31,13 +31,13 @@ export class KeySignature {
         } as Note));
     }
 
-    getNote(midi: number, preferedAccidental: "FLAT" | "SHARP" = 'FLAT') {
+    getNote(midi: number, duration = 1, preferedAccidental: "FLAT" | "SHARP" = 'FLAT') {
         const pitch = midi % 12;
         let match = this.relativeMidis.indexOf(pitch);
         if (match !== -1) {
-            return NoteGlyph.fromNote({ duration: 1, midi: midi } as Note);
+            return NoteGlyph.fromNote({ duration: duration, midi: midi } as Note);
         } else {
-            return NoteGlyph.fromNote({ duration: 1, midi: midi } as Note, preferedAccidental);
+            return NoteGlyph.fromNote({ duration: duration, midi: midi } as Note, preferedAccidental);
         }
     }
 
@@ -62,8 +62,6 @@ export class KeySignature {
                 tmp += this.intervals[(start + idx) % 7];
             });
         }
-        console.log(intervals);
-
         return new Chord(intervals, octave);
     }
 }

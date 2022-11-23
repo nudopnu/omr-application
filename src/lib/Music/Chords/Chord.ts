@@ -1,4 +1,4 @@
-import { ChordGlyph, NoteGlyph } from "../Sheet/Glyph";
+import { ChordGlyph } from "../Sheet/Glyph";
 import { KeySignature } from "../Sheet/KeySignature";
 
 export const ChordTypes = [
@@ -41,10 +41,10 @@ export class Chord {
         public octave?: number,
     ) { }
 
-    toGlyph(key: KeySignature, arpeggiate?: boolean): ChordGlyph {
+    toGlyph(key: KeySignature, arpeggiate?: boolean, duration: number = 1): ChordGlyph {
         let tmp = this.octave ? this.octave * 12 : 0;
         const relativePitches = this.intervals.map(interval => tmp += interval);
-        const notes = relativePitches.map(relativePitch => key.getNote(relativePitch));
+        const notes = relativePitches.map(relativePitch => key.getNote(relativePitch, duration));
         return ChordGlyph.fromNotes(notes, arpeggiate);
     }
 }

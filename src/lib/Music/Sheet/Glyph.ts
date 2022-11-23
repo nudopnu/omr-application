@@ -69,7 +69,7 @@ export class ChordGlyph implements IGlyph {
 
     static fromNotes(notes: Note[], arpeggiate?: boolean): ChordGlyph {
         const noteGlpyhs: NoteGlyph[] = notes.map(note => NoteGlyph.fromNote(note));
-        const chordGlyph = new ChordGlyph(noteGlpyhs);
+        const chordGlyph = new ChordGlyph(noteGlpyhs, notes[0].duration);
         chordGlyph.arpeggiated = arpeggiate ? arpeggiate : false;
         return chordGlyph;
     }

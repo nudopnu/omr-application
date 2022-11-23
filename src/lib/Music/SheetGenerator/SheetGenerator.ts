@@ -1,5 +1,5 @@
 import { Meter } from "../AbcUtils/Meter";
-import { Chord, RomanNumerals } from "../Chords/Chord";
+import { RomanNumerals } from "../Chords/Chord";
 import { Accidentals } from "../Sheet/Accidental";
 import { DecorationTypes } from "../Sheet/Decoration";
 import { Dynamics } from "../Sheet/Dynamics";
@@ -122,8 +122,10 @@ export class SheetGenerator {
 
         const CIonian = new KeySignature('C', 'Ionian');
         const chordSystem = sheet.addSystem();
-        const chordGlyphs = RomanNumerals.map(romanNumeral => CIonian.getChord(romanNumeral, "triad", 5).toGlyph(CIonian, true));
+        const chordGlyphs = RomanNumerals.map((romanNumeral, idx) => CIonian.getChord(romanNumeral, "seventh", 5).toGlyph(CIonian, true, idx % 5 + 1));
         chordSystem.getStaff().addGlyphs(chordGlyphs);
+        console.log(chordGlyphs);
+
 
         return sheet;
     }
