@@ -17,7 +17,7 @@ export const SeventhNames = [
     'm7',
     'M7',
     '7',
-    '7',
+    'dim7',
 ] as const;
 
 export const RomanNumerals = [

@@ -129,7 +129,13 @@ export class SheetGenerator {
                 CIonian.getChord(romanNumeral, "seventh", 5, idx % 4)
                     .toGlyph(CIonian, true, idx % 5 + 1)
             );
-        chordSystem.getStaff().addGlyphs(chordGlyphs);
+        chordGlyphs.push(
+            CIonian.getChord("I", "seventh", 5)
+                .toGlyph(CIonian, false, 3)
+        )
+        const chordStaff = chordSystem.getStaff();
+        chordStaff.addGlyphs(chordGlyphs);
+        chordStaff.splitNote(-1);
         console.log(chordGlyphs);
 
 
