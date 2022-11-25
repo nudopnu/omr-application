@@ -136,8 +136,11 @@ export class SheetGenerator {
         const chordStaff = chordSystem.getStaff();
         chordStaff.addGlyphs(chordGlyphs);
         chordStaff.splitNote(-1);
-        console.log(chordGlyphs);
-
+        chordSystem.addBar("START");
+        chordSystem.addBar("REPEAT_START_END");
+        chordSystem.getStaff().addRests([-3, -2, -1, 1, 2, 3, 4]);
+        chordSystem.addBar("REPEAT_START_END");
+        sheet.applyBars();
 
         return sheet;
     }

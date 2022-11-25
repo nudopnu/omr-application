@@ -106,6 +106,11 @@ export class KeyGlyph implements IGlyph {
     ) { }
 }
 
+export type GlyphWithDuration =
+    | RestGlyph
+    | ChordGlyph
+    ;
+
 export type Glyph =
     | ChordGlyph
     | RestGlyph

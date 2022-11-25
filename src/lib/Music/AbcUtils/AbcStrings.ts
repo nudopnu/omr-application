@@ -35,8 +35,8 @@ export class AbcStrings {
         REPEAT_DOUBLE: '::',
         DOUBLE: "||",
         END: "|]",
-        REPEAT_END: ':|',
-        REPEAT_START: '|:',
+        REPEAT_END: ' :|',
+        REPEAT_START: '|: ',
         SINGLE: "|",
         START: "[|",
     };

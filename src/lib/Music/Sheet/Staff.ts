@@ -1,46 +1,85 @@
+import { BidirectionalMap } from "../../BidirectionalMap";
 import { Meter } from "../AbcUtils/Meter";
+import { Bar, BarType } from "./Bar";
 import { ChordGroup } from "./ChordGroup";
 import { Clef } from "./Clef";
-import { BarLineGlyph, ChordGlyph, Glyph, NoteGlyph } from "./Glyph";
+import { BarLineGlyph, ChordGlyph, Glyph, GlyphWithDuration, NoteGlyph, RestGlyph } from "./Glyph";
 import { KeySignature } from "./KeySignature";
 import { Sheet } from "./Sheet";
 import { StaffOptions } from "./StaffOptions";
 
 export class Staff {
 
-    public numberOfChords: number = 0;
+    private durationGlyphIdxMap: BidirectionalMap<number, GlyphWithDuration> = new BidirectionalMap();
+    private durationGlyphBarMap: BidirectionalMap<GlyphWithDuration, Bar> = new BidirectionalMap();
+    glyphs: Glyph[] = [];
 
     constructor(
         public sheet: Sheet,
-        public glyphs: Glyph[] = [],
         public options?: StaffOptions,
-    ) { }
+        public bars: Bar[] = [],
+    ) {
+        if (bars.length === 0) {
+            bars.push(new Bar(this, "DEFAULT"));
+        } else {
+            bars.forEach((bar, idx) => {
+                this.addGlyphs(bar.getStartGlyphs());
+                if (idx !== bars.length - 1) {
+                    this.addGlyphs(bar.getEndGlyphs());
+                }
+            });
+        }
+    }
+
+    indexOf(glyph: GlyphWithDuration): number {
+        return this.durationGlyphIdxMap.getKey(glyph)!;
+    }
 
     addNotes(notes: NoteGlyph[], duration?: number) {
         duration = duration ? duration : this.sheet.options.defaultDuration;
+        const chordGlyphs = notes.map(note => new ChordGlyph([note], note.duration));
+        this.addChordGlyphs(chordGlyphs);
+    }
+
+    addRests(durations: number[]) {
+        const restGlyphs = durations.map(duration => new RestGlyph(duration));
         this.glyphs.push(
-            ...notes
-                .map(note => new ChordGlyph([note], note.duration))
-        )
-        this.numberOfChords += notes.length;
+            ...restGlyphs
+        );
+        this.updateDurationGlyphsMap();
+    }
+
+    addChordGlyphs(chordGlyphs: ChordGlyph[]) {
+        this.glyphs.push(
+            ...chordGlyphs
+        );
+        this.updateDurationGlyphsMap();
+    }
+
+    startNextBar(type: BarType = "DEFAULT"): Bar {
+        const lastBar = this.bars[this.bars.length - 1];
+        const newBar = new Bar(this, type);
+        this.bars.push(newBar);
+        this.addGlyphs(lastBar.getEndGlyphs());
+        this.addGlyphs(newBar.getStartGlyphs());
+        return newBar;
+    }
+
+    applyBars(isLastInSheet = false): void {
+        const lastBar = this.bars[this.bars.length - 1];
+        console.log(lastBar, lastBar.getEndGlyphs());
+
+        this.addGlyphs(lastBar.getEndGlyphs());
     }
 
     splitNote(idx: number, durations: 'auto' | number[] = 'auto') {
-        let counter = 0;
-        let realidx = 0;
-        console.log(this.glyphs, idx, this.numberOfChords);
-        idx = (this.numberOfChords + idx) % this.numberOfChords;
-        console.log(this.glyphs, idx);
-        this.glyphs
-            .forEach(glyph => {
-                if (glyph.type === "chord") {
-                    if (counter === idx) return
-                    counter++;
-                };
-                realidx++;
-            });
+        const chordIdcs = this.durationGlyphIdxMap.keys();
+        chordIdcs.sort();
+        idx = (idx + chordIdcs.length) % chordIdcs.length
+        const realIdx = chordIdcs[idx];
+        const targetChord = this.glyphs[realIdx] as ChordGlyph;
+        console.log(chordIdcs, realIdx);
 
-        const targetChord = this.glyphs[realidx] as ChordGlyph;
 
         let durationA = targetChord.duration - 1;
         let durationB = targetChord.duration - 1;
@@ -50,13 +89,42 @@ export class Staff {
             durationB = durations[1];
         }
 
-        this.glyphs = [
-            ...this.glyphs.splice(0, realidx),
+        const newGlyphs: Glyph[] = [
             { ...targetChord, duration: durationA, tie: "START" },
             new BarLineGlyph("SINGLE"),
-            { ...targetChord, duration: durationB, tie: "END" },
-            ...this.glyphs.splice(realidx + 1),
+            { ...targetChord, duration: durationB, tie: "END" }
         ];
+
+        this.modifyAtIdx('replace', realIdx, newGlyphs);
+    }
+
+    modifyAtIdx(operation: 'delete' | 'replace' | 'prepend' | 'append', idx: number, glyphs: Glyph[] = []) {
+        const preceedingGlyphs = this.glyphs.splice(0, idx);
+        const targetGlyph = this.glyphs[idx];
+        const followingGlyphs = this.glyphs.splice(idx + 1);
+
+        if (operation === 'replace' || operation === 'delete') {
+            this.glyphs = [
+                ...preceedingGlyphs,
+                ...glyphs,
+                ...followingGlyphs,
+            ];
+        } else if (operation === 'append') {
+            this.glyphs = [
+                ...preceedingGlyphs,
+                targetGlyph,
+                ...glyphs,
+                ...followingGlyphs,
+            ];
+        } else if (operation === 'prepend') {
+            this.glyphs = [
+                ...preceedingGlyphs,
+                ...glyphs,
+                targetGlyph,
+                ...followingGlyphs,
+            ];
+        }
+        this.updateDurationGlyphsMap();
     }
 
     getNotes(): ChordGlyph[] {
@@ -69,9 +137,21 @@ export class Staff {
 
     addGlyphs(glyphs: Glyph[]) {
         this.glyphs.push(...glyphs);
-        this.numberOfChords += this.glyphs
-            .filter(glyph => glyph.type === "chord")
-            .length;
+        this.updateDurationGlyphsMap();
+    }
+
+    private updateDurationGlyphsMap() {
+        const previousIdcs = this.durationGlyphIdxMap.keys();
+        const newIdcs: number[] = [];
+        this.durationGlyphIdxMap.reset();
+        this.glyphs.forEach((glyph, idx) => {
+            if (glyph.type === "chord" || glyph.type === "rest") {
+                this.durationGlyphIdxMap.set(idx, glyph);
+                if (previousIdcs.indexOf(idx) !== -1) {
+                    newIdcs.push(idx);
+                }
+            }
+        });
     }
 
     setClef(clef: Clef) {

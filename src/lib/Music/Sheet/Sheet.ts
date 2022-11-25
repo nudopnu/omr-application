@@ -21,5 +21,9 @@ export class Sheet {
         return system;
     }
 
+    applyBars() {
+        this.systems.forEach(system => system.applyBars());
+    }
+
 }
 

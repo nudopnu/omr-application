@@ -1,3 +1,4 @@
+import { Bar, BarType } from "./Bar";
 import { Sheet } from "./Sheet";
 import { Staff } from "./Staff";
 
@@ -27,6 +28,10 @@ export class System {
         return system;
     }
 
+    addBar(type: BarType = "DEFAULT"): Bar[] {
+        return this.staffs.map(staff => staff.startNextBar(type));
+    }
+
     private constructor(
         public staffs: Staff[] = [],
     ) { }
@@ -34,4 +39,9 @@ export class System {
     getStaff(idx = 0): Staff {
         return this.staffs[idx];
     }
+
+    applyBars(): void {
+        this.staffs.forEach(staff => staff.applyBars());
+    }
+
 }
