@@ -3,7 +3,8 @@ import { RomanNumerals } from "../Chords/Chord";
 import { Accidentals } from "../Sheet/Accidental";
 import { DecorationTypes } from "../Sheet/Decoration";
 import { Dynamics } from "../Sheet/Dynamics";
-import { BarLineGlyph, KeyGlyph, MeterGlyph, MultiMeasureRest, NoteGlyph, RestGlyph } from "../Sheet/Glyph";
+import { BarLineGlyph, ChordGlyph, KeyGlyph, MeterGlyph, MultiMeasureRest, NoteGlyph, RestGlyph } from "../Sheet/Glyph";
+import { GraceNote } from "../Sheet/GraceNote";
 import { KeySignature } from "../Sheet/KeySignature";
 import { Sheet } from "../Sheet/Sheet";
 
@@ -42,6 +43,7 @@ export class SheetGenerator {
 
     static generateOrnamentsSheet(): Sheet {
         const sheet = new Sheet();
+        const CIonian = new KeySignature('C', 'Ionian');
 
         const tupletSizesA = [2, 3, 4, 5, 6];
         const tupletSizesB = [7, 8, 9];
@@ -87,10 +89,24 @@ export class SheetGenerator {
 
         [tupletSizesA, tupletSizesB].forEach((tupletSizes, i) => {
             const tupletStaff = sheet.systems[2 + i].getStaff();
-            tupletStaff.getNotes()
-                .forEach(note => {
-                    note.notes[0].accidental = Accidentals[i + 2];
-                });
+            if (i === 0) {
+                tupletStaff.getNotes()
+                    .forEach(note => {
+                        note.notes[0].accidental = Accidentals[i + 2];
+                    });
+            } else {
+                tupletStaff.getNotes()
+                    .forEach(note => {
+                        const copyNote = { ...note.notes[0] };
+                        const shift = Math.ceil(Math.random() * 6 + 2);
+                        const sign = Math.round(Math.random()) * 2 - 1;
+                        const type = Math.round(Math.random());
+                        copyNote.midi += shift * sign;
+                        if (shift === 0) copyNote.midi += 2 * sign;
+                        console.log(type, type ? "ACCIACCATURA" : "APPOGGIATURA");
+                        note.graceNote = new GraceNote(type ? "ACCIACCATURA" : "APPOGGIATURA", NoteGlyph.fromNote(copyNote));
+                    });
+            }
             let tmp = 0;
             tupletSizes.forEach((n, idx) => {
                 const noteGroup = tupletStaff.getNoteGroup(tmp, tmp + n);
@@ -122,7 +138,6 @@ export class SheetGenerator {
             });
         });
 
-        const CIonian = new KeySignature('C', 'Ionian');
         const chordSystem = sheet.addSystem();
         const chordGlyphs = RomanNumerals
             .map((romanNumeral, idx) =>

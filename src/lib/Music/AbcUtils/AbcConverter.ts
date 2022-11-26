@@ -1,4 +1,4 @@
-import { ChordGlyph, Glyph } from "../Sheet/Glyph";
+import { ChordGlyph, Glyph, NoteGlyph } from "../Sheet/Glyph";
 import { KeySignature } from "../Sheet/KeySignature";
 import { Sheet } from "../Sheet/Sheet";
 import { SheetOptions } from "../Sheet/SheetOptions";
@@ -73,8 +73,18 @@ export class AbcConverter {
         return res
     }
 
-    static chordToString(glyph: ChordGlyph, key: KeySignature) {
+    static chordToString(glyph: ChordGlyph, key: KeySignature, isGrace = false) {
         let res = "";
+
+        /* Prepend Grace Notes if present */
+        if (glyph.graceNote != null) {
+            const graceString = AbcConverter.noteToString(glyph.graceNote.note!, key);
+            if (glyph.graceNote.type === "ACCIACCATURA") {
+                res += `{${graceString}}`;
+            } else {
+                res += `{/${graceString}}`;
+            }
+        }
 
         /* Add Creshendo / Diminuendo */
         if (glyph.creshendo === "START") res += `!${AbcStrings.Creshendo.START}!`;
@@ -97,32 +107,7 @@ export class AbcConverter {
 
         /* Process notes */
         glyph.notes.forEach(note => {
-            let pitch = note.midi % 12;
-            let octave = (note.midi - pitch) / 12;
-
-            /* Add fingering if present */
-            if (note.fingering !== undefined) {
-                res += `!${note.fingering}!`;
-            }
-
-            /* Prepend enforced accidental if present */
-            if (note.accidental) {
-                res += AbcStrings.Accidental[note.accidental];
-            }
-
-            /* Match pitch of note to key signature */
-            let match = key.relativeMidis.indexOf(pitch);
-            if (match !== -1) {
-                res += AbcStrings.Pitches[match];
-            }
-
-            //TODO: automatically add accidentals
-
-            /* Shift note according to its octave */
-            if (octave < 5)
-                res += AbcStrings.Octave.LOWER.repeat(5 - octave);
-            if (octave > 5)
-                res += AbcStrings.Octave.HIGHER.repeat(octave - 5);
+            res += AbcConverter.noteToString(note, key);
         });
 
         /* Wrap into a chord if multiple notes present */
@@ -140,6 +125,37 @@ export class AbcConverter {
         /* Put whitespace if not connected to previous */
         if (glyph.beam == null || glyph.beam === "START") res = " " + res;
 
+        return res;
+    }
+
+    private static noteToString(note: NoteGlyph, key: KeySignature): string {
+        let res = "";
+        let pitch = note.midi % 12;
+        let octave = (note.midi - pitch) / 12;
+
+        /* Add fingering if present */
+        if (note.fingering !== undefined) {
+            res += `!${note.fingering}!`;
+        }
+
+        /* Prepend enforced accidental if present */
+        if (note.accidental) {
+            res += AbcStrings.Accidental[note.accidental];
+        }
+
+        /* Match pitch of note to key signature */
+        let match = key.relativeMidis.indexOf(pitch);
+        if (match !== -1) {
+            res += AbcStrings.Pitches[match];
+        }
+
+        //TODO: automatically add accidentals
+
+        /* Shift note according to its octave */
+        if (octave < 5)
+            res += AbcStrings.Octave.LOWER.repeat(5 - octave);
+        if (octave > 5)
+            res += AbcStrings.Octave.HIGHER.repeat(octave - 5);
         return res;
     }
 

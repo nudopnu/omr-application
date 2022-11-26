@@ -6,6 +6,7 @@ import { BarLineType } from "./BarLine";
 import { Clef } from "./Clef";
 import { DecorationType } from "./Decoration";
 import { Dynamic } from "./Dynamics";
+import { GraceNote, GraceNoteType } from "./GraceNote";
 import { KeySignature } from "./KeySignature";
 import { StyleType } from "./Style";
 
@@ -58,6 +59,7 @@ export class ChordGlyph implements IGlyph {
         public notes: NoteGlyph[],
         public duration: number = 1,
         public style: Optional<StyleType> = undefined,
+        public graceNote: Optional<GraceNote> = undefined,
         public beam: Optional<PartType> = undefined,
         public dynamic: Optional<Dynamic> = undefined,
         public creshendo: Optional<PartType> = undefined,
