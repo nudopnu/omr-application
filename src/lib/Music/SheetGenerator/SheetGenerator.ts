@@ -3,7 +3,7 @@ import { RomanNumerals } from "../Chords/Chord";
 import { Accidentals } from "../Sheet/Accidental";
 import { DecorationTypes } from "../Sheet/Decoration";
 import { Dynamics } from "../Sheet/Dynamics";
-import { BarLineGlyph, KeyGlyph, MultiMeasureRest, NoteGlyph, RestGlyph } from "../Sheet/Glyph";
+import { BarLineGlyph, KeyGlyph, MeterGlyph, MultiMeasureRest, NoteGlyph, RestGlyph } from "../Sheet/Glyph";
 import { KeySignature } from "../Sheet/KeySignature";
 import { Sheet } from "../Sheet/Sheet";
 
@@ -106,7 +106,7 @@ export class SheetGenerator {
             const tupletStaff = sheet.systems[4 + i].getStaff();
             tupletStaff.getNotes()
                 .forEach((note, idx) => {
-                    note.notes[0].accidental = Accidentals[i + 2];
+                    note.notes[0].accidental = Accidentals[i + 3];
                     note.duration = 1;
                     if (idx < 6) note.notes[0].fingering = idx;
                 });
@@ -140,7 +140,29 @@ export class SheetGenerator {
         chordSystem.addBar("REPEAT_START_END");
         chordSystem.getStaff().addRests([-3, -2, -1, 1, 2, 3, 4]);
         chordSystem.addBar("REPEAT_START_END");
+        chordSystem.getStaff().addGlyphs([new KeyGlyph("alto", new KeySignature("Cb"))]);
         sheet.applyBars();
+
+        const system = sheet.addSystem();
+        system.getStaff().setClef("tenor");
+        system.getStaff().addGlyphs([
+            new KeyGlyph("bass-8", new KeySignature("C#")),
+        ]);
+        system.getStaff().addNotes(NoteGlyph.fromNotes(CIonian.toScale(3, 1, 4)));
+        system.getStaff().addGlyphs([
+            new BarLineGlyph("DOUBLE"),
+            new KeyGlyph("treble-8", new KeySignature("C")),
+            new MultiMeasureRest(1),
+            new BarLineGlyph("SINGLE"),
+            new MultiMeasureRest(2),
+            new BarLineGlyph("END"),
+            new KeyGlyph("perc", new KeySignature("C")),
+            new MeterGlyph(Meter.fromType("fraction", 4, 4)),
+        ]);
+        system.getStaff().addNotes(NoteGlyph.fromNotes(CIonian.toScale(6, 2, 3)), 4, "X");
+        const percussionChord = CIonian.getChord("I", "triad", 5)
+            .toGlyph(CIonian, false, 3, "X");
+        system.getStaff().addChordGlyphs([percussionChord]);
 
         return sheet;
     }

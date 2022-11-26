@@ -1,4 +1,5 @@
 import { Optional } from "../../Optional";
+import { Meter } from "../AbcUtils/Meter";
 import { Note } from "../Note";
 import { Accidental } from "./Accidental";
 import { BarLineType } from "./BarLine";
@@ -6,6 +7,7 @@ import { Clef } from "./Clef";
 import { DecorationType } from "./Decoration";
 import { Dynamic } from "./Dynamics";
 import { KeySignature } from "./KeySignature";
+import { StyleType } from "./Style";
 
 export const GlyphTypes = [
     'note',
@@ -15,6 +17,7 @@ export const GlyphTypes = [
     'repeat',
     'barline',
     'key',
+    'meter',
     'n-tuplet',
 ] as const;
 
@@ -54,6 +57,7 @@ export class ChordGlyph implements IGlyph {
     constructor(
         public notes: NoteGlyph[],
         public duration: number = 1,
+        public style: Optional<StyleType> = undefined,
         public beam: Optional<PartType> = undefined,
         public dynamic: Optional<Dynamic> = undefined,
         public creshendo: Optional<PartType> = undefined,
@@ -67,9 +71,9 @@ export class ChordGlyph implements IGlyph {
         public punctuated: boolean = false,
     ) { }
 
-    static fromNotes(notes: Note[], arpeggiate?: boolean): ChordGlyph {
+    static fromNotes(notes: Note[], arpeggiate?: boolean, style?: StyleType): ChordGlyph {
         const noteGlpyhs: NoteGlyph[] = notes.map(note => NoteGlyph.fromNote(note));
-        const chordGlyph = new ChordGlyph(noteGlpyhs, notes[0].duration);
+        const chordGlyph = new ChordGlyph(noteGlpyhs, notes[0].duration, style);
         chordGlyph.arpeggiated = arpeggiate ? arpeggiate : false;
         return chordGlyph;
     }
@@ -106,6 +110,13 @@ export class KeyGlyph implements IGlyph {
     ) { }
 }
 
+export class MeterGlyph implements IGlyph {
+    readonly type = "meter";
+    constructor(
+        public meter: Meter,
+    ) { }
+}
+
 export type GlyphWithDuration =
     | RestGlyph
     | ChordGlyph
@@ -117,4 +128,5 @@ export type Glyph =
     | BarLineGlyph
     | MultiMeasureRest
     | KeyGlyph
+    | MeterGlyph
     ;

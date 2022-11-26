@@ -93,6 +93,7 @@ export class AbcConverter {
         glyph.ornaments.forEach(ornament => res += AbcStrings.Accent[ornament]);
         if (glyph.dynamic) res += `!${glyph.dynamic}!`;
         if (glyph.tremolo) res += `!${AbcStrings.Tremolo[glyph.tremolo]}!`;
+        if (glyph.style) res += `!${AbcStrings.Styles[glyph.style]}!`;
 
         /* Process notes */
         glyph.notes.forEach(note => {

@@ -1,10 +1,12 @@
 import { Accidental } from "../Sheet/Accidental";
 import { BarLineType } from "../Sheet/BarLine";
 import { DecorationType } from "../Sheet/Decoration";
+import { StyleType } from "../Sheet/Style";
 
 export type AbcBarLineMapping = { [key in BarLineType]: string }
 export type AbcDecorationMapping = { [key in DecorationType]: string }
 export type AbcAccidentalMapping = { [key in Accidental]: string }
+export type AbcStyleMapping = { [key in StyleType]: string }
 
 export class AbcStrings {
 
@@ -39,6 +41,14 @@ export class AbcStrings {
         REPEAT_START: '|: ',
         SINGLE: "|",
         START: "[|",
+    };
+
+    static readonly Styles: AbcStyleMapping = {
+        NORMAL: "style=normal",
+        RYTHM: "style=rhythm",
+        HARMONIC: "style=harmonic",
+        X: "style=x",
+        TRAINGLE: "style=triangle"
     };
 
     static readonly Pitches = [

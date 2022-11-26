@@ -7,6 +7,7 @@ import { BarLineGlyph, ChordGlyph, Glyph, GlyphWithDuration, NoteGlyph, RestGlyp
 import { KeySignature } from "./KeySignature";
 import { Sheet } from "./Sheet";
 import { StaffOptions } from "./StaffOptions";
+import { StyleType } from "./Style";
 
 export class Staff {
 
@@ -35,9 +36,9 @@ export class Staff {
         return this.durationGlyphIdxMap.getKey(glyph)!;
     }
 
-    addNotes(notes: NoteGlyph[], duration?: number) {
+    addNotes(notes: NoteGlyph[], duration?: number, style?: StyleType) {
         duration = duration ? duration : this.sheet.options.defaultDuration;
-        const chordGlyphs = notes.map(note => new ChordGlyph([note], note.duration));
+        const chordGlyphs = notes.map(note => new ChordGlyph([note], note.duration, style));
         this.addChordGlyphs(chordGlyphs);
     }
 
@@ -167,6 +168,11 @@ export class Staff {
     setMeter(meter: Meter) {
         this.ensureOptions();
         this.options!.meter = meter;
+    }
+
+    setStyle(style: StyleType) {
+        this.ensureOptions();
+        this.options!.style = style;
     }
 
     private ensureOptions() {
