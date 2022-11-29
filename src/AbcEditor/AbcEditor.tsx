@@ -275,7 +275,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
         console.log(svg, image);
     }
 
-    function validate(abcElem = document) {
+    function validate(abcElem: HTMLElement = document.querySelector('#abc-render')!) {
         const keys = AbcjsElementTypes
             .filter(key => AbcjsElements[key])
             .sort(elem => AbcjsElements[elem]!.id);
@@ -284,20 +284,8 @@ export function AbcEditor({ abcLayers, addLayer }) {
         setHints(["Cheking..."])
 
         keys.forEach(key => {
-            let isPresent = false;
-            const { selector, widthRationToParent } = AbcjsElements[key]!;
-            abcElem.querySelectorAll(selector).forEach(elem => {
-                if (widthRationToParent) {
-                    const t = 0.001
-                    const { width } = elem.getBoundingClientRect();
-                    const { width: parentWidth } = elem.parentElement!.getBoundingClientRect();
-                    const ar = width / parentWidth;
-                    if (Math.abs(ar - widthRationToParent) > t)
-                        return
-                }
-                isPresent = true;
-            });
-            if (!isPresent)
+            const { selector } = AbcjsElements[key]!;
+            if (!selector.query(abcElem))
                 hintText.push(`[NOT FOUND]: ${key}`);
             else
                 presentKeys.push(key);
@@ -311,19 +299,10 @@ export function AbcEditor({ abcLayers, addLayer }) {
         return presentKeys;
     }
 
-    function colorize(keys: AbcjsElementType[], flag, abcElem: HTMLElement = (document as any), getColor = (key => AbcjsElements[key].colors[1])) {
+    function colorize(keys: AbcjsElementType[], flag, abcElem: HTMLElement = document.querySelector('#abc-render')!, getColor = (key => AbcjsElements[key].colors[1])) {
         keys.forEach(key => {
-            const { selector, widthRationToParent } = AbcjsElements[key]!;
-            abcElem.querySelectorAll(selector).forEach(elem => {
-                if (widthRationToParent) {
-                    const t = 0.001
-                    const { width } = elem.getBoundingClientRect();
-                    const { width: parentWidth } = elem.parentElement!.getBoundingClientRect();
-                    const ar = width / parentWidth;
-                    console.log(elem, ar, widthRationToParent);
-                    if (Math.abs(ar - widthRationToParent) > t)
-                        return
-                }
+            const { selector } = AbcjsElements[key]!;
+            selector.query(abcElem).forEach(elem => {
                 (elem as HTMLElement).style.color = flag ? getColor(key) : '';
             });
         });

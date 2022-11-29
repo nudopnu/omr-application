@@ -3,7 +3,7 @@ import { RomanNumerals } from "../Chords/Chord";
 import { Accidentals } from "../Sheet/Accidental";
 import { DecorationTypes } from "../Sheet/Decoration";
 import { Dynamics } from "../Sheet/Dynamics";
-import { BarLineGlyph, ChordGlyph, KeyGlyph, MeterGlyph, MultiMeasureRest, NoteGlyph, RestGlyph } from "../Sheet/Glyph";
+import { BarLineGlyph, KeyGlyph, MeterGlyph, MultiMeasureRest, NoteGlyph, RestGlyph } from "../Sheet/Glyph";
 import { GraceNote } from "../Sheet/GraceNote";
 import { KeySignature } from "../Sheet/KeySignature";
 import { Sheet } from "../Sheet/Sheet";
@@ -169,7 +169,7 @@ export class SheetGenerator {
             new KeyGlyph("treble-8", new KeySignature("C")),
             new MultiMeasureRest(1),
             new BarLineGlyph("SINGLE"),
-            new MultiMeasureRest(2),
+            new MultiMeasureRest(20),
             new BarLineGlyph("END"),
             new KeyGlyph("perc", new KeySignature("C")),
             new MeterGlyph(Meter.fromType("fraction", 4, 4)),
