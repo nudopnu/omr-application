@@ -9,13 +9,15 @@ export class AbcConverter {
 
         /* Add Sheet Headers */
         let res = "X:1\n";
+        let multiStaff = false;
         const { systemType, meter } = sheet.options;
         if (systemType) {
             switch (systemType) {
                 case "grand-staff":
-                    res += "%%score { V1 V2";
-                    res += "V: V1 clef=treble";
-                    res += "V: V2 clef=bass";
+                    res += "%%score { V1 V2\n";
+                    res += "V: V1 clef=treble\n";
+                    res += "V: V2 clef=bass\n";
+                    multiStaff = true;
                     break;
                 default:
                     break;
@@ -27,7 +29,8 @@ export class AbcConverter {
 
         /* Process sheet content */
         sheet.systems.forEach(system => {
-            system.staffs.forEach(staff => {
+            system.staffs.forEach((staff, idx) => {
+                if (multiStaff) res += `[V:V${idx + 1}]\n`;
                 if (staff.options) {
                     const { clef, key, meter } = staff.options;
                     if (clef || key || meter) {

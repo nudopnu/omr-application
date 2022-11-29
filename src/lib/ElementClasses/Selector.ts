@@ -66,7 +66,6 @@ export class TimeSigSelector extends DefaultSelector {
     query(root: HTMLElement): HTMLElement[] {
         return super.query(root).filter(elem => {
             const decimals = elem.parentElement!.getAttribute("data-name") as string;
-            console.log(decimals.charAt([...elem.parentElement!.children].indexOf(elem)));
             return decimals.charAt([...elem.parentElement!.children].indexOf(elem)) === `${this.n}`;
         });
     }
@@ -82,7 +81,6 @@ export class RelativeWidthSelector extends DefaultSelector {
     query(root: HTMLElement): HTMLElement[] {
         return super.query(root).filter(elem => {
             const relW = elem.getBoundingClientRect().width / root.getBoundingClientRect().width;
-            console.log(relW);
             return Math.abs(relW - this.relativeWidth) < 0.001;
         });
     }

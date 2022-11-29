@@ -7,6 +7,8 @@ import { BarLineGlyph, KeyGlyph, MeterGlyph, MultiMeasureRest, NoteGlyph, RestGl
 import { GraceNote } from "../Sheet/GraceNote";
 import { KeySignature } from "../Sheet/KeySignature";
 import { Sheet } from "../Sheet/Sheet";
+import { Note } from "../Note";
+import { ChordGroup } from "../Sheet/ChordGroup";
 
 export class SheetGenerator {
 
@@ -180,6 +182,25 @@ export class SheetGenerator {
         system.getStaff().addChordGlyphs([percussionChord]);
 
         return sheet;
+    }
+
+    static generatePianoSheet(pageNr = 1): Sheet {
+        const sheet = new Sheet();
+        sheet.options.systemType = "grand-staff";
+        const system = sheet.addSystem()
+
+        const CIonian = new KeySignature('C', 'Ionian');
+        const durations = [5, 4, 3, 2, 1, -1, -2, -3];
+
+        const notes: Note[] = durations.map(duration => ({ midi: 60, duration: duration } as Note))
+        system.getStaff(0).addNotes(NoteGlyph.fromNotes(notes))
+        const chord = CIonian.getChord("III", "seventh", 3, 2);
+        const chordGlyph = chord.toGlyph(CIonian, false, 1);
+        const chordGroup = ChordGroup.fromChordGlyph(chordGlyph, 4, 'repeat');
+        chordGroup.beam();
+        const chordGlyphs = chordGroup.innerNotes;
+        system.getStaff(1).addChordGlyphs(chordGlyphs);
+        return sheet
     }
 
 }

@@ -136,6 +136,16 @@ export function AbcEditor({ abcLayers, addLayer }) {
         postProcess();
         validate();
     }
+    function onClickGenerateRandom2() {
+        const sheet = SheetGenerator.generatePianoSheet();
+        let abc = AbcConverter.fromSheet(sheet);
+        console.log(abc);
+        setValue(abc);
+        setChecked(false);
+        abcjs.renderAbc('abc-content', abc, abcOptions);
+        postProcess();
+        validate();
+    }
 
     function onClickGenerateScale() {
         const sheet = SheetGenerator.generateScaleSheet();
@@ -340,6 +350,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
                     <span>Preview ground truth</span>
                 </label>
                 <button onClick={onClickGenerateRandom}>Random Piano Sheet</button>
+                <button onClick={onClickGenerateRandom2}>Random Piano Sheet V2</button>
                 <button onClick={onClickGenerateScale}>Scale Sheet</button>
                 <button onClick={onClickGenerateOrnaments}>Ornaments Sheet</button>
                 <button onClick={onClickConvert}>Convert to PNG</button>

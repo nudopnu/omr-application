@@ -7,6 +7,14 @@ export class ChordGroup {
         public enclosed: boolean = false,
     ) { }
 
+    static fromChordGlyph(chordGlyph: ChordGlyph, times: number, method: 'repeat'): ChordGroup {
+        if (method === "repeat") {
+            const copies = [...Array(times).keys()].map(_ => ({ ...chordGlyph }) as ChordGlyph)
+            return new ChordGroup(copies);
+        }
+        return new ChordGroup([chordGlyph]);
+    }
+
     beam(connect: boolean = true) {
         if (connect) {
             this.innerNotes
