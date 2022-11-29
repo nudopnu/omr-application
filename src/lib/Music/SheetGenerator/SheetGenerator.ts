@@ -200,6 +200,7 @@ export class SheetGenerator {
         chordGroup.beam();
         const chordGlyphs = chordGroup.innerNotes;
         system.getStaff(1).addChordGlyphs(chordGlyphs);
+        
         return sheet
     }
 
