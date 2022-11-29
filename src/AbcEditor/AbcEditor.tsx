@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import abcjs, { AbcVisualParams } from "abcjs";
-import { ABC_CLASSES, DEFAULF_GENERATOR_SETTINGS, generateRandomSheet } from "../lib/Sheet";
+import { DEFAULF_GENERATOR_SETTINGS, generateRandomSheet } from "../lib/Sheet";
 import "./AbcEditor.css";
 import { AbcConverter } from '../lib/Music/AbcUtils/AbcConverter';
 import { SheetGenerator } from '../lib/Music/SheetGenerator/SheetGenerator';
 import { createRoot } from 'react-dom/client';
 import { SvgFilter } from './SvgFilter';
+import { AbcjsElements } from "../lib/ElementClasses/AbcjsElements";
+import { AbcjsElementType, AbcjsElementTypes } from "../lib/ElementClasses/AbcjsElementTypes";
 
 const sheets = [
     `X:1
@@ -141,7 +143,9 @@ export function AbcEditor({ abcLayers, addLayer }) {
         console.log(abc);
         setValue(abc);
         setChecked(false);
-        abcjs.renderAbc('abc-content', abc, abcOptions);
+        let res = abcjs.renderAbc('abc-content', abc, abcOptions);
+        console.log(res);
+
         postProcess();
         validate();
     }
@@ -177,7 +181,9 @@ export function AbcEditor({ abcLayers, addLayer }) {
         if (!abcRef) throw new Error("Editor not initialized!");
         let abcClone = abcRef.cloneNode(true) as HTMLElement;
         abcClone.style.setProperty('height', '100%');
-        const keys = Object.keys(ABC_CLASSES).sort(elem => ABC_CLASSES[elem].order);
+        const keys = AbcjsElementTypes
+            .filter(key => AbcjsElements[key])
+            .sort(elem => AbcjsElements[elem]!.id);
         colorize(keys, true, abcClone);
         cloneElem.appendChild(abcClone);
 
@@ -185,7 +191,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
         abcClone = abcRef.cloneNode(true) as HTMLElement;
         abcClone.style.setProperty('background-color', '#000');
         abcClone.style.setProperty('height', '100%');
-        const hexGrey = key => ABC_CLASSES[key].order.toString(16).padStart(2, '0')
+        const hexGrey = key => AbcjsElements[key].order.toString(16).padStart(2, '0')
         colorize(keys, true, abcClone, key => `#${hexGrey(key)}${hexGrey(key)}${hexGrey(key)}`);
         cloneElem.appendChild(abcClone);
 
@@ -270,31 +276,31 @@ export function AbcEditor({ abcLayers, addLayer }) {
     }
 
     function validate(abcElem = document) {
-        const keys = Object.keys(ABC_CLASSES).sort(elem => ABC_CLASSES[elem].order);
+        const keys = AbcjsElementTypes
+            .filter(key => AbcjsElements[key])
+            .sort(elem => AbcjsElements[elem]!.id);
         let hintText: string[] = [];
         let presentKeys: string[] = [];
         setHints(["Cheking..."])
 
         keys.forEach(key => {
-            ABC_CLASSES[key].access.forEach(acc => {
-                const { selector, aspectRatio, condition } = acc;
-                let isPresent = false;
-                abcElem.querySelectorAll(selector).forEach(elem => {
-                    if (aspectRatio) {
-                        const t = 0.001
-                        const { width, height } = elem.getBoundingClientRect();
-                        const ar = width / height;
-                        let cond = condition ? condition : (a, b) => Math.abs(a - b) > t;
-                        if (cond(ar, aspectRatio))
-                            return
-                    }
-                    isPresent = true;
-                });
-                if (!isPresent)
-                    hintText.push(`[NOT FOUND]: ${key}`);
-                else
-                    presentKeys.push(key);
+            let isPresent = false;
+            const { selector, widthRationToParent } = AbcjsElements[key]!;
+            abcElem.querySelectorAll(selector).forEach(elem => {
+                if (widthRationToParent) {
+                    const t = 0.001
+                    const { width } = elem.getBoundingClientRect();
+                    const { width: parentWidth } = elem.parentElement!.getBoundingClientRect();
+                    const ar = width / parentWidth;
+                    if (Math.abs(ar - widthRationToParent) > t)
+                        return
+                }
+                isPresent = true;
             });
+            if (!isPresent)
+                hintText.push(`[NOT FOUND]: ${key}`);
+            else
+                presentKeys.push(key);
         });
 
         if (hintText.length === 0) {
@@ -305,28 +311,29 @@ export function AbcEditor({ abcLayers, addLayer }) {
         return presentKeys;
     }
 
-    function colorize(keys, flag, abcElem: HTMLElement = (document as any), getColor = (key => ABC_CLASSES[key].colors[1])) {
+    function colorize(keys: AbcjsElementType[], flag, abcElem: HTMLElement = (document as any), getColor = (key => AbcjsElements[key].colors[1])) {
         keys.forEach(key => {
-            ABC_CLASSES[key].access.forEach(acc => {
-                const { selector, aspectRatio, condition } = acc;
-                abcElem.querySelectorAll(selector).forEach(elem => {
-                    if (aspectRatio) {
-                        const t = 0.001
-                        const { width, height } = elem.getBoundingClientRect();
-                        const ar = width / height;
-                        let cond = condition ? condition : (a, b) => Math.abs(a - b) > t;
-                        if (cond(ar, aspectRatio))
-                            return
-                    }
-                    elem.style.color = flag ? getColor(key) : '';
-                })
+            const { selector, widthRationToParent } = AbcjsElements[key]!;
+            abcElem.querySelectorAll(selector).forEach(elem => {
+                if (widthRationToParent) {
+                    const t = 0.001
+                    const { width } = elem.getBoundingClientRect();
+                    const { width: parentWidth } = elem.parentElement!.getBoundingClientRect();
+                    const ar = width / parentWidth;
+                    console.log(elem, ar, widthRationToParent);
+                    if (Math.abs(ar - widthRationToParent) > t)
+                        return
+                }
+                (elem as HTMLElement).style.color = flag ? getColor(key) : '';
             });
         });
 
     }
 
     useEffect(() => {
-        const keys = Object.keys(ABC_CLASSES).sort(elem => ABC_CLASSES[elem].order);
+        const keys = AbcjsElementTypes
+            .filter(key => AbcjsElements[key])
+            .sort(elem => AbcjsElements[elem]!.id);
         colorize(keys, checked);
     }, [checked])
 
