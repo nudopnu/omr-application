@@ -38,6 +38,12 @@ export interface IGlyph {
 
 export class NoteGlyph implements Note, IGlyph {
     readonly type = 'note';
+    static fromMidi(midi: number, duration: number, forcedAccidental: Optional<Accidental> = undefined): NoteGlyph {
+        return new NoteGlyph(midi, duration, forcedAccidental);
+    }
+    static fromMidis(midis: number[], durations: number[]): NoteGlyph[] {
+        return midis.map((midi, idx) => this.fromMidi(midi, durations[idx]));
+    }
     static fromNote(note: Note, forcedAccidental: Optional<Accidental> = undefined): NoteGlyph {
         return new NoteGlyph(note.midi, note.duration, forcedAccidental);
     }

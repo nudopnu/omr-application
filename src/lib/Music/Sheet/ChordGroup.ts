@@ -7,9 +7,12 @@ export class ChordGroup {
         public enclosed: boolean = false,
     ) { }
 
-    static fromChordGlyph(chordGlyph: ChordGlyph, times: number, method: 'repeat'): ChordGroup {
+    static fromChordGlyph(chordGlyph: ChordGlyph, times: number, method: 'repeat', map?: (chord: ChordGlyph, idx: number) => ChordGlyph): ChordGroup {
         if (method === "repeat") {
-            const copies = [...Array(times).keys()].map(_ => ({ ...chordGlyph }) as ChordGlyph)
+            let copies = [...Array(times).keys()].map(_ => ({ ...chordGlyph }) as ChordGlyph)
+            if (map) {
+                copies = copies.map(map);
+            }
             return new ChordGroup(copies);
         }
         return new ChordGroup([chordGlyph]);

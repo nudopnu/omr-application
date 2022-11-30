@@ -8,6 +8,7 @@ import { createRoot } from 'react-dom/client';
 import { SvgFilter } from './SvgFilter';
 import { AbcjsElements } from "../lib/ElementClasses/AbcjsElements";
 import { AbcjsElementType, AbcjsElementTypes } from "../lib/ElementClasses/AbcjsElementTypes";
+import { ThesisClasses } from "../lib/ElementClasses/ThesisClasses";
 
 const sheets = [
     `X:1
@@ -49,6 +50,8 @@ export function AbcEditor({ abcLayers, addLayer }) {
         selectTypes: [],
         viewportHorizontal: true,
     };
+
+    const relevantClasses = ThesisClasses;
 
     window.addEventListener('resize', event => {
         (document.querySelector('#abc-content')! as HTMLElement).style.setProperty('width', '100%');
@@ -294,8 +297,9 @@ export function AbcEditor({ abcLayers, addLayer }) {
         setHints(["Cheking..."])
 
         keys.forEach(key => {
+            if (relevantClasses.indexOf(key) === -1) return;
             const { selector } = AbcjsElements[key]!;
-            if (!selector.query(abcElem))
+            if (selector.query(abcElem).length === 0)
                 hintText.push(`[NOT FOUND]: ${key}`);
             else
                 presentKeys.push(key);

@@ -30,7 +30,6 @@ export class AbcConverter {
         /* Process sheet content */
         sheet.systems.forEach(system => {
             system.staffs.forEach((staff, idx) => {
-                if (multiStaff) res += `[V:V${idx + 1}]\n`;
                 if (staff.options) {
                     const { clef, key, meter } = staff.options;
                     if (clef || key || meter) {
@@ -43,6 +42,7 @@ export class AbcConverter {
                         }
                     }
                 }
+                if (multiStaff) res += `[V:V${idx + 1}]\n`;
                 staff.glyphs.forEach(glyph => {
                     res += this.glyphToString(glyph, sheet.options);
                 })

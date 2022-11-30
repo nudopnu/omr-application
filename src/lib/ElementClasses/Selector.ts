@@ -65,8 +65,13 @@ export class TimeSigSelector extends DefaultSelector {
 
     query(root: HTMLElement): HTMLElement[] {
         return super.query(root).filter(elem => {
-            const decimals = elem.parentElement!.getAttribute("data-name") as string;
-            return decimals.charAt([...elem.parentElement!.children].indexOf(elem)) === `${this.n}`;
+            if (elem.hasAttribute("data-name")) {
+                const decimals = elem.getAttribute("data-name") as string;
+                return decimals === `${this.n}`;
+            } else {
+                const decimals = elem.parentElement!.getAttribute("data-name") as string
+                return decimals.charAt([...elem.parentElement!.children].indexOf(elem)) === `${this.n}`;
+            }
         });
     }
 }
