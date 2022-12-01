@@ -308,7 +308,6 @@ export function AbcEditor({ abcLayers, addLayer }) {
         if (hintText.length === 0) {
             hintText = ["All classes present"]
         }
-        console.log(hintText);
         setHints(["Cheking...", ...hintText])
         return presentKeys;
     }

@@ -4,13 +4,14 @@ import { Accidentals } from "../Sheet/Accidental";
 import { BarLineType } from "../Sheet/BarLine";
 import { DecorationTypes } from "../Sheet/Decoration";
 import { Duration } from "../Sheet/Duration";
-import { Dynamics } from "../Sheet/Dynamics";
+import { Dynamic, Dynamics } from "../Sheet/Dynamics";
 import { BarLineGlyph, ChordGlyph, GlyphWithDuration, KeyGlyph, MeterGlyph, MultiMeasureRest, NoteGlyph, RestGlyph } from "../Sheet/Glyph";
 import { GraceNote } from "../Sheet/GraceNote";
 import { KeySignature } from "../Sheet/KeySignature";
 import { Sheet } from "../Sheet/Sheet";
 import { System } from "../Sheet/System";
 import { RandomBag } from "./RandomBag";
+import { RandomUtils } from "./RandomUtils";
 
 export class SheetGenerator {
 
@@ -196,17 +197,18 @@ export class SheetGenerator {
         const CIonian = new KeySignature('C', 'Ionian');
         const BASE_DURATIONS = [5, 4, 3, 2, 1, -1, -2, -3];
 
-        for (let systemIndex = 0; systemIndex < 5; systemIndex++) {
+        for (let systemIndex = 0; systemIndex < 4; systemIndex++) {
             /* Add grand staff */
             const system = sheet.addSystem();
             systems.push(system)
             let isSpaceLeft = true;
+            let repeatSignCounter = 0;
 
             while (isSpaceLeft) {
 
                 /* Generate random durations */
                 const duration = new Duration(Meter.fromType("C"));
-                const rndDurations = duration.getRandomDurations(11);
+                const rndDurations = duration.getRandomDurations(9);
                 const n = rndDurations.length;
 
                 for (let staffNr = 0; staffNr < 2; staffNr++) {
@@ -241,22 +243,37 @@ export class SheetGenerator {
 
                     /* Fuse durations with glyphs */
                     rndGlyphs.forEach((glyph, idx) => glyph.duration = rndDurations[idx]);
-                    console.log(rndGlyphs.length);
 
                     system.getStaff(staffNr).addGlyphs(rndGlyphs);
                 }
                 isSpaceLeft = system.getStaff().glyphs.length <= 20;
                 let type: BarLineType = "SINGLE";
-                if (systemIndex === 4 && !isSpaceLeft) type = "END";
-                if (systemIndex === 3 && isSpaceLeft) type = "REPEAT_START";
-                if (systemIndex === 3 && !isSpaceLeft) type = "REPEAT_END";
+                if (systemIndex === 3 && !isSpaceLeft) type = "END";
+                if (systemIndex === 2 && isSpaceLeft) {
+                    type = repeatSignCounter === 0 ? "REPEAT_START" : "REPEAT_DOUBLE";
+                    repeatSignCounter++;
+                };
+                if (systemIndex === 2 && !isSpaceLeft) type = "REPEAT_END";
                 system.getStaff(0).addGlyphs([new BarLineGlyph(type)]);
                 system.getStaff(1).addGlyphs([new BarLineGlyph(type)]);
             }
-            RandomBag.__take(system.getStaff(0).getNotes(), 4).forEach(note => note.beam = "MIDDLE");
-            RandomBag.__take(system.getStaff(0).getNotes(), 4).forEach(note => {
-                RandomBag.__takeSingle(note.notes).accidental = RandomBag.__takeSingle([...Accidentals]);
+            /* Add beams */
+            RandomUtils.take(system.getStaff(0).getNotes(), 4).forEach(note => note.beam = "MIDDLE");
+
+            /* Add accidentals */
+            RandomUtils.take(system.getStaff(0).getNotes(), 4).forEach(note => {
+                RandomUtils.takeSingle(note.notes).accidental = RandomUtils.takeSingle([...Accidentals]);
             });
+
+            /* Add slurs */
+            let rndGroup = RandomUtils.takeSingle(system.getStaff(0).getSuccessiveChords(3));
+            let rndPair = RandomUtils.takeIntervalRange(rndGroup, 1, 2);
+            rndPair[0].slur = "START";
+            rndPair[1].slur = "END";
+            rndGroup = RandomUtils.takeSingle(system.getStaff(1).getSuccessiveChords(3));
+            rndPair = RandomUtils.takeIntervalRange(rndGroup, 1, 2);
+            rndPair[0].slur = "START";
+            rndPair[1].slur = "END";
         }
 
         /* Add key signatures */
@@ -265,23 +282,22 @@ export class SheetGenerator {
         systems[2].getStaff(1).setKey(new KeySignature("C"));
         systems[2].getStaff(1).setMeter(Meter.fromType("fraction", 4, 4));
 
-        /* Add beams */
-
         /* Add dynamics */
-        let rndPair = RandomBag.__take(systems[0].getStaff(0).getNotes(), 2, true);
+        let rndPair = RandomUtils.take(systems[0].getStaff(0).getNotes(), 2, true, 2);
         rndPair[0].creshendo = "START";
         rndPair[1].creshendo = "END";
-        rndPair = RandomBag.__take(systems[1].getStaff(0).getNotes(), 2, true);
+        rndPair = RandomUtils.take(systems[1].getStaff(0).getNotes(), 2, true, 2);
         rndPair[0].diminuendo = "START";
         rndPair[1].diminuendo = "END";
 
-        /* Add slurs */
-        rndPair = RandomBag.__takeInterval(systems[2].getStaff(0).getNotes(), 1, 2);
-        rndPair[0].slur = "START";
-        rndPair[1].slur = "END";
 
-        // RandomBag.__take(systems[1].getStaff(0).getNotes(), 2)
-        //     .forEach(note => note.dynamic = Dynamics[Math.floor(Math.random() * Dynamics.length)]);
+
+        rndPair = RandomUtils.take(systems[3].getStaff(0).getNotes(), 2);
+        const dynamicsRB = new RandomBag<Dynamic>()
+        dynamicsRB.addItems("one-of", ["mf", "mp"])
+        dynamicsRB.addItems("one-of", ["f", "ff", "fff", "ffff", "p", "pp", "ppp", "pppp"]);
+        dynamicsRB.generate(2);
+        dynamicsRB.take(2).forEach((dynamic, idx) => rndPair[idx].dynamic = dynamic);
 
         return sheet
     }

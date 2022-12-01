@@ -12,7 +12,6 @@ import { StyleType } from "./Style";
 export class Staff {
 
     private durationGlyphIdxMap: BidirectionalMap<number, GlyphWithDuration> = new BidirectionalMap();
-    private durationGlyphBarMap: BidirectionalMap<GlyphWithDuration, Bar> = new BidirectionalMap();
     glyphs: Glyph[] = [];
 
     constructor(
@@ -34,6 +33,14 @@ export class Staff {
 
     indexOf(glyph: GlyphWithDuration): number {
         return this.durationGlyphIdxMap.getKey(glyph)!;
+    }
+
+    getNext(glyph: GlyphWithDuration): GlyphWithDuration {
+        return this.durationGlyphIdxMap.getValue(this.indexOf(glyph) + 1)!;
+    }
+
+    getPrevious(glyph: GlyphWithDuration): GlyphWithDuration {
+        return this.durationGlyphIdxMap.getValue(this.indexOf(glyph) - 1)!;
     }
 
     addNotes(notes: NoteGlyph[], duration?: number, style?: StyleType) {
@@ -130,6 +137,25 @@ export class Staff {
 
     getNotes(): ChordGlyph[] {
         return this.glyphs.filter(glyph => glyph.type === "chord") as ChordGlyph[];
+    }
+
+    getSuccessiveChords(minNumOfNotes?: number): ChordGlyph[][] {
+        let res: ChordGlyph[][] = [[]];
+        this.glyphs.forEach(glyph => {
+            if (glyph.type !== "chord") {
+                if (res[res.length - 1].length > 0)
+                    res.push([]);
+            } else {
+                res[res.length - 1].push(glyph);
+            }
+        })
+        if (res[res.length - 1].length === 0)
+            res = res.slice(0, res.length - 2);
+        if (minNumOfNotes) {
+            res = res.filter(group => group.length >= minNumOfNotes);
+        }
+        console.log(res);
+        return res;
     }
 
     getNoteGroup(startIdx?: number, endIdx?: number): ChordGroup {
