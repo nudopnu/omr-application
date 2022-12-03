@@ -80,36 +80,61 @@ export class Staff {
         this.addGlyphs(lastBar.getEndGlyphs());
     }
 
-    splitNote(idx: number, durations: 'auto' | number[] = 'auto') {
-        const chordIdcs = this.durationGlyphIdxMap.keys();
-        chordIdcs.sort();
-        idx = (idx + chordIdcs.length) % chordIdcs.length
-        const realIdx = chordIdcs[idx];
-        const targetChord = this.glyphs[realIdx] as ChordGlyph;
-        console.log(chordIdcs, realIdx);
+    splitEven(chord: GlyphWithDuration, tie = false) {
+        const idx = this.indexOf(chord);
+        console.log(this.durationGlyphIdxMap, idx);
 
+        let durationA = chord.duration - 1;
+        let durationB = chord.duration - 1;
 
-        let durationA = targetChord.duration - 1;
-        let durationB = targetChord.duration - 1;
+        const cloneA = chord.clone();
+        cloneA.duration = durationA;
 
-        if (durations !== 'auto' && durations.length === 2) {
-            durationA = durations[0];
-            durationB = durations[1];
+        const cloneB = chord.clone();
+        cloneB.duration = durationB;
+
+        if (tie && chord.type === "chord") {
+            (cloneA as ChordGlyph).tie = "START";
+            (cloneB as ChordGlyph).tie = "END";
         }
 
         const newGlyphs: Glyph[] = [
-            { ...targetChord, duration: durationA, tie: "START" },
+            cloneA,
             new BarLineGlyph("SINGLE"),
-            { ...targetChord, duration: durationB, tie: "END" }
+            cloneB,
         ];
 
-        this.modifyAtIdx('replace', realIdx, newGlyphs);
+        this.modifyAtIdx('replace', idx, newGlyphs);
+    }
+
+    splitToTriplet(chord: ChordGlyph) {
+        let idx = this.indexOf(chord)
+        let duration = chord.duration - 1;
+
+        const cloneA = chord.clone();
+        cloneA.duration = duration;
+        cloneA.beam = "MIDDLE";
+
+        const cloneB = chord.clone();
+        cloneB.duration = duration;
+        cloneB.beam = "END";
+
+        chord.startTuple = 3;
+        chord.duration = duration;
+
+        const newGlyphs: Glyph[] = [
+            chord,
+            cloneA,
+            cloneB,
+        ];
+
+        this.modifyAtIdx('replace', idx, newGlyphs);
     }
 
     modifyAtIdx(operation: 'delete' | 'replace' | 'prepend' | 'append', idx: number, glyphs: Glyph[] = []) {
-        const preceedingGlyphs = this.glyphs.splice(0, idx);
+        const preceedingGlyphs = this.glyphs.slice(0, idx);
         const targetGlyph = this.glyphs[idx];
-        const followingGlyphs = this.glyphs.splice(idx + 1);
+        const followingGlyphs = this.glyphs.slice(idx + 1);
 
         if (operation === 'replace' || operation === 'delete') {
             this.glyphs = [

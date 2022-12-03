@@ -1,4 +1,6 @@
+import { ChordGlyph } from "./Glyph";
 import { DefaultSheetOptions, SheetOptions } from "./SheetOptions";
+import { Staff } from "./Staff";
 import { System } from "./System";
 
 export class Sheet {
@@ -25,5 +27,19 @@ export class Sheet {
         this.systems.forEach(system => system.applyBars());
     }
 
+    getNotes(): ChordGlyph[] {
+        return this.systems.flatMap(system => system.getNotes());
+    }
+
+    getStaffOf(chord: ChordGlyph): Staff {
+        return this.systems
+            .map(system => system.getStaffOf(chord))
+            .filter(staff => staff !== undefined)[0];
+    }
+
+    getSystemOf(staff: Staff): System {
+        return this.systems
+            .filter(system => system.staffs.indexOf(staff) !== -1)[0];
+    }
 }
 

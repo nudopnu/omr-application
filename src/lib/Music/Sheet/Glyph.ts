@@ -6,7 +6,7 @@ import { BarLineType } from "./BarLine";
 import { Clef } from "./Clef";
 import { DecorationType } from "./Decoration";
 import { Dynamic } from "./Dynamics";
-import { GraceNote, GraceNoteType } from "./GraceNote";
+import { GraceNote } from "./GraceNote";
 import { KeySignature } from "./KeySignature";
 import { StyleType } from "./Style";
 
@@ -85,6 +85,26 @@ export class ChordGlyph implements IGlyph {
         chordGlyph.arpeggiated = arpeggiate ? arpeggiate : false;
         return chordGlyph;
     }
+
+    clone() {
+        return new ChordGlyph(
+            this.notes,
+            this.duration,
+            this.style,
+            this.graceNote,
+            this.beam,
+            this.dynamic,
+            this.creshendo,
+            this.diminuendo,
+            this.slur,
+            this.tie,
+            this.ornaments,
+            this.startTuple,
+            this.tremolo,
+            this.arpeggiated,
+            this.punctuated,
+        );
+    }
 }
 
 export class RestGlyph implements IGlyph {
@@ -93,6 +113,12 @@ export class RestGlyph implements IGlyph {
         public duration: number,
         public punctuated: boolean = false,
     ) { }
+    clone(): RestGlyph {
+        return new RestGlyph(
+            this.duration,
+            this.punctuated,
+        );
+    }
 }
 
 export class MultiMeasureRest implements IGlyph {

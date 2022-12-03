@@ -5,7 +5,7 @@ import { BarLineType } from "../Sheet/BarLine";
 import { DecorationTypes } from "../Sheet/Decoration";
 import { Duration } from "../Sheet/Duration";
 import { Dynamic, Dynamics } from "../Sheet/Dynamics";
-import { BarLineGlyph, ChordGlyph, GlyphWithDuration, KeyGlyph, MeterGlyph, MultiMeasureRest, NoteGlyph, RestGlyph } from "../Sheet/Glyph";
+import { BarLineGlyph, ChordGlyph, GlyphTypes, GlyphWithDuration, KeyGlyph, MeterGlyph, MultiMeasureRest, NoteGlyph, RestGlyph } from "../Sheet/Glyph";
 import { GraceNote } from "../Sheet/GraceNote";
 import { KeySignature } from "../Sheet/KeySignature";
 import { Sheet } from "../Sheet/Sheet";
@@ -155,7 +155,7 @@ export class SheetGenerator {
         )
         const chordStaff = chordSystem.getStaff();
         chordStaff.addGlyphs(chordGlyphs);
-        chordStaff.splitNote(-1);
+        chordStaff.splitEven(chordGlyphs[chordGlyphs.length - 1]);
         chordSystem.addBar("START");
         chordSystem.addBar("REPEAT_START_END");
         chordSystem.getStaff().addRests([-3, -2, -1, 1, 2, 3, 4]);
@@ -270,10 +270,13 @@ export class SheetGenerator {
             let rndPair = RandomUtils.takeIntervalRange(rndGroup, 1, 2);
             rndPair[0].slur = "START";
             rndPair[1].slur = "END";
+            console.log("SLUR", rndPair);
+
             rndGroup = RandomUtils.takeSingle(system.getStaff(1).getSuccessiveChords(3));
             rndPair = RandomUtils.takeIntervalRange(rndGroup, 1, 2);
             rndPair[0].slur = "START";
             rndPair[1].slur = "END";
+            console.log("TIE", rndPair);
         }
 
         /* Add key signatures */
@@ -286,11 +289,39 @@ export class SheetGenerator {
         let rndPair = RandomUtils.take(systems[0].getStaff(0).getNotes(), 2, true, 2);
         rndPair[0].creshendo = "START";
         rndPair[1].creshendo = "END";
+        console.log("CRESHENDO", rndPair);
+
         rndPair = RandomUtils.take(systems[1].getStaff(0).getNotes(), 2, true, 2);
         rndPair[0].diminuendo = "START";
         rndPair[1].diminuendo = "END";
 
+        /* Add tie */
+        let longNotes = sheet.getNotes().filter(note => BASE_DURATIONS.indexOf(note.duration) < 4);
+        const tieNote = RandomUtils.takeSingle(longNotes);
+        const tieStaff = sheet.getStaffOf(tieNote);
+        const tieSystem = sheet.getSystemOf(tieStaff);
+        const opposedStaff = tieSystem.staffs[tieSystem.staffs.filter(staff => staff !== tieStaff).map((staff, idx) => idx)[0]];
+        tieStaff.splitEven(tieNote, true);
+        // opposedStaff.splitEven(opposedStaff.glyphs[tieStaff.indexOf(tieNote)] as GlyphWithDuration);
 
+        /* Add triplet */
+        longNotes = sheet.getNotes().filter(note => BASE_DURATIONS.indexOf(note.duration) < 4);
+        const tupletNote = RandomUtils.takeSingle(longNotes);
+        sheet.getStaffOf(tupletNote).splitToTriplet(tupletNote);
+
+        /* Add whole note and whole rest */
+        const barline = RandomUtils.takeSingle(sheet.systems[0].staffs[0].glyphs.filter(glyph => glyph.type === "barline"));
+        const barlineIdx = sheet.systems[0].staffs[0].glyphs.indexOf(barline);
+        sheet.systems[0].staffs[0].modifyAtIdx("replace", barlineIdx, [
+            new BarLineGlyph(),
+            new RestGlyph(4),
+            new BarLineGlyph(),
+        ]);
+        sheet.systems[0].staffs[1].modifyAtIdx("replace", barlineIdx, [
+            new BarLineGlyph(),
+            CIonian.getChord(RandomUtils.takeSingle([...RomanNumerals]), "seventh", 4, RandomUtils.randInt(0, 2)).toGlyph(CIonian, false, 4),
+            new BarLineGlyph(),
+        ]);
 
         rndPair = RandomUtils.take(systems[3].getStaff(0).getNotes(), 2);
         const dynamicsRB = new RandomBag<Dynamic>()

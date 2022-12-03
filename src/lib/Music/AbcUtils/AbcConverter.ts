@@ -95,13 +95,6 @@ export class AbcConverter {
         if (glyph.diminuendo === "START") res += `!${AbcStrings.Diminuendo.START}!`;
         if (glyph.diminuendo === "END") res += `!${AbcStrings.Diminuendo.END}!`;
 
-        /* Add Slur / Tie */
-        if (glyph.slur === "START") res += AbcStrings.Slur.START;
-        if (glyph.tie === "END") res += AbcStrings.TIE;
-
-        /* Add Tuple */
-        if (glyph.startTuple > 1) res += `(${glyph.startTuple})`;
-
         /* Add Ornaments */
         glyph.ornaments.forEach(ornament => res += AbcStrings.Accent[ornament]);
         if (glyph.dynamic) res += `!${glyph.dynamic}!`;
@@ -121,12 +114,17 @@ export class AbcConverter {
             }
         }
 
+        /* Add Tuple */
+        if (glyph.startTuple > 1) res = `(${glyph.startTuple})` + res;
+
         /* Add Slur / Tie */
+        if (glyph.slur === "START") res = AbcStrings.Slur.START + res;
         if (glyph.slur === "END") res += AbcStrings.Slur.END;
         if (glyph.tie === "START") res += AbcStrings.TIE;
 
         /* Put whitespace if not connected to previous */
         if (glyph.beam == null || glyph.beam === "START") res = " " + res;
+        if (glyph.beam === "END") res += " ";
 
         return res;
     }

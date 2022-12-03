@@ -1,4 +1,5 @@
 import { Bar, BarType } from "./Bar";
+import { ChordGlyph } from "./Glyph";
 import { Sheet } from "./Sheet";
 import { Staff } from "./Staff";
 
@@ -44,4 +45,11 @@ export class System {
         this.staffs.forEach(staff => staff.applyBars());
     }
 
+    getNotes(): ChordGlyph[] {
+        return this.staffs.flatMap(staff => staff.getNotes())
+    }
+
+    getStaffOf(chord: ChordGlyph): Staff {
+        return this.staffs.filter(staff => staff.indexOf(chord) !== undefined)[0];
+    }
 }

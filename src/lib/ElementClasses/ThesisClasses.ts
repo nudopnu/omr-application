@@ -31,7 +31,6 @@ export const ThesisClasses: AbcjsElementType[] = [
     'KeySharp',
     'LedgerLine',
     'NoteheadBlack',
-    'NoteheadDoubleWhole',
     'NoteheadHalf',
     'NoteheadWhole',
     'RepeatDot',
