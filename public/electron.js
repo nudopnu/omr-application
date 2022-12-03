@@ -36,6 +36,7 @@ function createWindow() {
 
       let win = new BrowserWindow({ title: 'Preview', show: false, autoHideMenuBar: true, height: 800, width: 800 });
       win.loadURL(url);
+      console.log("LOADING GENERTATED URL...");
 
       const printOptions = {
         silent: false,
@@ -53,10 +54,12 @@ function createWindow() {
 
       win.webContents.once('did-finish-load', async () => {
         await win.webContents.executeJavaScript("document.body.style.margin='0';");
-        win.webContents.printToPDF(printOptions).then((data) => {
+        console.log("DONE.\nGENERATING PDF...");
+
+        win.webContents.printToPDF(printOptions).then(async (data) => {
           let buf = Buffer.from(data);
           let url = 'data:application/pdf;base64,' + buf.toString('base64');
-          console.log(url);
+          console.log("DONE.");
 
           if (show) {
             win.webContents.on('ready-to-show', () => {
@@ -67,6 +70,9 @@ function createWindow() {
             win.webContents.on('closed', () => win = null);
             win.loadURL(url);
           } else {
+            console.log("WRITING PDF FILE...");
+            await fs.writeFile("tmp.pdf", url.split(",")[1], 'base64', err => { console.log(err); })
+            console.log("PDF written");
             resolve(url);
           }
 
@@ -79,8 +85,8 @@ function createWindow() {
   });
   ipcMain.handle('pdf2png', (_event, url, dpi) => {
     return new Promise(async (resolve, reject) => {
+      console.log("WRITING PDF FILE...");
       await fs.writeFile("tmp.pdf", url.split(",")[1], 'base64', err => { console.log(err); })
-
       console.log("PDF written");
 
       const magick = spawn('magick', ['+antialias', '-define png:color-type=6', `-density ${dpi}`, '"tmp.pdf"', 'C:/Users/peter/Downloads/out.png'], { shell: true });

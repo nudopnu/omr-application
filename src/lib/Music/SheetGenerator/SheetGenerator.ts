@@ -311,9 +311,6 @@ export class SheetGenerator {
         const punctuationNote = RandomUtils.takeSingle(longNotes);
         const punctuationStaff = sheet.getStaffOf(punctuationNote);
         punctuationStaff.splitToPunctuation(punctuationNote);
-        // const parallelNote = sheet.getSystemOf(punctuationStaff)
-        //     .getParallelStartingNotesOf(punctuationNote)[0];
-        // sheet.getStaffOf(parallelNote).splitToPunctuation(parallelNote);
 
         /* Add whole note and whole rest */
         const barline = RandomUtils.takeSingle(sheet.systems[0].staffs[0].glyphs.filter(glyph => glyph.type === "barline"));

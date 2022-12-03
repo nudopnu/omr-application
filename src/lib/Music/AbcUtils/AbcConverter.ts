@@ -14,7 +14,7 @@ export class AbcConverter {
         if (systemType) {
             switch (systemType) {
                 case "grand-staff":
-                    res += "%%score { V1 V2\n";
+                    res += "%%score { V1 V2 }\n";
                     res += "V: V1 clef=treble\n";
                     res += "V: V2 clef=bass\n";
                     multiStaff = true;

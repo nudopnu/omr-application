@@ -123,6 +123,11 @@ export class Staff {
         chord.startTuple = 3;
         chord.duration = duration;
 
+        if (chord.slur === "END") {
+            chord.slur = undefined;
+            cloneB.slur = "END";
+        }
+
         const newGlyphs: Glyph[] = [
             chord,
             cloneA,

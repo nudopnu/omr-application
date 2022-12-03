@@ -49,6 +49,10 @@ export function AbcEditor({ abcLayers, addLayer }) {
         add_classes: true,
         selectTypes: [],
         viewportHorizontal: true,
+        format: {
+            tripletfont: 'Maestro small bold',
+            annotationfont: 'Maestro 10px bold',
+        }
     };
 
     const relevantClasses = ThesisClasses;
@@ -66,15 +70,6 @@ export function AbcEditor({ abcLayers, addLayer }) {
     }
 
     function postProcess() {
-        ([...document.querySelectorAll('[font-family="Times"]')] as HTMLElement[]).forEach(elem => {
-            elem.style.setProperty('font-family', "Maestro");
-            elem.style.setProperty('font-size', '22px');
-        });
-        ([...document.querySelectorAll('[font-family="Helvetica"]')] as HTMLElement[]).forEach(elem => {
-            elem.style.setProperty('font-family', "Maestro");
-            elem.style.setProperty('font-weight', 'bold');
-            elem.style.setProperty('font-size', 'small');
-        });
 
         /* Inject filter defs */
         const abcContentContainer = document.querySelector('.abcjs-inner > svg') as HTMLElement;
@@ -175,6 +170,9 @@ export function AbcEditor({ abcLayers, addLayer }) {
     }
 
     async function onClickConvert2() {
+        const svgElement = document.querySelector('.abcjs-container > svg') as HTMLElement;
+        svgElement.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+        
         let hintText: string[] = [];
 
         /* Work on a clone */
@@ -195,8 +193,10 @@ export function AbcEditor({ abcLayers, addLayer }) {
         let abcClone = abcRef.cloneNode(true) as HTMLElement;
         abcClone.style.setProperty('height', '100%');
         const keys = AbcjsElementTypes
+            .filter(key => relevantClasses.indexOf(key) !== -1)
             .filter(key => AbcjsElements[key])
             .sort(elem => AbcjsElements[elem]!.id);
+        console.log("Processing classes:", keys);
         colorize(keys, true, abcClone);
         cloneElem.appendChild(abcClone);
 
@@ -204,7 +204,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
         abcClone = abcRef.cloneNode(true) as HTMLElement;
         abcClone.style.setProperty('background-color', '#000');
         abcClone.style.setProperty('height', '100%');
-        const hexGrey = key => AbcjsElements[key].order.toString(16).padStart(2, '0')
+        const hexGrey = key => AbcjsElements[key].id.toString(16).padStart(2, '0')
         colorize(keys, true, abcClone, key => `#${hexGrey(key)}${hexGrey(key)}${hexGrey(key)}`);
         cloneElem.appendChild(abcClone);
 
