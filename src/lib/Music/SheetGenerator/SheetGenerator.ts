@@ -286,7 +286,7 @@ export class SheetGenerator {
         systems[2].getStaff(1).setMeter(Meter.fromType("fraction", 4, 4));
 
         /* Add dynamics */
-        let rndPair = RandomUtils.take(systems[0].getStaff(0).getNotes(), 2, true, 2);
+        let rndPair = RandomUtils.takeIntervalRange(systems[0].getStaff(0).getNotes(), 2, 5);
         rndPair[0].creshendo = "START";
         rndPair[1].creshendo = "END";
         console.log("CRESHENDO", rndPair);
@@ -299,15 +299,21 @@ export class SheetGenerator {
         let longNotes = sheet.getNotes().filter(note => BASE_DURATIONS.indexOf(note.duration) < 4);
         const tieNote = RandomUtils.takeSingle(longNotes);
         const tieStaff = sheet.getStaffOf(tieNote);
-        const tieSystem = sheet.getSystemOf(tieStaff);
-        const opposedStaff = tieSystem.staffs[tieSystem.staffs.filter(staff => staff !== tieStaff).map((staff, idx) => idx)[0]];
         tieStaff.splitEven(tieNote, true);
-        // opposedStaff.splitEven(opposedStaff.glyphs[tieStaff.indexOf(tieNote)] as GlyphWithDuration);
 
         /* Add triplet */
         longNotes = sheet.getNotes().filter(note => BASE_DURATIONS.indexOf(note.duration) < 4);
         const tupletNote = RandomUtils.takeSingle(longNotes);
         sheet.getStaffOf(tupletNote).splitToTriplet(tupletNote);
+
+        // /* Add punctuation */
+        longNotes = sheet.getNotes().filter(note => BASE_DURATIONS.indexOf(note.duration) < 4);
+        const punctuationNote = RandomUtils.takeSingle(longNotes);
+        const punctuationStaff = sheet.getStaffOf(punctuationNote);
+        punctuationStaff.splitToPunctuation(punctuationNote);
+        // const parallelNote = sheet.getSystemOf(punctuationStaff)
+        //     .getParallelStartingNotesOf(punctuationNote)[0];
+        // sheet.getStaffOf(parallelNote).splitToPunctuation(parallelNote);
 
         /* Add whole note and whole rest */
         const barline = RandomUtils.takeSingle(sheet.systems[0].staffs[0].glyphs.filter(glyph => glyph.type === "barline"));
@@ -328,7 +334,16 @@ export class SheetGenerator {
         dynamicsRB.addItems("one-of", ["mf", "mp"])
         dynamicsRB.addItems("one-of", ["f", "ff", "fff", "ffff", "p", "pp", "ppp", "pppp"]);
         dynamicsRB.generate(2);
-        dynamicsRB.take(2).forEach((dynamic, idx) => rndPair[idx].dynamic = dynamic);
+        const dynamics = dynamicsRB.take(2);
+        console.log(dynamics, dynamics.every(d => d.indexOf("f") !== -1), dynamics.every(d => d.indexOf("p") !== -1));
+
+        if (dynamics.every(d => d.indexOf("f") !== -1)) {
+            dynamics[0] = dynamics[0].replace("f", "p") as Dynamic;
+        }
+        if (dynamics.every(d => d.indexOf("p") !== -1)) {
+            dynamics[0] = dynamics[0].replace("p", "f") as Dynamic;
+        }
+        dynamics.forEach((dynamic, idx) => rndPair[idx].dynamic = dynamic);
 
         return sheet
     }

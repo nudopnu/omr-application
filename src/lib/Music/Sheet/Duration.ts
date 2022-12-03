@@ -47,4 +47,9 @@ export class Duration {
         }
         return durations;
     }
+
+    static modify(duration: number, modify: number) {
+        const baseDurations = [5, 4, 3, 2, 1, -1, -2, -3];
+        return baseDurations[baseDurations.indexOf(duration) - modify];
+    }
 }

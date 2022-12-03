@@ -1,4 +1,4 @@
-import { ChordGlyph } from "./Glyph";
+import { ChordGlyph, GlyphWithDuration } from "./Glyph";
 import { DefaultSheetOptions, SheetOptions } from "./SheetOptions";
 import { Staff } from "./Staff";
 import { System } from "./System";
@@ -31,7 +31,7 @@ export class Sheet {
         return this.systems.flatMap(system => system.getNotes());
     }
 
-    getStaffOf(chord: ChordGlyph): Staff {
+    getStaffOf(chord: GlyphWithDuration): Staff {
         return this.systems
             .map(system => system.getStaffOf(chord))
             .filter(staff => staff !== undefined)[0];

@@ -161,8 +161,8 @@ export class AbcConverter {
     }
 
     static durationToString(duration: number, punctuated: boolean): string {
-        if (duration < 1) return "1/" + (Math.pow(2, -duration) + (punctuated ? Math.pow(2, -duration - 1) : 0))
-        if (duration > 1) return (Math.pow(2, duration - 1) + (punctuated ? Math.pow(2, duration - 2) : 0)) + "";
+        if (duration < 1) return "1/" + Math.pow(2, -duration) + (punctuated ? ">" : "");
+        if (duration > 1) return Math.pow(2, duration - 1) + (punctuated ? ">" : "");
         return "";
     }
 

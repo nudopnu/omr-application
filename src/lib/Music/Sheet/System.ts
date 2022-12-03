@@ -1,5 +1,5 @@
 import { Bar, BarType } from "./Bar";
-import { ChordGlyph } from "./Glyph";
+import { ChordGlyph, GlyphWithDuration } from "./Glyph";
 import { Sheet } from "./Sheet";
 import { Staff } from "./Staff";
 
@@ -49,7 +49,14 @@ export class System {
         return this.staffs.flatMap(staff => staff.getNotes())
     }
 
-    getStaffOf(chord: ChordGlyph): Staff {
+    getStaffOf(chord: GlyphWithDuration): Staff {
         return this.staffs.filter(staff => staff.indexOf(chord) !== undefined)[0];
+    }
+
+    getParallelStartingNotesOf(glyph: GlyphWithDuration): GlyphWithDuration[] {
+        const idx = this.getStaffOf(glyph).indexOf(glyph);
+        return this.staffs
+            .map(staff => staff.glyphs[idx] as GlyphWithDuration)
+            .filter(note => note !== glyph);
     }
 }

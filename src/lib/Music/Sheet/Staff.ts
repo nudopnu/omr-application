@@ -3,6 +3,7 @@ import { Meter } from "../AbcUtils/Meter";
 import { Bar, BarType } from "./Bar";
 import { ChordGroup } from "./ChordGroup";
 import { Clef } from "./Clef";
+import { Duration } from "./Duration";
 import { BarLineGlyph, ChordGlyph, Glyph, GlyphWithDuration, NoteGlyph, RestGlyph } from "./Glyph";
 import { KeySignature } from "./KeySignature";
 import { Sheet } from "./Sheet";
@@ -109,7 +110,7 @@ export class Staff {
 
     splitToTriplet(chord: ChordGlyph) {
         let idx = this.indexOf(chord)
-        let duration = chord.duration - 1;
+        let duration = Duration.modify(chord.duration, -1);
 
         const cloneA = chord.clone();
         cloneA.duration = duration;
@@ -126,6 +127,21 @@ export class Staff {
             chord,
             cloneA,
             cloneB,
+        ];
+
+        this.modifyAtIdx('replace', idx, newGlyphs);
+    }
+
+    splitToPunctuation(chord: GlyphWithDuration) {
+        let idx = this.indexOf(chord)
+        const clone = chord.clone();
+        clone.duration = Duration.modify(clone.duration, -1);
+        chord.duration = Duration.modify(chord.duration, -1);
+        chord.punctuated = true;
+
+        const newGlyphs: Glyph[] = [
+            chord,
+            clone,
         ];
 
         this.modifyAtIdx('replace', idx, newGlyphs);
