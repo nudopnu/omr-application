@@ -31,7 +31,7 @@ function createWindow() {
   startBackgroundProcess("highlight");
   startBackgroundProcess("jsontest");
   startBackgroundProcess("predict");
-  ipcMain.handle('print', (_event, url, show) => {
+  ipcMain.handle('print', (_event, url, name, show) => {
     return new Promise((resolve, reject) => {
 
       let win = new BrowserWindow({ title: 'Preview', show: false, autoHideMenuBar: true, height: 800, width: 800 });
@@ -71,7 +71,7 @@ function createWindow() {
             win.loadURL(url);
           } else {
             console.log("WRITING PDF FILE...");
-            await fs.writeFile("tmp.pdf", url.split(",")[1], 'base64', err => { console.log(err); })
+            await fs.writeFile(`${name}.pdf`, url.split(",")[1], 'base64', err => { console.log(err); })
             console.log("PDF written");
             resolve(url);
           }

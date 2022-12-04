@@ -128,6 +128,12 @@ export class Staff {
             cloneB.slur = "END";
         }
 
+        if (chord.notes.length >= 3) {
+            chord.notes = [chord.notes[0]];
+            cloneA.notes = [cloneA.notes[1]];
+            cloneB.notes = [cloneB.notes[2]];
+        }
+
         const newGlyphs: Glyph[] = [
             chord,
             cloneA,

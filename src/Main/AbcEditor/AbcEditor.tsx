@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import abcjs, { AbcVisualParams } from "abcjs";
-import { DEFAULF_GENERATOR_SETTINGS, generateRandomSheet } from "../lib/Sheet";
+import { DEFAULF_GENERATOR_SETTINGS, generateRandomSheet } from "../../lib/Sheet";
 import "./AbcEditor.css";
-import { AbcConverter } from '../lib/Music/AbcUtils/AbcConverter';
-import { SheetGenerator } from '../lib/Music/SheetGenerator/SheetGenerator';
+import { AbcConverter } from '../../lib/Music/AbcUtils/AbcConverter';
+import { SheetGenerator } from '../../lib/Music/SheetGenerator/SheetGenerator';
 import { createRoot } from 'react-dom/client';
 import { SvgFilter } from './SvgFilter';
-import { AbcjsElements } from "../lib/ElementClasses/AbcjsElements";
-import { AbcjsElementType, AbcjsElementTypes } from "../lib/ElementClasses/AbcjsElementTypes";
-import { ThesisClasses } from "../lib/ElementClasses/ThesisClasses";
+import { AbcjsElements } from "../../lib/ElementClasses/AbcjsElements";
+import { AbcjsElementType, AbcjsElementTypes } from "../../lib/ElementClasses/AbcjsElementTypes";
+import { ThesisClasses } from "../../lib/ElementClasses/ThesisClasses";
 
 const sheets = [
     `X:1
@@ -30,6 +30,8 @@ C1- | C1 D2 E3 F4 G6 A8|: c,,1 (d,,2 e,,3 f,,4 g,,6 a,,8):|c128|
 [V:V2]
 [C,E,G,Bd]- |[CEGBd] D2 e3 f4 g6 a8|: C1 D2 E3 F4 G6 A8:|[C,c,]128|`
 ];
+
+let OutCounter = 1;
 
 export function AbcEditor({ abcLayers, addLayer }) {
     const [value, setValue] = useState<string>(sheets[0]);
@@ -172,7 +174,9 @@ export function AbcEditor({ abcLayers, addLayer }) {
     async function onClickConvert2() {
         const svgElement = document.querySelector('.abcjs-container > svg') as HTMLElement;
         svgElement.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-        
+
+        validate();
+
         let hintText: string[] = [];
 
         /* Work on a clone */
@@ -226,7 +230,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
         /* Send to main process */
         hintText = ["Generating pdf..."];
         setHints(hintText)
-        const pdf = await (window as any).page.print(url, false);
+        const pdf = await (window as any).page.print(url, String(OutCounter++).padStart(3, "0"), false);
         hintText = [...hintText, "Done."]
         setHints(hintText)
 
@@ -299,10 +303,13 @@ export function AbcEditor({ abcLayers, addLayer }) {
         keys.forEach(key => {
             if (relevantClasses.indexOf(key) === -1) return;
             const { selector } = AbcjsElements[key]!;
-            if (selector.query(abcElem).length === 0)
+            const selection = selector.query(abcElem);
+            if (selection.length === 0)
                 hintText.push(`[NOT FOUND]: ${key}`);
-            else
+            else {
                 presentKeys.push(key);
+                selection.forEach(elem => elem.classList.add(key));
+            }
         });
 
         if (hintText.length === 0) {

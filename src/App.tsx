@@ -1,17 +1,17 @@
 import React from 'react';
 
 import { useState } from 'react';
-import { AbcEditor } from './AbcEditor/AbcEditor';
+import { AbcEditor } from './Main/AbcEditor/AbcEditor';
 import './App.css';
-import { ImageLayer, LayerUT as uLayer } from './Layers/Layer';
-import { Layers } from './Layers/Layers';
+import { ImageLayer, LayerUT as uLayer } from './Main/Layers/Layer';
+import { Layers } from './Main/Layers/Layers';
 import { loadImage, uriToCanvas } from './lib/Image';
 import { AbcTools } from './Toolbar/AbcTools/AbcTools';
 import { ColorPicker } from './Toolbar/ColorPicker/ColorPicker';
 import { LayerPicker } from './Toolbar/LayerPicker/LayerPicker';
 import { ModelPicker } from './Toolbar/ModelPicker/ModelPicker';
 import { Toolbar } from './Toolbar/Toolbar';
-import { WorkArea } from './WorkArea/WorkArea';
+import { WorkArea } from './Main/WorkArea/WorkArea';
 
 function App() {
 

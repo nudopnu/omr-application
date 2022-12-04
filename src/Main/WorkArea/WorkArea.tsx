@@ -1,6 +1,6 @@
 import React from 'react';
 import { useEffect, useRef, useState } from "react";
-import { FilePicker } from "../FilePicker/FilePicker";
+import { FilePicker } from "../../common/FilePicker/FilePicker";
 import './WorkArea.css';
 
 // Thanks to:
@@ -70,7 +70,7 @@ export function WorkArea({ layers, children, onOpenFiles, addLayer }) {
                 let url = URL.createObjectURL(blob);
 
                 /* Send to main process */
-                await (window as any).page.print(url, true);
+                await (window as any).page.print(url, 'screenshot', true);
             }
             else if (event.key === 'd') {
                 const elem = document.querySelector("[role='img']");

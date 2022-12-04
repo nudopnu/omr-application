@@ -4,22 +4,31 @@ export interface ISelector {
 
 export class DefaultSelector implements ISelector {
     constructor(
+        public className: string,
         public queryString: string,
     ) { }
 
-    query(root: HTMLElement): HTMLElement[] {
-        return [...root.querySelectorAll(this.queryString)] as HTMLElement[];
+    queryClass(root): HTMLElement[] {
+        return [...root.querySelectorAll(`.${this.className}`)] as HTMLElement[];
+    }
+
+    query(root: HTMLElement, filter = (elem, idx?) => true): HTMLElement[] {
+        return [
+            ...[...root.querySelectorAll(this.queryString)].filter(filter),
+            ...this.queryClass(root),
+        ] as HTMLElement[];
     }
 }
 
 export class AspectRatioSelector extends DefaultSelector {
     constructor(
+        public className: string,
         public queryString: string,
         public aspectRatio: number,
-    ) { super(queryString); }
+    ) { super(className, queryString); }
 
     query(root: HTMLElement) {
-        return super.query(root).filter(elem => {
+        return super.query(root, elem => {
             const { width, height } = elem.getBoundingClientRect();
             const computedAspectRatio = width / height;
             return (Math.abs(computedAspectRatio - this.aspectRatio) < 0.001);
@@ -29,12 +38,13 @@ export class AspectRatioSelector extends DefaultSelector {
 
 export class HairpinSelector extends DefaultSelector {
     constructor(
+        public className: string,
         public queryString: string,
         public diminuendo: boolean,
-    ) { super(queryString); }
+    ) { super(className, queryString); }
 
     query(root: HTMLElement): HTMLElement[] {
-        return super.query(root).filter(elem => {
+        return super.query(root, elem => {
             const drawString = elem.getAttribute("d") as string;
             const matches = drawString.match(/M[^L]+/gm)
             const isCreshendo = matches![0] !== matches![1];
@@ -45,12 +55,13 @@ export class HairpinSelector extends DefaultSelector {
 
 export class InnerHTMLSelector extends DefaultSelector {
     constructor(
+        public className: string,
         public queryString: string,
         public innerHTML: string,
-    ) { super(queryString); }
+    ) { super(className, queryString); }
 
     query(root: HTMLElement): HTMLElement[] {
-        return super.query(root).filter(elem => {
+        return super.query(root, elem => {
             const elemInnerHTML = elem.innerHTML as string;
             return elemInnerHTML === this.innerHTML;
         });
@@ -59,12 +70,13 @@ export class InnerHTMLSelector extends DefaultSelector {
 
 export class TimeSigSelector extends DefaultSelector {
     constructor(
+        public className: string,
         public queryString: string,
         public n: number,
-    ) { super(queryString); }
+    ) { super(className, queryString); }
 
     query(root: HTMLElement): HTMLElement[] {
-        return super.query(root).filter(elem => {
+        return super.query(root, elem => {
             if (elem.hasAttribute("data-name")) {
                 const decimals = elem.getAttribute("data-name") as string;
                 return decimals === `${this.n}`;
@@ -79,12 +91,13 @@ export class TimeSigSelector extends DefaultSelector {
 
 export class RelativeWidthSelector extends DefaultSelector {
     constructor(
+        public className: string,
         public queryString: string,
         public relativeWidth: number,
-    ) { super(queryString); }
+    ) { super(className, queryString); }
 
     query(root: HTMLElement): HTMLElement[] {
-        return super.query(root).filter(elem => {
+        return super.query(root, elem => {
             const relW = elem.getBoundingClientRect().width / root.getBoundingClientRect().width;
             return Math.abs(relW - this.relativeWidth) < 0.001;
         });

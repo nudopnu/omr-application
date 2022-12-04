@@ -1,4 +1,4 @@
-import { ReactComponent as Spin } from '../spinner.svg'
+import { ReactComponent as Spin } from '../../spinner.svg'
 import './Spinner.css'
 
 export function Spinner({ text }) {

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { List } from "../../common/List";
-import { Spinner } from "../../Spinner/Spinner";
+import { Spinner } from "../../common/Spinner/Spinner";
 import "./ColorPicker.css"
 
 export function ColorPicker({ addLayer }) {

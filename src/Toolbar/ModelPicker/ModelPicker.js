@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { List } from "../../common/List";
-import { Spinner } from "../../Spinner/Spinner";
+import { Spinner } from "../../common/Spinner/Spinner";
 import './ModelPicker.css'
 
 export function ModelPicker({ getImage, addLayer }) {
