@@ -9,15 +9,10 @@ export function AbcTools({ addLayer }) {
         addLayer(newLayer)
     }
 
-    function onOpenBoundingBoxes(){
-
-    }
-
     return (
         <>
             <span style={{ margin: '10px 0px', display: 'block' }}>Abc Tools</span>
             <button onClick={onCreateNew}>Open Editor</button>
-            <button onClick={onOpenBoundingBoxes}>Bounding Boxes</button>
         </>
     );
 }

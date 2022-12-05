@@ -9,6 +9,7 @@ import { SvgFilter } from './SvgFilter';
 import { AbcjsElements } from "../../lib/ElementClasses/AbcjsElements";
 import { AbcjsElementType, AbcjsElementTypes } from "../../lib/ElementClasses/AbcjsElementTypes";
 import { ThesisClasses } from "../../lib/ElementClasses/ThesisClasses";
+import { BBox } from "../../lib/BBox";
 
 const sheets = [
     `X:1
@@ -329,6 +330,74 @@ export function AbcEditor({ abcLayers, addLayer }) {
 
     }
 
+    function createBoundingBoxes() {
+        const abcElem = document.querySelector('.abcjs-container > svg') as HTMLElement;
+
+        /* Needed to get svg-relative coordinate */
+        const [parentX, parentY, parentW, parentH] = (abcElem as any).getAttribute("viewBox")
+            .split(" ")
+            .map(x => parseFloat(x));
+
+        /* The svg container might not fill up the whole sheet -> fix with heightFactor */
+        const { height: svgParentHeight } = abcElem.parentElement!.parentElement!.parentElement!.getBoundingClientRect();
+        const { height: svgHeight } = abcElem.getBoundingClientRect();
+        const heightFactor = svgHeight / svgParentHeight;
+
+        /* Split beams */
+        const { selector } = AbcjsElements.Beam!;
+        selector.query(abcElem).forEach((elem, idx) => {
+            const paths = elem.getAttribute('d')!
+                .split('M')
+                .filter(path => path.length > 0)
+                .map(path => "M" + path);
+            const children = paths.map(path => {
+                const clone = elem.cloneNode() as SVGPathElement;
+                clone.setAttribute("d", path);
+                return clone;
+            });
+            elem.replaceWith(...children);
+        });
+
+        /* Create bounding boxes */
+        const bboxes: BBox[] = [];
+        let bboxContainer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        let id = 0;
+        relevantClasses.forEach(key => {
+            const { selector } = AbcjsElements[key]!;
+            selector.query(abcElem).forEach((elem, idx) => {
+                let { x, y, width, height } = (elem as any).getBBox();
+                let cx = x + width / 2;
+                let cy = y + height / 2;
+                let res = { id: id++, type: key, x: x, y: y, width: width, height: height, cx: cx, cy: cy } as BBox;
+                let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                rect.setAttribute('x', x);
+                rect.setAttribute('y', y);
+                rect.setAttribute('width', width);
+                rect.setAttribute('height', height);
+                rect.setAttribute('fill', 'none');
+                rect.setAttribute('stroke', '#00a');
+                bboxContainer.appendChild(rect);
+
+                [x, width] = [x, width].map(e => e / parentW);
+                [y, height] = [y, height].map(e => (e / parentH) * heightFactor);
+                cx = x + width / 2;
+                cy = y + height / 2;
+                res = { id: id++, type: key, x: x, y: y, width: width, height: height, cx: cx, cy: cy } as BBox;
+                bboxes.push(res);
+            });
+        })
+        abcElem.appendChild(bboxContainer);
+        console.log(bboxes);
+
+        /* Download as JSON */
+        let data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(bboxes));
+        let downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute('href', data);
+        downloadAnchorNode.setAttribute('download', 'bboxes.json');
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+    }
+
     useEffect(() => {
         const keys = AbcjsElementTypes
             .filter(key => AbcjsElements[key])
@@ -393,6 +462,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
                     </div>
                 </div>
                 <button onClick={() => validate()}>Validate</button>
+                <button onClick={createBoundingBoxes}>Create Bounding Boxes</button>
                 <div id="hints">{hints.map((hint, idx) => <div key={idx}>{hint}</div>)}</div>
             </div>
         </div>

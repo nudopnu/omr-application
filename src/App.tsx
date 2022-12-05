@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useState } from 'react';
-import { AbcEditor } from './Main/AbcEditor/AbcEditor';
+import { AbcEditor } from './Tools/AbcEditor/AbcEditor';
 import './App.css';
 import { ImageLayer, LayerUT as uLayer } from './Main/Layers/Layer';
 import { Layers } from './Main/Layers/Layers';
