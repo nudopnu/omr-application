@@ -303,7 +303,7 @@ export class SheetGenerator {
 
         /* Add triplet */
         longNotes = sheet.getNotes()
-            .filter(note => BASE_DURATIONS.indexOf(note.duration) < 4)
+            .filter(note => BASE_DURATIONS.indexOf(note.duration) < 3)
             .filter(note => note.notes.length > 2);
         const tupletNote = RandomUtils.takeSingle(longNotes);
         sheet.getStaffOf(tupletNote).splitToTriplet(tupletNote);

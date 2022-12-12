@@ -156,6 +156,8 @@ export class Staff {
         ];
 
         this.modifyAtIdx('replace', idx, newGlyphs);
+        console.log(this.glyphs);
+        
     }
 
     modifyAtIdx(operation: 'delete' | 'replace' | 'prepend' | 'append', idx: number, glyphs: Glyph[] = []) {

@@ -67,7 +67,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
     function handleChange(event) {
         setValue(event.target.value);
         abcjs.renderAbc('abc-content', event.target.value, abcOptions);
-        postProcess();
+        // postProcess();
         setChecked(false);
         setHints([]);
     }
@@ -134,7 +134,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
         setValue(abc);
         setChecked(false);
         abcjs.renderAbc('abc-content', abc, abcOptions);
-        postProcess();
+        // postProcess();
         validate();
     }
     function onClickGenerateRandom2() {
@@ -144,7 +144,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
         setValue(abc);
         setChecked(false);
         abcjs.renderAbc('abc-content', abc, abcOptions);
-        postProcess();
+        // postProcess();
         validate();
     }
 
@@ -157,7 +157,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
         let res = abcjs.renderAbc('abc-content', abc, abcOptions);
         console.log(res);
 
-        postProcess();
+        // postProcess();
         validate();
     }
 
@@ -168,7 +168,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
         setValue(abc);
         setChecked(false);
         abcjs.renderAbc('abc-content', abc, abcOptions);
-        postProcess();
+        // postProcess();
         validate();
     }
 
@@ -209,8 +209,9 @@ export function AbcEditor({ abcLayers, addLayer }) {
         abcClone = abcRef.cloneNode(true) as HTMLElement;
         abcClone.style.setProperty('background-color', '#000');
         abcClone.style.setProperty('height', '100%');
-        const hexGrey = key => AbcjsElements[key].id.toString(16).padStart(2, '0')
-        colorize(keys, true, abcClone, key => `#${hexGrey(key)}${hexGrey(key)}${hexGrey(key)}`);
+        // const hexGrey = key => AbcjsElements[key].id.toString(16).padStart(2, '0')
+        // colorize(keys, true, abcClone, (_key, idx) => `#${hexGrey(idx)}${hexGrey(idx)}${hexGrey(idx)}`);
+        colorize(keys, true, abcClone, (_key, idx) => `#${idx.toString(16).padStart(6, '0')}`);
         cloneElem.appendChild(abcClone);
 
         /* Generate masks */
@@ -320,11 +321,13 @@ export function AbcEditor({ abcLayers, addLayer }) {
         return presentKeys;
     }
 
-    function colorize(keys: AbcjsElementType[], flag, abcElem: HTMLElement = document.querySelector('#abc-render')!, getColor = (key => AbcjsElements[key].colors[1])) {
+    function colorize(keys: AbcjsElementType[], flag, abcElem: HTMLElement = document.querySelector('#abc-render')!, getColor = ((key, idx?) => AbcjsElements[key].colors[1])) {
+        let idx = 1;
+        
         keys.forEach(key => {
             const { selector } = AbcjsElements[key]!;
             selector.query(abcElem).forEach(elem => {
-                (elem as HTMLElement).style.color = flag ? getColor(key) : '';
+                (elem as HTMLElement).style.color = flag ? getColor(key, idx++) : '';
             });
         });
 
@@ -398,6 +401,20 @@ export function AbcEditor({ abcLayers, addLayer }) {
         downloadAnchorNode.remove();
     }
 
+    function getClassList() {
+        const json = relevantClasses
+            .sort((a, b) => AbcjsElements[a]!.id - AbcjsElements[b]!.id)
+            .map((c, idx) => ({ class: c, color: AbcjsElements[c]?.colors[1], dsid: AbcjsElements[c]?.id, id: idx + 1 }));
+
+        /* Download as JSON */
+        let data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(json));
+        let downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute('href', data);
+        downloadAnchorNode.setAttribute('download', 'classlist.json');
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+    }
+
     useEffect(() => {
         const keys = AbcjsElementTypes
             .filter(key => AbcjsElements[key])
@@ -407,13 +424,13 @@ export function AbcEditor({ abcLayers, addLayer }) {
 
     useEffect(() => {
         abcjs.renderAbc('abc-content', value, abcOptions);
-        postProcess();
+        // postProcess();
     }, [turbulenceFrequency, turbulenceStrength, staffLineThickness, rotation, verticalScale]);
 
 
     useEffect(() => {
         abcjs.renderAbc('abc-content', value, abcOptions);
-        postProcess();
+        // postProcess();
     }, [])
 
     return (
@@ -463,6 +480,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
                 </div>
                 <button onClick={() => validate()}>Validate</button>
                 <button onClick={createBoundingBoxes}>Create Bounding Boxes</button>
+                <button onClick={getClassList}>Get Classlist</button>
                 <div id="hints">{hints.map((hint, idx) => <div key={idx}>{hint}</div>)}</div>
             </div>
         </div>
