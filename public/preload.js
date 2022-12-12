@@ -26,9 +26,9 @@ contextBridge.exposeInMainWorld('layers', {
 })
 
 contextBridge.exposeInMainWorld('page', {
-    print: (url, name, show) => ipcRenderer.invoke('print', url, show),
+    print: (url, name, show) => ipcRenderer.invoke('print', url, name, show),
     capture: (url, width, height) => ipcRenderer.invoke('capture', url, width, height),
-    pdf2png: (url, dpi) => ipcRenderer.invoke('pdf2png', url, dpi),
+    pdf2png: (url, name, dpi) => ipcRenderer.invoke('pdf2png', url, name, dpi),
 });
 
 provideBackgroundPython("jsontest");

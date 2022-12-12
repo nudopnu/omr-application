@@ -36,6 +36,7 @@ let OutCounter = 1;
 
 export function AbcEditor({ abcLayers, addLayer }) {
     const [value, setValue] = useState<string>(sheets[0]);
+    const [name, setName] = useState<string>('default');
     const [hints, setHints] = useState<string[]>([]);
     const [checked, setChecked] = useState<boolean>(false);
     const [turbulenceFrequency, setTurbulenceFrequency] = useState<number>(0);
@@ -64,20 +65,52 @@ export function AbcEditor({ abcLayers, addLayer }) {
         (document.querySelector('#abc-content')! as HTMLElement).style.setProperty('width', '100%');
     });
 
-    function handleChange(event) {
-        setValue(event.target.value);
-        abcjs.renderAbc('abc-content', event.target.value, abcOptions);
-        // postProcess();
-        setChecked(false);
-        setHints([]);
-    }
+
 
     function postProcess() {
+
+        // addAugmentation();
+        // abcContentContainer.appendChild(noise);
+
+        const abcElem = document.querySelector('.abcjs-container > svg') as HTMLElement;
+
+        /* Split beams */
+        const { selector } = AbcjsElements.Beam!;
+        selector.query(abcElem).forEach((elem, idx) => {
+            const paths = elem.getAttribute('d')!
+                .split('M')
+                .filter(path => path.length > 0)
+                .map(path => "M" + path);
+            const children = paths.map(path => {
+                const clone = elem.cloneNode() as SVGPathElement;
+                clone.setAttribute("d", path);
+                return clone;
+            });
+            elem.replaceWith(...children);
+        });
+
+        setHints(["Postprocessing completed."]);
+    }
+
+    function addAugmentation() {
+
+        function updateRotation() {
+            ([...document.querySelectorAll('svg > g')] as HTMLElement[]).forEach(element => {
+                element.style.setProperty('transform', `rotate(${rotation}deg) scale(1, ${verticalScale})`);
+            });
+        }
+
+        function scaleStafflines(scaleX: number, scaleY: number) {
+            ([...document.querySelectorAll('.abcjs-staff > path')] as HTMLElement[]).forEach(elem => {
+                elem.style.setProperty("transform", `scale(${scaleX}, ${scaleY})`);
+                elem.style.setProperty('transform-box', 'fill-box');
+            });
+        }
 
         /* Inject filter defs */
         const abcContentContainer = document.querySelector('.abcjs-inner > svg') as HTMLElement;
         const defContainer = document.createElement('defs');
-        abcContentContainer.appendChild(defContainer)
+        abcContentContainer.appendChild(defContainer);
         definitionsRoot = createRoot(defContainer);
         definitionsRoot.render(<SvgFilter turbulenceFrequency={turbulenceFrequency} turbulenceStrength={turbulenceStrength} />);
 
@@ -94,7 +127,6 @@ export function AbcEditor({ abcLayers, addLayer }) {
         // (document.querySelector('svg') as SVGElement)
         //     .style
         //     .setProperty('transform', 'perspective(25cm) scale(.8) rotateX(4deg) rotateY(4deg)');
-
         /* Apply staff thickness */
         const scaleX = 1;
         scaleStafflines(scaleX, staffLineThickness);
@@ -105,77 +137,58 @@ export function AbcEditor({ abcLayers, addLayer }) {
         // paper.setAttribute('height', '100%');
         // paper.style.setProperty('filter', 'url(#paper)');
         // abcContentContainer.insertBefore(paper, abcContentContainer.firstChild);
-
         /* Add background noise */
         const noise = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
         noise.setAttribute('width', '100%');
         noise.setAttribute('height', '100%');
         noise.style.setProperty('filter', 'url(#noise)');
-        // abcContentContainer.appendChild(noise);
-
-    }
-
-    function updateRotation() {
-        ([...document.querySelectorAll('svg > g')] as HTMLElement[]).forEach(element => {
-            element.style.setProperty('transform', `rotate(${rotation}deg) scale(1, ${verticalScale})`);
-        });
-    }
-
-    function scaleStafflines(scaleX: number, scaleY: number) {
-        ([...document.querySelectorAll('.abcjs-staff > path')] as HTMLElement[]).forEach(elem => {
-            elem.style.setProperty("transform", `scale(${scaleX}, ${scaleY})`);
-            elem.style.setProperty('transform-box', 'fill-box');
-        });
     }
 
     function onClickGenerateRandom() {
         let abc = generateRandomSheet(DEFAULF_GENERATOR_SETTINGS.settings);
-        console.log(abc);
-        setValue(abc);
-        setChecked(false);
-        abcjs.renderAbc('abc-content', abc, abcOptions);
-        // postProcess();
-        validate();
+        setAbcString(abc);
     }
     function onClickGenerateRandom2() {
         const sheet = SheetGenerator.generatePianoSheet();
         let abc = AbcConverter.fromSheet(sheet);
-        console.log(abc);
-        setValue(abc);
-        setChecked(false);
-        abcjs.renderAbc('abc-content', abc, abcOptions);
-        // postProcess();
-        validate();
+        setAbcString(abc);
     }
 
     function onClickGenerateScale() {
         const sheet = SheetGenerator.generateScaleSheet();
         let abc = AbcConverter.fromSheet(sheet);
-        console.log(abc);
-        setValue(abc);
-        setChecked(false);
-        let res = abcjs.renderAbc('abc-content', abc, abcOptions);
-        console.log(res);
-
-        // postProcess();
-        validate();
+        setAbcString(abc);
     }
 
     function onClickGenerateOrnaments() {
         const sheet = SheetGenerator.generateOrnamentsSheet();
         let abc = AbcConverter.fromSheet(sheet);
+        setAbcString(abc);
+    }
+
+    function handleChange(event) {
+        setValue(event.target.value);
+        abcjs.renderAbc('abc-content', event.target.value, abcOptions);
+        postProcess();
+        setChecked(false);
+        setHints(["Validation required."]);
+    }
+
+    function setAbcString(abc: string) {
         console.log(abc);
         setValue(abc);
         setChecked(false);
         abcjs.renderAbc('abc-content', abc, abcOptions);
-        // postProcess();
+        postProcess();
         validate();
     }
 
-    async function onClickConvert2() {
+
+    async function onClickGenerateXY() {
         const svgElement = document.querySelector('.abcjs-container > svg') as HTMLElement;
         svgElement.setAttribute("xmlns", "http://www.w3.org/2000/svg");
 
+        postProcess();
         validate();
 
         let hintText: string[] = [];
@@ -232,7 +245,8 @@ export function AbcEditor({ abcLayers, addLayer }) {
         /* Send to main process */
         hintText = ["Generating pdf..."];
         setHints(hintText)
-        const pdf = await (window as any).page.print(url, String(OutCounter++).padStart(3, "0"), false);
+        const name = String(OutCounter++).padStart(3, "0");
+        const pdf = await (window as any).page.print(url, name, false);
         hintText = [...hintText, "Done."]
         setHints(hintText)
 
@@ -240,10 +254,11 @@ export function AbcEditor({ abcLayers, addLayer }) {
         hintText = [...hintText, "Converting to PNG..."]
         setHints(hintText)
         const dpi = 280;
-        await (window as any).page.pdf2png(pdf, dpi);
+        await (window as any).page.pdf2png(pdf, name, dpi);
         hintText = [...hintText, "Done."]
         setHints(hintText)
     }
+
     function onClickConvert() {
 
         const svgElement = document.querySelector('.abcjs-container > svg') as HTMLElement;
@@ -323,7 +338,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
 
     function colorize(keys: AbcjsElementType[], flag, abcElem: HTMLElement = document.querySelector('#abc-render')!, getColor = ((key, idx?) => AbcjsElements[key].colors[1])) {
         let idx = 1;
-        
+
         keys.forEach(key => {
             const { selector } = AbcjsElements[key]!;
             selector.query(abcElem).forEach(elem => {
@@ -345,21 +360,6 @@ export function AbcEditor({ abcLayers, addLayer }) {
         const { height: svgParentHeight } = abcElem.parentElement!.parentElement!.parentElement!.getBoundingClientRect();
         const { height: svgHeight } = abcElem.getBoundingClientRect();
         const heightFactor = svgHeight / svgParentHeight;
-
-        /* Split beams */
-        const { selector } = AbcjsElements.Beam!;
-        selector.query(abcElem).forEach((elem, idx) => {
-            const paths = elem.getAttribute('d')!
-                .split('M')
-                .filter(path => path.length > 0)
-                .map(path => "M" + path);
-            const children = paths.map(path => {
-                const clone = elem.cloneNode() as SVGPathElement;
-                clone.setAttribute("d", path);
-                return clone;
-            });
-            elem.replaceWith(...children);
-        });
 
         /* Create bounding boxes */
         const bboxes: BBox[] = [];
@@ -424,13 +424,13 @@ export function AbcEditor({ abcLayers, addLayer }) {
 
     useEffect(() => {
         abcjs.renderAbc('abc-content', value, abcOptions);
-        // postProcess();
+        postProcess();
     }, [turbulenceFrequency, turbulenceStrength, staffLineThickness, rotation, verticalScale]);
 
 
     useEffect(() => {
         abcjs.renderAbc('abc-content', value, abcOptions);
-        // postProcess();
+        postProcess();
     }, [])
 
     return (
@@ -450,7 +450,8 @@ export function AbcEditor({ abcLayers, addLayer }) {
                 <button onClick={onClickGenerateScale}>Scale Sheet</button>
                 <button onClick={onClickGenerateOrnaments}>Ornaments Sheet</button>
                 <button onClick={onClickConvert}>Convert to PNG</button>
-                <button onClick={onClickConvert2}>Generate XY</button>
+                {/* <input type="text" value={name} /> */}
+                <button onClick={onClickGenerateXY}>Generate XY</button>
                 <div id='settings'>
                     <div className='setting'>
                         <span>Staffline thickness:</span>

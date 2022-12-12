@@ -71,7 +71,9 @@ function createWindow() {
             win.loadURL(url);
           } else {
             console.log("WRITING PDF FILE...");
-            await fs.writeFile(`${name}.pdf`, url.split(",")[1], 'base64', err => { console.log(err); })
+            if (!fs.existsSync('out'))
+              fs.mkdirSync('out');
+            await fs.writeFile(`out/${name}.pdf`, url.split(",")[1], 'base64', err => { console.log(err); })
             console.log("PDF written");
             resolve(url);
           }
@@ -83,13 +85,20 @@ function createWindow() {
       });
     });
   });
-  ipcMain.handle('pdf2png', (_event, url, dpi) => {
+  ipcMain.handle('pdf2png', (_event, url, name, dpi) => {
     return new Promise(async (resolve, reject) => {
-      console.log("WRITING PDF FILE...");
-      await fs.writeFile("tmp.pdf", url.split(",")[1], 'base64', err => { console.log(err); })
-      console.log("PDF written");
+      // console.log("WRITING PDF FILE...");
+      // await fs.writeFile("tmp.pdf", url.split(",")[1], 'base64', err => { console.log(err); })
+      // console.log("PDF written");
 
-      const magick = spawn('magick', ['+antialias', '-define png:color-type=6', `-density ${dpi}`, '"tmp.pdf"', 'C:/Users/peter/Downloads/out.png'], { shell: true });
+      if (!fs.existsSync('out'))
+        fs.mkdirSync('out');
+      const outdir = `out/${name}`;
+      if (!fs.existsSync(outdir))
+        fs.mkdirSync(outdir);
+      console.log("WRITING PNGS TO " + outdir);
+
+      const magick = spawn('magick', ['+antialias', '-define png:color-type=6', `-density ${dpi}`, `"${name}.pdf"`, `${outdir}/out.png`], { shell: true });
       let magickRes = "";
 
       magick.stdout.on('data', (data) => {
