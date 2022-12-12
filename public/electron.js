@@ -98,7 +98,7 @@ function createWindow() {
         fs.mkdirSync(outdir);
       console.log("WRITING PNGS TO " + outdir);
 
-      const magick = spawn('magick', ['+antialias', '-define png:color-type=6', `-density ${dpi}`, `"${name}.pdf"`, `${outdir}/out.png`], { shell: true });
+      const magick = spawn('magick', ['+antialias', '-define png:color-type=6', `-density ${dpi}`, `"out/${name}.pdf"`, `${outdir}/out.png`], { shell: true });
       let magickRes = "";
 
       magick.stdout.on('data', (data) => {
