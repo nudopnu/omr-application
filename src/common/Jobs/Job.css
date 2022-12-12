@@ -1,0 +1,21 @@
+.job {
+  font-size: small;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.job :first-child {
+  flex-grow: 2;
+}
+
+.inline {
+  display: inline;
+  width: auto;
+}
+
+button.inline {
+  background-color: hsl(0, 0%, 42%);
+  height: 25px;
+}

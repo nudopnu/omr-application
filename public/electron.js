@@ -73,8 +73,9 @@ function createWindow() {
             console.log("WRITING PDF FILE...");
             if (!fs.existsSync('out'))
               fs.mkdirSync('out');
-            await fs.writeFile(`out/${name}.pdf`, url.split(",")[1], 'base64', err => { console.log(err); })
-            console.log("PDF written");
+            const outfile = `out/${name}.pdf`;
+            await fs.writeFile(outfile, url.split(",")[1], 'base64', err => { console.log(err); })
+            console.log("PDF written: " + outfile);
             resolve(url);
           }
 
@@ -87,17 +88,16 @@ function createWindow() {
   });
   ipcMain.handle('pdf2png', (_event, url, name, dpi) => {
     return new Promise(async (resolve, reject) => {
-      // console.log("WRITING PDF FILE...");
-      // await fs.writeFile("tmp.pdf", url.split(",")[1], 'base64', err => { console.log(err); })
-      // console.log("PDF written");
 
+      /* Ensure output directories */
       if (!fs.existsSync('out'))
         fs.mkdirSync('out');
       const outdir = `out/${name}`;
       if (!fs.existsSync(outdir))
         fs.mkdirSync(outdir);
-      console.log("WRITING PNGS TO " + outdir);
+      console.log("WRITING PNGS TO " + outdir + "/");
 
+      /* Convert using imagemagick */
       const magick = spawn('magick', ['+antialias', '-define png:color-type=6', `-density ${dpi}`, `"out/${name}.pdf"`, `${outdir}/out.png`], { shell: true });
       let magickRes = "";
 

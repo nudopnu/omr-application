@@ -55,6 +55,7 @@
   min-width: 16px;
   min-height: 16px;
   border: 1px solid rgb(104, 104, 104);
+  cursor: pointer;
 }
 
 .layers {

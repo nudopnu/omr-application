@@ -10,6 +10,9 @@ import { AbcjsElements } from "../../lib/ElementClasses/AbcjsElements";
 import { AbcjsElementType, AbcjsElementTypes } from "../../lib/ElementClasses/AbcjsElementTypes";
 import { ThesisClasses } from "../../lib/ElementClasses/ThesisClasses";
 import { BBox } from "../../lib/BBox";
+import { FileDrop } from "../../common/FileDrop/FileDrop";
+import { JobList } from "../../common/Jobs/Joblist";
+import { ConversionJob, IJob } from "../../common/Jobs/Job";
 
 const sheets = [
     `X:1
@@ -36,7 +39,16 @@ let OutCounter = 1;
 
 export function AbcEditor({ abcLayers, addLayer }) {
     const [value, setValue] = useState<string>(sheets[0]);
-    const [name, setName] = useState<string>('default');
+    const [jobs, setJobs] = useState<IJob[]>([
+        new ConversionJob('001.abc', () => new Promise((resolve, reject) => {
+            console.log("abc");
+            resolve('ABC');
+        })),
+        new ConversionJob('001.abc', () => new Promise((resolve, reject) => {
+            console.log("abc3");
+            resolve('ABC');
+        })),
+    ]);
     const [hints, setHints] = useState<string[]>([]);
     const [checked, setChecked] = useState<boolean>(false);
     const [turbulenceFrequency, setTurbulenceFrequency] = useState<number>(0);
@@ -184,7 +196,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
     }
 
 
-    async function onClickGenerateXY() {
+    async function onClickGenerateXY(name?: string) {
         const svgElement = document.querySelector('.abcjs-container > svg') as HTMLElement;
         svgElement.setAttribute("xmlns", "http://www.w3.org/2000/svg");
 
@@ -245,7 +257,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
         /* Send to main process */
         hintText = ["Generating pdf..."];
         setHints(hintText)
-        const name = String(OutCounter++).padStart(3, "0");
+        name = !name ? String(OutCounter++).padStart(3, "0") : name;
         const pdf = await (window as any).page.print(url, name, false);
         hintText = [...hintText, "Done."]
         setHints(hintText)
@@ -451,8 +463,10 @@ export function AbcEditor({ abcLayers, addLayer }) {
                 <button onClick={onClickGenerateOrnaments}>Ornaments Sheet</button>
                 <button onClick={onClickConvert}>Convert to PNG</button>
                 {/* <input type="text" value={name} /> */}
-                <button onClick={onClickGenerateXY}>Generate XY</button>
-                <div id='settings'>
+                <button onClick={() => onClickGenerateXY()}>Generate XY</button>
+                <FileDrop instruction="Drop abc files here" />
+                <JobList jobs={jobs} />
+                {/* <div id='settings'>
                     <div className='setting'>
                         <span>Staffline thickness:</span>
                         <input type="range" min={0.1} max={5} step={0.1} value={staffLineThickness} onChange={e => setStaffLineThickness(e.target.valueAsNumber)} />
@@ -478,7 +492,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
                         <input type="range" min={.5} max={1} step={0.1} value={verticalScale} onChange={e => setVerticalScale(e.target.valueAsNumber)} />
                         {verticalScale}
                     </div>
-                </div>
+                </div> */}
                 <button onClick={() => validate()}>Validate</button>
                 <button onClick={createBoundingBoxes}>Create Bounding Boxes</button>
                 <button onClick={getClassList}>Get Classlist</button>

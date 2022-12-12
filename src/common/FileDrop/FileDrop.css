@@ -1,0 +1,8 @@
+#area {
+  border-radius: 5px;
+  border: 3px dashed rgb(35, 35, 48);
+  font-size: small;
+  text-align: center;
+  padding: 10px;
+  margin-top: 10px;
+}
