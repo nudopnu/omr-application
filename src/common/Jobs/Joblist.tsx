@@ -5,7 +5,7 @@ interface JobListProps {
     jobs?: IJob[];
 }
 
-export function JobList({ jobs = [] }: JobListProps) {
+export function JobList({ jobs = [] }: JobListProps = {}) {
     const [, updateState] = React.useState({});
     const forceUpdate = React.useCallback(() => updateState({}), []);
 

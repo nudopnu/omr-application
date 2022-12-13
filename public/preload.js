@@ -31,6 +31,10 @@ contextBridge.exposeInMainWorld('page', {
     pdf2png: (url, name, dpi) => ipcRenderer.invoke('pdf2png', url, name, dpi),
 });
 
+contextBridge.exposeInMainWorld('file', {
+    readFile: (path) => ipcRenderer.invoke('READ_FILE', path),
+})
+
 provideBackgroundPython("jsontest");
 provideBackgroundPython("predict");
 provideBackgroundPython("highlight");

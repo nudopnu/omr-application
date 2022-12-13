@@ -39,16 +39,7 @@ let OutCounter = 1;
 
 export function AbcEditor({ abcLayers, addLayer }) {
     const [value, setValue] = useState<string>(sheets[0]);
-    const [jobs, setJobs] = useState<IJob[]>([
-        new ConversionJob('001.abc', () => new Promise((resolve, reject) => {
-            console.log("abc");
-            resolve('ABC');
-        })),
-        new ConversionJob('001.abc', () => new Promise((resolve, reject) => {
-            console.log("abc3");
-            resolve('ABC');
-        })),
-    ]);
+    const [jobs, setJobs] = useState<IJob[]>([]);
     const [hints, setHints] = useState<string[]>([]);
     const [checked, setChecked] = useState<boolean>(false);
     const [turbulenceFrequency, setTurbulenceFrequency] = useState<number>(0);
@@ -364,7 +355,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
         const abcElem = document.querySelector('.abcjs-container > svg') as HTMLElement;
 
         /* Needed to get svg-relative coordinate */
-        const [parentX, parentY, parentW, parentH] = (abcElem as any).getAttribute("viewBox")
+        const [, , parentW, parentH] = (abcElem as any).getAttribute("viewBox")
             .split(" ")
             .map(x => parseFloat(x));
 
@@ -427,6 +418,21 @@ export function AbcEditor({ abcLayers, addLayer }) {
         downloadAnchorNode.remove();
     }
 
+    function onFilesReceive(files: FileList) {
+        interface FileWithPath extends File {
+            path: string;
+        }
+
+        setJobs([...files].map(file => new ConversionJob(file.name, () => new Promise(async (resolve, reject) => {
+            const path = (file as FileWithPath).path
+            console.log(path);
+            const abc = await (window as any).file.readFile(path);
+            setAbcString(abc);
+            onClickGenerateXY(file.name.split(".")[0]);
+            resolve('done');
+        }))))
+    }
+
     useEffect(() => {
         const keys = AbcjsElementTypes
             .filter(key => AbcjsElements[key])
@@ -464,7 +470,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
                 <button onClick={onClickConvert}>Convert to PNG</button>
                 {/* <input type="text" value={name} /> */}
                 <button onClick={() => onClickGenerateXY()}>Generate XY</button>
-                <FileDrop instruction="Drop abc files here" />
+                <FileDrop instruction="Drop abc files here" onFilesReceive={onFilesReceive} />
                 <JobList jobs={jobs} />
                 {/* <div id='settings'>
                     <div className='setting'>
