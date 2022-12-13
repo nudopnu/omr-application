@@ -33,6 +33,7 @@ contextBridge.exposeInMainWorld('page', {
 
 contextBridge.exposeInMainWorld('file', {
     readFile: (path) => ipcRenderer.invoke('READ_FILE', path),
+    writeFile: (filename, content) => ipcRenderer.invoke('WRITE_FILE', filename, content),
 })
 
 provideBackgroundPython("jsontest");

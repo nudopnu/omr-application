@@ -4,7 +4,7 @@ import './Job.css';
 export interface IJob {
     name: string;
     state: JobState;
-    run: () => Promise<any>;
+    run: (params?) => Promise<any>;
 }
 
 export const JobStates = [
@@ -22,15 +22,6 @@ interface JobProps {
     job: IJob;
     requestRemoval: () => void;
     onStateChange: (job) => void;
-}
-
-export class ConversionJob implements IJob {
-    constructor(
-        public name: string,
-        public run: () => Promise<any>,
-        public state = 'Default' as JobState,
-    ) { }
-
 }
 
 export function Job({ job, requestRemoval, onStateChange }: JobProps) {

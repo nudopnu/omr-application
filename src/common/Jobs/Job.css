@@ -18,4 +18,5 @@
 button.inline {
   background-color: hsl(0, 0%, 42%);
   height: 25px;
+  min-width: 65px;
 }

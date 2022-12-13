@@ -8,7 +8,7 @@ const { ipcMain } = require('electron');
 const { getModels, predict } = require('./python');
 const { startBackgroundProcess } = require('./background');
 const { onCapturing, onPdf2Png, onPrint } = require('./ipcMain/capturing');
-const { onReadFile } = require('./ipcMain/file');
+const { onReadFile, onWriteFile } = require('./ipcMain/file');
 const { IPC } = require('./ipcMain/utils');
 
 let mainWindow;
@@ -33,6 +33,7 @@ function createWindow() {
   ipcMain.handle(...IPC('pdf2png', onPdf2Png));
   ipcMain.handle(...IPC('capture', onCapturing));
   ipcMain.handle(...IPC('READ_FILE', onReadFile));
+  ipcMain.handle(...IPC('WRITE_FILE', onWriteFile));
   startBackgroundProcess("highlight");
   startBackgroundProcess("jsontest");
   startBackgroundProcess("predict");

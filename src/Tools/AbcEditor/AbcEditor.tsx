@@ -12,7 +12,8 @@ import { ThesisClasses } from "../../lib/ElementClasses/ThesisClasses";
 import { BBox } from "../../lib/BBox";
 import { FileDrop } from "../../common/FileDrop/FileDrop";
 import { JobList } from "../../common/Jobs/Joblist";
-import { ConversionJob, IJob } from "../../common/Jobs/Job";
+import { IJob } from "../../common/Jobs/Job";
+import { ConversionJob } from "../../common/Jobs/ConversionJob";
 
 const sheets = [
     `X:1
@@ -351,7 +352,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
 
     }
 
-    function createBoundingBoxes() {
+    function createBoundingBoxes(filename?: string) {
         const abcElem = document.querySelector('.abcjs-container > svg') as HTMLElement;
 
         /* Needed to get svg-relative coordinate */
@@ -367,7 +368,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
         /* Create bounding boxes */
         const bboxes: BBox[] = [];
         let bboxContainer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        let id = 0;
+        let id = 1;
         relevantClasses.forEach(key => {
             const { selector } = AbcjsElements[key]!;
             selector.query(abcElem).forEach((elem, idx) => {
@@ -388,12 +389,18 @@ export function AbcEditor({ abcLayers, addLayer }) {
                 [y, height] = [y, height].map(e => (e / parentH) * heightFactor);
                 cx = x + width / 2;
                 cy = y + height / 2;
-                res = { id: id++, type: key, x: x, y: y, width: width, height: height, cx: cx, cy: cy } as BBox;
+                res = { id: id, type: key, x: x, y: y, width: width, height: height, cx: cx, cy: cy, instanceColor: `#${id.toString(16).padStart(6, '0')}` } as BBox;
+                id++;
                 bboxes.push(res);
             });
         })
         abcElem.appendChild(bboxContainer);
         console.log(bboxes);
+
+        if (filename) {
+            (window as any).file.writeFile(filename, JSON.stringify(bboxes));
+            return;
+        }
 
         /* Download as JSON */
         let data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(bboxes));
@@ -404,10 +411,15 @@ export function AbcEditor({ abcLayers, addLayer }) {
         downloadAnchorNode.remove();
     }
 
-    function getClassList() {
+    function getClassList(filename?: string) {
         const json = relevantClasses
             .sort((a, b) => AbcjsElements[a]!.id - AbcjsElements[b]!.id)
             .map((c, idx) => ({ class: c, color: AbcjsElements[c]?.colors[1], dsid: AbcjsElements[c]?.id, id: idx + 1 }));
+
+        if (filename) {
+            (window as any).file.writeFile(filename, JSON.stringify(json));
+            return;
+        }
 
         /* Download as JSON */
         let data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(json));
@@ -427,8 +439,10 @@ export function AbcEditor({ abcLayers, addLayer }) {
             const path = (file as FileWithPath).path
             console.log(path);
             const abc = await (window as any).file.readFile(path);
-            setAbcString(abc);
-            onClickGenerateXY(file.name.split(".")[0]);
+            await setAbcString(abc);
+            await onClickGenerateXY(file.name.split(".")[0]);
+            createBoundingBoxes(file.name.split(".")[0] + ".json");
+            console.log(file.name + "done!");
             resolve('done');
         }))))
     }
@@ -449,7 +463,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
     useEffect(() => {
         abcjs.renderAbc('abc-content', value, abcOptions);
         postProcess();
-    }, [])
+    }, []);
 
     return (
         <div id="abc-editor">
@@ -500,8 +514,8 @@ export function AbcEditor({ abcLayers, addLayer }) {
                     </div>
                 </div> */}
                 <button onClick={() => validate()}>Validate</button>
-                <button onClick={createBoundingBoxes}>Create Bounding Boxes</button>
-                <button onClick={getClassList}>Get Classlist</button>
+                <button onClick={() => createBoundingBoxes()}>Create Bounding Boxes</button>
+                <button onClick={() => getClassList()}>Get Classlist</button>
                 <div id="hints">{hints.map((hint, idx) => <div key={idx}>{hint}</div>)}</div>
             </div>
         </div>
