@@ -430,6 +430,34 @@ export function AbcEditor({ abcLayers, addLayer }) {
         downloadAnchorNode.remove();
     }
 
+    function downloadSVGFile() {
+        const svg = document.querySelector('.abcjs-inner > svg')!;
+
+        //get svg source.
+        var serializer = new XMLSerializer();
+        var source = serializer.serializeToString(svg);
+
+        //add name spaces.
+        if (!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
+            source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+        }
+        if (!source.match(/^<svg[^>]+"http\:\/\/www\.w3\.org\/1999\/xlink"/)) {
+            source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
+        }
+
+        //add xml declaration
+        source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
+
+        //convert svg source to URI data scheme.
+        var url = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(source);
+
+        let downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute('href', url);
+        downloadAnchorNode.setAttribute('download', 'sheet.svg');
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+    }
+
     function onFilesReceive(files: FileList) {
         interface FileWithPath extends File {
             path: string;
@@ -516,6 +544,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
                 <button onClick={() => validate()}>Validate</button>
                 <button onClick={() => createBoundingBoxes()}>Create Bounding Boxes</button>
                 <button onClick={() => getClassList()}>Get Classlist</button>
+                <button onClick={() => downloadSVGFile()}>Download SVG</button>
                 <div id="hints">{hints.map((hint, idx) => <div key={idx}>{hint}</div>)}</div>
             </div>
         </div>
