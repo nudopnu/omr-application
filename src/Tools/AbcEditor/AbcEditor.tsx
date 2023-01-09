@@ -351,6 +351,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
             const { selector } = AbcjsElements[key]!;
             selector.query(abcElem).forEach(elem => {
                 (elem as HTMLElement).style.color = flag ? getColor(key, idx++) : '';
+                console.log((elem as HTMLElement).style.color);
             });
         });
 
@@ -392,7 +393,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
                 const systemId = getSystemId(elem);
                 console.log(systemId);
                 
-                let res = { id: id++, type: classname, x: x, y: y, width: width, height: height, cx: cx, cy: cy, systemId: systemId } as BBox;
+                let res = { id: id, type: classname, x: x, y: y, width: width, height: height, cx: cx, cy: cy, systemId: systemId } as BBox;
 
                 /* Draw rect around it */
                 let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
