@@ -40,6 +40,7 @@ export function JobList({ jobs = [] }: JobListProps = {}) {
                         job={job}
                         requestRemoval={() => remove(idx)}
                         onStateChange={console.log}
+                        settings={settings}
                     />
                 ))
             }
@@ -61,7 +62,7 @@ export function JobList({ jobs = [] }: JobListProps = {}) {
             job.state = 'Running';
             forceUpdate();
             try {
-                await job.run();
+                await job.run(settings);
                 job.state = 'Done';
                 forceUpdate();
             } catch (error) {

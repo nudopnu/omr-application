@@ -5,4 +5,5 @@ export interface BBox {
     cy: number;
     width: number;
     height: number;
+    systemId: number;
 }

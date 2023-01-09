@@ -93,6 +93,10 @@ export function AbcEditor({ abcLayers, addLayer }) {
             elem.replaceWith(...children);
         });
 
+        /* Assign System numbers */
+        document.querySelectorAll("svg > g")
+            .forEach((e, idx) => e.setAttribute("system", idx.toString()));
+
         setHints(["Postprocessing completed."]);
     }
 
@@ -352,6 +356,14 @@ export function AbcEditor({ abcLayers, addLayer }) {
 
     }
 
+    function getSystemId(elem): number {
+        if (!elem.parentElement || elem.parentElement.tagName === "svg")
+            return -1;
+        if (elem.parentElement.hasAttribute("system"))
+            return elem.parentElement.getAttribute("system");
+        return getSystemId(elem.parentElement);
+    }
+
     function createBoundingBoxes(filename?: string) {
         const abcElem = document.querySelector('.abcjs-container > svg') as HTMLElement;
 
@@ -369,13 +381,20 @@ export function AbcEditor({ abcLayers, addLayer }) {
         const bboxes: BBox[] = [];
         let bboxContainer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         let id = 1;
-        relevantClasses.forEach(key => {
-            const { selector } = AbcjsElements[key]!;
+        relevantClasses.forEach(classname => {
+            const { selector } = AbcjsElements[classname]!;
             selector.query(abcElem).forEach((elem, idx) => {
+
+                /* Get bounding box data */
                 let { x, y, width, height } = (elem as any).getBBox();
                 let cx = x + width / 2;
                 let cy = y + height / 2;
-                let res = { id: id++, type: key, x: x, y: y, width: width, height: height, cx: cx, cy: cy } as BBox;
+                const systemId = getSystemId(elem);
+                console.log(systemId);
+                
+                let res = { id: id++, type: classname, x: x, y: y, width: width, height: height, cx: cx, cy: cy, systemId: systemId } as BBox;
+
+                /* Draw rect around it */
                 let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
                 rect.setAttribute('x', x);
                 rect.setAttribute('y', y);
@@ -385,11 +404,12 @@ export function AbcEditor({ abcLayers, addLayer }) {
                 rect.setAttribute('stroke', '#00a');
                 bboxContainer.appendChild(rect);
 
+                /* Make coordinates relative to parent */
                 [x, width] = [x, width].map(e => e / parentW);
                 [y, height] = [y, height].map(e => (e / parentH) * heightFactor);
                 cx = x + width / 2;
                 cy = y + height / 2;
-                res = { id: id, type: key, x: x, y: y, width: width, height: height, cx: cx, cy: cy, instanceColor: `#${id.toString(16).padStart(6, '0')}` } as BBox;
+                res = { id: id, type: classname, x: x, y: y, width: width, height: height, cx: cx, cy: cy, instanceColor: `#${id.toString(16).padStart(6, '0')}`, systemId: systemId } as BBox;
                 id++;
                 bboxes.push(res);
             });
@@ -397,12 +417,13 @@ export function AbcEditor({ abcLayers, addLayer }) {
         abcElem.appendChild(bboxContainer);
         console.log(bboxes);
 
+        /* Save as file if filename provided */
         if (filename) {
             (window as any).file.writeFile(filename, JSON.stringify(bboxes));
             return;
         }
 
-        /* Download as JSON */
+        /* Download as JSON otherwise */
         let data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(bboxes));
         let downloadAnchorNode = document.createElement('a');
         downloadAnchorNode.setAttribute('href', data);
@@ -463,13 +484,16 @@ export function AbcEditor({ abcLayers, addLayer }) {
             path: string;
         }
 
-        setJobs([...files].map(file => new ConversionJob(file.name, () => new Promise(async (resolve, reject) => {
+        setJobs([...files].map(file => new ConversionJob(file.name, (settings) => new Promise(async (resolve, reject) => {
             const path = (file as FileWithPath).path
             console.log(path);
             const abc = await (window as any).file.readFile(path);
+            console.log(settings)
             await setAbcString(abc);
-            await onClickGenerateXY(file.name.split(".")[0]);
-            createBoundingBoxes(file.name.split(".")[0] + ".json");
+            if (settings.PDF.enabled)
+                await onClickGenerateXY(file.name.split(".")[0]);
+            if (settings.BOUNDING_BOX.enabled)
+                createBoundingBoxes(file.name.split(".")[0] + ".json");
             console.log(file.name + "done!");
             resolve('done');
         }))))

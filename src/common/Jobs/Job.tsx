@@ -1,10 +1,11 @@
 import React from 'react';
+import { ConversionJobSettings } from './ConversionJob';
 import './Job.css';
 
 export interface IJob {
     name: string;
     state: JobState;
-    run: (params?) => Promise<any>;
+    run: (settings: ConversionJobSettings) => Promise<any>;
 }
 
 export const JobStates = [
@@ -22,14 +23,15 @@ interface JobProps {
     job: IJob;
     requestRemoval: () => void;
     onStateChange: (job) => void;
+    settings: ConversionJobSettings;
 }
 
-export function Job({ job, requestRemoval, onStateChange }: JobProps) {
+export function Job({ job, requestRemoval, onStateChange, settings }: JobProps) {
 
     async function onClickRun() {
         job.state = 'Running';
         try {
-            await job.run();
+            await job.run(settings);
         } catch (error) {
             job.state = 'Error';
         }
