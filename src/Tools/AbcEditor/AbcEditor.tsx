@@ -389,47 +389,28 @@ export function AbcEditor({ abcLayers, addLayer }) {
 
         /* Create bounding boxes */
         const bboxes: BBox[] = [];
-        let bboxContainer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        const bboxContainer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         let alreadyVisited = new Set();
         relevantClasses
             .sort(elem => AbcjsElements[elem]!.id)
             .forEach(classname => {
                 const { selector } = AbcjsElements[classname]!;
                 selector.query(abcElem).forEach((elem, idx) => {
-
-                    if (alreadyVisited.has(elem))
-                        return;
-
-                    /* Get bounding box data */
-                    let { x, y, width, height } = (elem as any).getBBox();
-                    let cx = x + width / 2;
-                    let cy = y + height / 2;
+                    if (alreadyVisited.has(elem)) return;
                     const systemId = getSystemId(elem);
                     const elemId = parseInt(elem.getAttribute("elem-id")!)
-                    console.log(systemId);
-
-                    let res = { id: elemId, type: classname, x: x, y: y, width: width, height: height, cx: cx, cy: cy, systemId: systemId } as BBox;
-
-                    /* Draw rect around it */
-                    let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                    rect.setAttribute('x', x);
-                    rect.setAttribute('y', y);
-                    rect.setAttribute('width', width);
-                    rect.setAttribute('height', height);
-                    rect.setAttribute('fill', 'none');
-                    rect.setAttribute('stroke', '#00a');
-                    bboxContainer.appendChild(rect);
-
-                    /* Make coordinates relative to parent */
-                    [x, width] = [x, width].map(e => e / parentW);
-                    [y, height] = [y, height].map(e => (e / parentH) * heightFactor);
-                    cx = x + width / 2;
-                    cy = y + height / 2;
-                    res = { id: elemId, type: classname, x: x, y: y, width: width, height: height, cx: cx, cy: cy, instanceColor: `#${elemId.toString(16).padStart(6, '0')}`, systemId: systemId } as BBox;
+                    let res = createBoundingBox(elem, elemId, classname, systemId, bboxContainer, parentW, parentH, heightFactor);
                     bboxes.push(res);
                     alreadyVisited.add(elem);
                 });
             })
+        abcElem.querySelectorAll("[system]").forEach(elem => {
+            const systemId = parseInt(elem.getAttribute("system")!);
+            let res = createBoundingBox((elem as HTMLElement), systemId, "System", systemId, bboxContainer, parentW, parentH, heightFactor);
+            bboxes.push(res);
+            console.log(res);
+            
+        });
         abcElem.appendChild(bboxContainer);
         console.log(bboxes);
 
@@ -446,6 +427,32 @@ export function AbcEditor({ abcLayers, addLayer }) {
         downloadAnchorNode.setAttribute('download', 'bboxes.json');
         downloadAnchorNode.click();
         downloadAnchorNode.remove();
+    }
+
+    function createBoundingBox(elem: HTMLElement, elemId: number, classname: string, systemId: number, bboxContainer: SVGGElement, parentW: any, parentH: any, heightFactor: number) {
+        /* Get bounding box data */
+        let { x, y, width, height } = (elem as any).getBBox();
+        let cx = x + width / 2;
+        let cy = y + height / 2;
+        let res = { id: elemId, type: classname, x: x, y: y, width: width, height: height, cx: cx, cy: cy, systemId: systemId } as BBox;
+
+        /* Draw rect around it */
+        let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('x', x);
+        rect.setAttribute('y', y);
+        rect.setAttribute('width', width);
+        rect.setAttribute('height', height);
+        rect.setAttribute('fill', 'none');
+        rect.setAttribute('stroke', '#00a');
+        bboxContainer.appendChild(rect);
+
+        /* Make coordinates relative to parent */
+        [x, width] = [x, width].map(e => e / parentW);
+        [y, height] = [y, height].map(e => (e / parentH) * heightFactor);
+        cx = x + width / 2;
+        cy = y + height / 2;
+        res = { id: elemId, type: classname, x: x, y: y, width: width, height: height, cx: cx, cy: cy, instanceColor: `#${elemId.toString(16).padStart(6, '0')}`, systemId: systemId } as BBox;
+        return res;
     }
 
     function getClassList(filename?: string) {
