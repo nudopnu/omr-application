@@ -13,10 +13,10 @@ export class DefaultSelector implements ISelector {
     }
 
     query(root: HTMLElement, filter = (elem, idx?) => true): HTMLElement[] {
-        return [
+        return [...new Set([
             ...[...root.querySelectorAll(this.queryString)].filter(filter),
             ...this.queryClass(root),
-        ] as HTMLElement[];
+        ])] as HTMLElement[];
     }
 }
 

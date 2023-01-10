@@ -97,6 +97,16 @@ export function AbcEditor({ abcLayers, addLayer }) {
         document.querySelectorAll("svg > g")
             .forEach((e, idx) => e.setAttribute("system", idx.toString()));
 
+        let idx = 1;
+        relevantClasses.forEach(key => {
+            const { selector } = AbcjsElements[key]!;
+            [...new Set(selector.query(abcElem))].forEach(elem => {
+                if (elem.hasAttribute("elem-id"))
+                    return
+                elem.setAttribute("elem-id", (idx++).toString());
+            });
+        })
+
         setHints(["Postprocessing completed."]);
     }
 
@@ -351,7 +361,6 @@ export function AbcEditor({ abcLayers, addLayer }) {
             const { selector } = AbcjsElements[key]!;
             selector.query(abcElem).forEach(elem => {
                 (elem as HTMLElement).style.color = flag ? getColor(key, idx++) : '';
-                console.log((elem as HTMLElement).style.color);
             });
         });
 
@@ -381,40 +390,46 @@ export function AbcEditor({ abcLayers, addLayer }) {
         /* Create bounding boxes */
         const bboxes: BBox[] = [];
         let bboxContainer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        let id = 1;
-        relevantClasses.forEach(classname => {
-            const { selector } = AbcjsElements[classname]!;
-            selector.query(abcElem).forEach((elem, idx) => {
+        let alreadyVisited = new Set();
+        relevantClasses
+            .sort(elem => AbcjsElements[elem]!.id)
+            .forEach(classname => {
+                const { selector } = AbcjsElements[classname]!;
+                selector.query(abcElem).forEach((elem, idx) => {
 
-                /* Get bounding box data */
-                let { x, y, width, height } = (elem as any).getBBox();
-                let cx = x + width / 2;
-                let cy = y + height / 2;
-                const systemId = getSystemId(elem);
-                console.log(systemId);
-                
-                let res = { id: id, type: classname, x: x, y: y, width: width, height: height, cx: cx, cy: cy, systemId: systemId } as BBox;
+                    if (alreadyVisited.has(elem))
+                        return;
 
-                /* Draw rect around it */
-                let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                rect.setAttribute('x', x);
-                rect.setAttribute('y', y);
-                rect.setAttribute('width', width);
-                rect.setAttribute('height', height);
-                rect.setAttribute('fill', 'none');
-                rect.setAttribute('stroke', '#00a');
-                bboxContainer.appendChild(rect);
+                    /* Get bounding box data */
+                    let { x, y, width, height } = (elem as any).getBBox();
+                    let cx = x + width / 2;
+                    let cy = y + height / 2;
+                    const systemId = getSystemId(elem);
+                    const elemId = parseInt(elem.getAttribute("elem-id")!)
+                    console.log(systemId);
 
-                /* Make coordinates relative to parent */
-                [x, width] = [x, width].map(e => e / parentW);
-                [y, height] = [y, height].map(e => (e / parentH) * heightFactor);
-                cx = x + width / 2;
-                cy = y + height / 2;
-                res = { id: id, type: classname, x: x, y: y, width: width, height: height, cx: cx, cy: cy, instanceColor: `#${id.toString(16).padStart(6, '0')}`, systemId: systemId } as BBox;
-                id++;
-                bboxes.push(res);
-            });
-        })
+                    let res = { id: elemId, type: classname, x: x, y: y, width: width, height: height, cx: cx, cy: cy, systemId: systemId } as BBox;
+
+                    /* Draw rect around it */
+                    let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    rect.setAttribute('x', x);
+                    rect.setAttribute('y', y);
+                    rect.setAttribute('width', width);
+                    rect.setAttribute('height', height);
+                    rect.setAttribute('fill', 'none');
+                    rect.setAttribute('stroke', '#00a');
+                    bboxContainer.appendChild(rect);
+
+                    /* Make coordinates relative to parent */
+                    [x, width] = [x, width].map(e => e / parentW);
+                    [y, height] = [y, height].map(e => (e / parentH) * heightFactor);
+                    cx = x + width / 2;
+                    cy = y + height / 2;
+                    res = { id: elemId, type: classname, x: x, y: y, width: width, height: height, cx: cx, cy: cy, instanceColor: `#${elemId.toString(16).padStart(6, '0')}`, systemId: systemId } as BBox;
+                    bboxes.push(res);
+                    alreadyVisited.add(elem);
+                });
+            })
         abcElem.appendChild(bboxContainer);
         console.log(bboxes);
 
