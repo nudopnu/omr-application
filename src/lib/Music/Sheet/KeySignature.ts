@@ -40,6 +40,11 @@ export class KeySignature {
             return NoteGlyph.fromNote({ duration: duration, midi: midi } as Note, preferedAccidental);
         }
     }
+    
+    getNthNote(n: number, duration: number, octave = 5): NoteGlyph {
+        const midi = octave * 12 + this.relativeMidis[n];
+        return NoteGlyph.fromNote({ duration: duration, midi: midi } as Note);
+    }
 
     getChord(romanNumeral: RomanNumeral, type: ChordType, octave?: number, inversion = 0): Chord {
         let intervals: number[] = [];

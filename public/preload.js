@@ -38,4 +38,5 @@ contextBridge.exposeInMainWorld('file', {
 
 provideBackgroundPython("jsontest");
 provideBackgroundPython("predict");
+provideBackgroundPython("predict2");
 provideBackgroundPython("highlight");

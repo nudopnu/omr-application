@@ -178,6 +178,12 @@ export function AbcEditor({ abcLayers, addLayer }) {
         setAbcString(abc);
     }
 
+    function onClickMock() {
+        const sheet = SheetGenerator.generateMockSheet();
+        let abc = AbcConverter.fromSheet(sheet);
+        setAbcString(abc);
+    }
+
     function onClickGenerateOrnaments() {
         const sheet = SheetGenerator.generateOrnamentsSheet();
         let abc = AbcConverter.fromSheet(sheet);
@@ -555,6 +561,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
                 <button onClick={onClickGenerateRandom}>Random Piano Sheet</button>
                 <button onClick={onClickGenerateRandom2}>Random Piano Sheet V2</button>
                 <button onClick={onClickGenerateScale}>Scale Sheet</button>
+                <button onClick={onClickMock}>Mock Response</button>
                 <button onClick={onClickGenerateOrnaments}>Ornaments Sheet</button>
                 <button onClick={onClickConvert}>Convert to PNG</button>
                 {/* <input type="text" value={name} /> */}

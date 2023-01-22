@@ -18,6 +18,7 @@ export function ModelPicker({ getImage, addLayer }) {
         setIsModelLoaded(false);
         setLoadingModel(true);
         await window.predict.sendCommand("loadModel", modelName);
+        await window.predict2.sendCommand("loadModel", modelName);
         setIsModelLoaded(true);
         setLoadingModel(false);
 
@@ -42,6 +43,26 @@ export function ModelPicker({ getImage, addLayer }) {
         addLayer(newLayer);
     }
 
+    async function onRequestPrediction2() {
+
+        setPredicting(true);
+        let res = await window.predict2.sendCommand("predict", getImage());
+        setPredicting(false);
+
+        console.log(res);
+
+        // let dataUrl = "data:image/png;base64," + res.payload.slice(2, -1)
+        // console.log(dataUrl);
+
+        // const newLayer = {
+        //     type: 'base64ImageUrl',
+        //     name: 'Prediction',
+        //     visible: true,
+        //     src: dataUrl
+        // };
+        // addLayer(newLayer);
+    }
+
     /* on load */
     useEffect(() => {
         (async () => {
@@ -49,6 +70,7 @@ export function ModelPicker({ getImage, addLayer }) {
                 return;
             setHasInit(true);
             await window.predict.start();
+            await window.predict2.start();
             const modelnames = await window.python.getModels();
             setModelList(modelnames);
         })()
@@ -61,7 +83,10 @@ export function ModelPicker({ getImage, addLayer }) {
             {
                 (isPredicting && <Spinner text={"Predicting..."} />) ||
                 (isLoadingModel && <Spinner text={"Loading Model..."} />) ||
-                (isModelLoaded && <button onClick={_ => onRequestPrediction()}>Predict Classes</button>)
+                (isModelLoaded && <>
+                    <button onClick={_ => onRequestPrediction()}>Predict Classes (Legacy)</button>
+                    <button onClick={_ => onRequestPrediction2()}>Predict Classes</button>
+                </>)
             }
         </div>
     );

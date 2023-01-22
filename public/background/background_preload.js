@@ -6,7 +6,7 @@ const path = require('path');
 let pyshell;
 let log;
 
-function pythonBackgroundProcess(name) {
+function pythonBackgroundProcess(name, relative_path=undefined) {
 
     const READY_TO_MAIN = `${name.toLocaleUpperCase()}_READY`;
     const RESPONSE_TO_MAIN = `${name.toLocaleUpperCase()}_RESPONSE`;
@@ -19,7 +19,10 @@ function pythonBackgroundProcess(name) {
 
     contextBridge.exposeInMainWorld('api', {
         start: () => {
-            const processPath = path.join(__dirname, '..', '..', 'scripts', `${name}.py`);
+            let processPath = path.join(__dirname, '..', '..', 'scripts', `${name}.py`);
+            if (relative_path) {
+                processPath = path.join(__dirname, relative_path, `${name}.py`);
+            }
             pyshell = new PythonShell(processPath, { mode: 'json' });
 
             // listen for python 
