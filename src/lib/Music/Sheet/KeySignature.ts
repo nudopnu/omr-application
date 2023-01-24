@@ -42,7 +42,9 @@ export class KeySignature {
     }
     
     getNthNote(n: number, duration: number, octave = 5): NoteGlyph {
-        const midi = octave * 12 + this.relativeMidis[n];
+        const octave_offset: number = Math.floor(n / 7);
+        n = (n + Math.abs(octave_offset) * 7) % 7;
+        const midi = (octave + octave_offset) * 12 + this.relativeMidis[n];
         return NoteGlyph.fromNote({ duration: duration, midi: midi } as Note);
     }
 

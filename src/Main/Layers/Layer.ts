@@ -7,5 +7,11 @@ export class ImageLayer implements Layer {
     src: string = "";
 }
 
+export class AbcLayer implements Layer {
+    readonly type: string = 'abcNotation';
+    notation: string = "";
+}
+
 export type LayerUT =
-    ImageLayer;
+    ImageLayer
+    | AbcLayer;

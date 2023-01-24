@@ -58,7 +58,7 @@ function App() {
 
   async function deleteLayer(index) {
     if (layers[index].type === 'base64ImageUrl') {
-      const remainingImages: ImageLayer[] = layers.filter(layer => layer.type === 'base64ImageUrl');
+      const remainingImages: ImageLayer[] = layers.filter(layer => layer.type === 'base64ImageUrl') as ImageLayer[];
       if (remainingImages.length > 0) {
         setImage(remainingImages[0].src);
         const canvas = await uriToCanvas(remainingImages[0].src);

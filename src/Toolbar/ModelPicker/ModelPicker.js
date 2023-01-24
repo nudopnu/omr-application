@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { List } from "../../common/List";
 import { Spinner } from "../../common/Spinner/Spinner";
 import './ModelPicker.css'
+import { SheetGenerator } from '../../lib/Music/SheetGenerator/SheetGenerator';
+import { AbcConverter } from '../../lib/Music/AbcUtils/AbcConverter';
 
 export function ModelPicker({ getImage, addLayer }) {
     /* State variables */
@@ -50,6 +52,19 @@ export function ModelPicker({ getImage, addLayer }) {
         setPredicting(false);
 
         console.log(res);
+        let sheetData = JSON.parse(res.payload.replaceAll("'", '"'))
+        console.log(sheetData);
+
+        const sheet = SheetGenerator.generateMockSheet(sheetData);
+        let abc = AbcConverter.fromSheet(sheet);
+
+        const newLayer = {
+            type: 'abc-render',
+            name: 'ABC-Render',
+            visible: true,
+            notation: abc
+        };
+        addLayer(newLayer);
 
         // let dataUrl = "data:image/png;base64," + res.payload.slice(2, -1)
         // console.log(dataUrl);

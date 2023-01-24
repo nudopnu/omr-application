@@ -17,12 +17,12 @@ import { ResponseNoteGlyph } from "./Response";
 
 export class SheetGenerator {
 
-    static generateMockSheet() {
+    static generateMockSheet(response = MockResponse) {
         const sheet = new Sheet();
         const CIonian = new KeySignature('C', 'Ionian');
+        console.log(CIonian);
 
-        MockResponse.forEach(staffs => {
-            console.log(staffs);
+        response.forEach(staffs => {
 
             if (staffs.length > 1) {
                 sheet.options.systemType = "grand-staff";
@@ -30,32 +30,61 @@ export class SheetGenerator {
             const system = sheet.addSystem();
 
             staffs.forEach((staff_glyphs, idx) => {
-                if (staff_glyphs[0].type === "ClefG") {
+                const isTreble = staff_glyphs[0].type === "ClefG";
+                if (isTreble) {
                     system.getStaff(idx).setClef("treble");
                 } else if (staff_glyphs[0].type === "ClefF") {
                     system.getStaff(idx).setClef("bass");
                 }
+                let lastBeamGroup = -2;
                 staff_glyphs.forEach(glyph => {
                     if (glyph.type === "half") {
                         const pitches = (glyph as ResponseNoteGlyph).pitches;
-                        const notes: NoteGlyph[] = NoteGlyph.fromMidis(pitches.map(pitch => pitch + 60), pitches.map(_ => 3));
+                        let offset = - 11;
+                        if (isTreble) {
+                            offset = 1;
+                        }
+                        const notes: NoteGlyph[] = pitches.map(pitch => CIonian.getNthNote(pitch + offset, 3));//NoteGlyph.fromMidis(pitches.map(pitch => pitch + 60), pitches.map(_ => 3));
                         const chordGlyph: ChordGlyph = ChordGlyph.fromNotes(notes);
                         system.getStaff(idx).addChordGlyphs([chordGlyph])
                     }
                     else if (glyph.type === "black") {
                         let duration = 2;
 
-                        if ((glyph as ResponseNoteGlyph).beamgroup !== "-1") {
+                        const beamgroup = (glyph as ResponseNoteGlyph).beamgroup;
+                        if (beamgroup !== -1) {
                             duration = 1;
-                            console.log((glyph as ResponseNoteGlyph).beamgroup);
+                        } else {
+                            lastBeamGroup = -1;
                         }
                         const pitches = (glyph as ResponseNoteGlyph).pitches;
-                        const notes: NoteGlyph[] = pitches.map(pitch => CIonian.getNthNote(pitch, duration));
+                        let offset = - 11;
+                        if (isTreble) {
+                            offset = 1;
+                        }
+
+                        const notes: NoteGlyph[] = pitches.map(pitch => CIonian.getNthNote(pitch + offset, duration));
                         const chordGlyph: ChordGlyph = ChordGlyph.fromNotes(notes);
+
+                        if (beamgroup !== -1) {
+                            if (lastBeamGroup === beamgroup) {
+                                chordGlyph.beam = "MIDDLE";
+                            } else {
+                                chordGlyph.beam = "START";
+                            }
+                            lastBeamGroup = beamgroup;
+                        } else {
+                            lastBeamGroup = -1;
+                        }
+
                         system.getStaff(idx).addChordGlyphs([chordGlyph])
                     }
                     else if (glyph.type === "RestWhole") {
                         const restGlyph: RestGlyph = new RestGlyph(4);
+                        system.getStaff(idx).addGlyphs([restGlyph])
+                    }
+                    else if (glyph.type === "RestQuarter") {
+                        const restGlyph: RestGlyph = new RestGlyph(2);
                         system.getStaff(idx).addGlyphs([restGlyph])
                     }
                 });
