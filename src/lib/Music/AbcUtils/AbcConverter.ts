@@ -73,6 +73,10 @@ export class AbcConverter {
         else if (glyph.type === "key") {
             res += ` [K:${glyph.key.key} ${glyph.key.mode} clef=${glyph.clef}] `
         }
+        else if (glyph.type === "void") {
+            res += ` x`
+            res += this.durationToString(glyph.duration, false);
+        }
         return res
     }
 

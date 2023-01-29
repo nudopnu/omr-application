@@ -5,7 +5,7 @@ import { BarLineType } from "../Sheet/BarLine";
 import { DecorationTypes } from "../Sheet/Decoration";
 import { Duration } from "../Sheet/Duration";
 import { Dynamic, Dynamics } from "../Sheet/Dynamics";
-import { BarLineGlyph, ChordGlyph, GlyphTypes, GlyphWithDuration, KeyGlyph, MeterGlyph, MultiMeasureRest, NoteGlyph, RestGlyph } from "../Sheet/Glyph";
+import { BarLineGlyph, ChordGlyph, GlyphTypes, GlyphWithDuration, KeyGlyph, MeterGlyph, MultiMeasureRest, NoteGlyph, RestGlyph, VoidGlyph } from "../Sheet/Glyph";
 import { GraceNote } from "../Sheet/GraceNote";
 import { KeySignature } from "../Sheet/KeySignature";
 import { Sheet } from "../Sheet/Sheet";
@@ -37,7 +37,11 @@ export class SheetGenerator {
                     system.getStaff(idx).setClef("bass");
                 }
                 let lastBeamGroup = -2;
+
+                /* Add glyphs to staff */
                 staff_glyphs.forEach(glyph => {
+
+                    /* Determine glyph type */
                     if (glyph.type === "half") {
                         const pitches = (glyph as ResponseNoteGlyph).pitches;
                         let offset = - 11;
@@ -88,7 +92,34 @@ export class SheetGenerator {
                         system.getStaff(idx).addGlyphs([restGlyph])
                     }
                 });
-            })
+            });
+            if (system.staffs.length > 1) {
+                const maxSum = new Map<number, number>();
+                const sums = system.staffs.map(staff => {
+                    const sum = new Map<number, number>();
+                    let durationGlyphs = staff.glyphs.filter(glyph => glyph.type === 'chord' || glyph.type === 'rest')
+                    durationGlyphs.forEach(glyph => {
+                        const duration = (glyph as ChordGlyph).duration;
+                        const newLocal = sum.get(duration) === undefined ? 0 : sum.get(duration);
+                        sum.set(duration, newLocal! + 1);
+                    });
+                    sum.forEach((v, k) => {
+                        if (!maxSum.has(k) || v > maxSum.get(k)!) {
+                            maxSum.set(k, v);
+                        }
+                    })
+                    return sum;
+                });
+                sums
+                    .forEach((sum, idx) => {
+                        sum.forEach((v, k) => {
+                            const diff = maxSum.get(k)! - v;
+                            if (diff > 0) {
+                                system.getStaff(idx).addGlyphs([new VoidGlyph(k)]);
+                            }
+                        })
+                    });
+            }
         })
         return sheet;
     }

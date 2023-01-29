@@ -99,8 +99,8 @@ export function ModelPicker({ getImage, addLayer }) {
                 (isPredicting && <Spinner text={"Predicting..."} />) ||
                 (isLoadingModel && <Spinner text={"Loading Model..."} />) ||
                 (isModelLoaded && <>
-                    <button onClick={_ => onRequestPrediction()}>Predict Classes (Legacy)</button>
-                    <button onClick={_ => onRequestPrediction2()}>Predict Classes</button>
+                    <button onClick={_ => onRequestPrediction()}>Predict Classes</button>
+                    <button onClick={_ => onRequestPrediction2()}>Read Sheet Music</button>
                 </>)
             }
         </div>

@@ -20,6 +20,7 @@ export const GlyphTypes = [
     'key',
     'meter',
     'n-tuplet',
+    'void',
 ] as const;
 
 export type GlyphType = typeof GlyphTypes[number];
@@ -33,7 +34,14 @@ export const PartTypes = [
 export type PartType = typeof PartTypes[number];
 
 export interface IGlyph {
-    type: GlyphType;
+    readonly type: GlyphType;
+}
+
+export class VoidGlyph implements IGlyph {
+    readonly type = 'void';
+    constructor(
+        public duration: number,
+    ) { }
 }
 
 export class NoteGlyph implements Note, IGlyph {
@@ -163,4 +171,5 @@ export type Glyph =
     | MultiMeasureRest
     | KeyGlyph
     | MeterGlyph
+    | VoidGlyph
     ;

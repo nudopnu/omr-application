@@ -22,6 +22,7 @@ let OutCounter = 1;
 export function AbcEditor({ abcLayers, addLayer }) {
     let initSheet = (abcLayers[0] as AbcLayer).notation;
     const [value, setValue] = useState<string>(initSheet);
+    const [visualObj, setVisObjects] = useState<any>(null);
     const [jobs, setJobs] = useState<IJob[]>([]);
     const [hints, setHints] = useState<string[]>([]);
     const [checked, setChecked] = useState<boolean>(false);
@@ -30,6 +31,78 @@ export function AbcEditor({ abcLayers, addLayer }) {
     const [staffLineThickness, setStaffLineThickness] = useState<number>(1);
     const [verticalScale, setVerticalScale] = useState<number>(1);
     const [rotation, setRotation] = useState<number>(0);
+
+    // This object is the class that will contain the buffer
+    let midiBuffer;
+
+
+    function startAudio() {
+        var startAudioButton = document.querySelector(".activate-audio")!;
+        var stopAudioButton = document.querySelector(".stop-audio")!;
+        var statusDiv = document.querySelector(".status")!;
+        var audioError = document.querySelector(".audio-error")!;
+
+        startAudioButton!.setAttribute("style", "display:none;");
+        // statusDiv!.innerHTML = "<div>Testing browser</div>";
+        if (abcjs.synth.supportsAudio()) {
+            stopAudioButton.setAttribute("style", "");
+
+            // An audio context is needed - this can be passed in for two reasons:
+            // 1) So that you can share this audio context with other elements on your page.
+            // 2) So that you can create it during a user interaction so that the browser doesn't block the sound.
+            // Setting this is optional - if you don't set an audioContext, then abcjs will create one.
+            var audioContext = new window.AudioContext();
+            audioContext.resume().then(function () {
+                // statusDiv.innerHTML += "<div>AudioContext resumed</div>";
+                // In theory the AC shouldn't start suspended because it is being initialized in a click handler, but iOS seems to anyway.
+
+                // This does a bare minimum so this object could be created in advance, or whenever convenient.
+                midiBuffer = new abcjs.synth.CreateSynth();
+
+                // midiBuffer.init preloads and caches all the notes needed. There may be significant network traffic here.
+                console.log(visualObj);
+                
+                return midiBuffer.init({
+                    visualObj: visualObj,
+                    audioContext: audioContext,
+                    millisecondsPerMeasure: visualObj.millisecondsPerMeasure()
+                }).then(function (response) {
+                    console.log("Notes loaded: ", response)
+                    // statusDiv.innerHTML += "<div>Audio object has been initialized</div>";
+                    // console.log(response); // this contains the list of notes that were loaded.
+                    // midiBuffer.prime actually builds the output buffer.
+                    return midiBuffer.prime();
+                }).then(function (response) {
+                    // statusDiv.innerHTML += "<div>Audio object has been primed (" + response.duration + " seconds).</div>";
+                    // statusDiv.innerHTML += "<div>status = " + response.status + "</div>"
+                    // At this point, everything slow has happened. midiBuffer.start will return very quickly and will start playing very quickly without lag.
+                    midiBuffer.start();
+                    // statusDiv.innerHTML += "<div>Audio started</div>";
+                    return Promise.resolve();
+                }).catch(function (error) {
+                    if (error.status === "NotSupported") {
+                        stopAudioButton.setAttribute("style", "display:none;");
+                        var audioError = document.querySelector(".audio-error");
+                        audioError!.setAttribute("style", "");
+                    } else
+                        console.warn("synth error", error);
+                });
+            });
+        } else {
+            audioError = document.querySelector(".audio-error")!;
+            audioError.setAttribute("style", "");
+        }
+    };
+
+
+    function stopAudio() {
+        var startAudioButton = document.querySelector(".activate-audio")!;
+        var stopAudioButton = document.querySelector(".stop-audio")!;
+        startAudioButton.setAttribute("style", "");
+        stopAudioButton.setAttribute("style", "display:none;");
+        if (midiBuffer)
+            midiBuffer.stop();
+    }
 
     let definitionsRoot;
 
@@ -177,7 +250,8 @@ export function AbcEditor({ abcLayers, addLayer }) {
 
     function handleChange(event) {
         setValue(event.target.value);
-        abcjs.renderAbc('abc-content', event.target.value, abcOptions);
+        let visObjects = abcjs.renderAbc('abc-content', event.target.value, abcOptions);
+        setVisObjects(visObjects[0]);
         postProcess();
         setChecked(false);
         setHints(["Validation required."]);
@@ -187,7 +261,8 @@ export function AbcEditor({ abcLayers, addLayer }) {
         console.log(abc);
         setValue(abc);
         setChecked(false);
-        abcjs.renderAbc('abc-content', abc, abcOptions);
+        let visObjects = abcjs.renderAbc('abc-content', abc, abcOptions);
+        setVisObjects(visObjects[0]);
         postProcess();
         validate();
     }
@@ -400,7 +475,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
             let res = createBoundingBox((elem as HTMLElement), systemId, "System", systemId, bboxContainer, parentW, parentH, heightFactor);
             bboxes.push(res);
             console.log(res);
-            
+
         });
         abcElem.appendChild(bboxContainer);
         console.log(bboxes);
@@ -521,7 +596,8 @@ export function AbcEditor({ abcLayers, addLayer }) {
     }, [checked])
 
     useEffect(() => {
-        abcjs.renderAbc('abc-content', value, abcOptions);
+        const visObjs = abcjs.renderAbc('abc-content', value, abcOptions);
+        setVisObjects(visObjs[0]);
         postProcess();
     }, [turbulenceFrequency, turbulenceStrength, staffLineThickness, rotation, verticalScale]);
 
@@ -535,6 +611,17 @@ export function AbcEditor({ abcLayers, addLayer }) {
         <div id="abc-editor">
             <div id="abc-editor-inner">
                 <textarea value={value} onChange={handleChange} id="" cols={30} rows={10}></textarea>
+                {/* <p className="suspend-explanation">Browsers won't allow audio to work unless the audio is started in response to a
+                    user action. This prevents auto-playing web sites. Therefore, the
+                    following button is needed to do the initialization:</p> */}
+                <div className="row">
+                    <div>
+                        <button className="activate-audio" onClick={startAudio}>Play Tune</button>
+                        <button className="stop-audio" onClick={stopAudio} style={{ display: "none" }}>Stop Audio</button>
+                        <div className='audio-error' style={{ display: "none" }}>Audio is not supported in this browser.</div>
+                    </div>
+                    <div className="status"></div>
+                </div>
                 <label>
                     <input
                         type="checkbox"
