@@ -1,3 +1,3 @@
 import os
 
-print(os.listdir("../optical-music-recognition/models/"))
+print(os.listdir("../../models/"))

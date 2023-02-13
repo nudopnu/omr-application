@@ -12,11 +12,11 @@ const initialSettings: ConversionJobSettings = {
         enabled: true,
     },
     PNG: {
-        enabled: false,
+        enabled: true,
         limParallel: 3,
     },
     BOUNDING_BOX: {
-        enabled: false,
+        enabled: true,
     }
 };
 

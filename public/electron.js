@@ -25,7 +25,7 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
     }
   });
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
   ipcMain.handle('ping', () => 'poing');
   ipcMain.handle('get-models', () => getModels());
   ipcMain.handle(...IPC('predict', (modelname, img) => predict(modelname, img)));

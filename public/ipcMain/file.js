@@ -16,7 +16,7 @@ function onWriteFile(filename, content) {
     return new Promise((resolve, reject) => {
 
         /* Ensure output directories */
-        const outdir = `out`;
+        let outdir = "../../datasets/generated/bbox";
         if (!fs.existsSync(outdir))
             fs.mkdirSync(outdir);
         const path = outdir + "/" + filename;

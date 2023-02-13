@@ -482,7 +482,7 @@ export function AbcEditor({ abcLayers, addLayer }) {
 
         /* Save as file if filename provided */
         if (filename) {
-            (window as any).file.writeFile(filename, JSON.stringify(bboxes));
+            (window as any).file.writeFile(`${filename}`, JSON.stringify(bboxes));
             return;
         }
 
